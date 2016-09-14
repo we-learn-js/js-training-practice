@@ -1,0 +1,18 @@
+{
+  "name": "js-training-practice",
+  "version": "0.0.0",
+  "description": "JS Training practice project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soyundev/js-training-practice.git"
+  },
+  "author": "David Almeida <davidbarna@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/soyundev/js-training-practice/issues"
+  },
+  "homepage": "https://github.com/soyundev/js-training-practice#readme"
+}
