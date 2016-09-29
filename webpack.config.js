@@ -10,13 +10,9 @@ module.exports = {
   },
   plugins: [
     new CopyWebpackPlugin([{
-      from: './**/*.+(html)'
+      from: './**/*.+(html|json|css)'
     },{
-      from: '../node_modules/semantic-ui-css/semantic.min.js',
-      to: 'vendor/semantic.js'
-    },{
-      from: '../node_modules/semantic-ui-css/semantic.min.css',
-      to: 'vendor/semantic.css'
+      from: './vendor/**/*.*'
     }])
   ]
 };

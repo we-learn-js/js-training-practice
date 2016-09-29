@@ -1,3 +1,3 @@
 var quiz = require('./index')
 
-console.log(quiz)
+quiz(document.getElementById('quiz'), { url: 'data/quiz.json?' + Date.now() })
