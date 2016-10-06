@@ -119,8 +119,6 @@ quiz = function (element, options) {
         hljs.highlightBlock(block)
       })
 
-      // $questions.find('input').on('keypress', onValueChange)
-      // $questions.find('input').on('change', onValueChange)
       $questions.find('#question-' + currentQuestion).css('display', 'block')
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
     }
@@ -128,15 +126,21 @@ quiz = function (element, options) {
 
     if (responseCount === questions.length) {
       $('#submit-response').css('display', 'none')
-      $element.append('<div>Thank you for your responses.<br/><br/> </div>')
-      $element.append('<button class="ui primary button" onclick="window.print()">Print responses</button>')
+      $element.append('<div>Thank you for your responses.<br /><br /> </div>')
+      $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
     }
+
+    $resetButton = $('<button class="ui button negative">Reset</button>')
+    $resetButton.on('click', function(){
+      localStorage.removeItem('quiz')
+      location.reload();
+    })
+
+    $element.append($resetButton)
 
     $('#submit-response').on('click', function () {
       var $inputs = $('[name^=question_' + currentQuestion + ']')
       var question = questions[currentQuestion]
-
-      console.log($inputs)
 
       switch (question.input.type) {
         case 'checkbox':
@@ -181,7 +185,6 @@ quiz = function (element, options) {
 
       isQuestionAnswered = true
 
-      console.log('response', currentQuestion, responses[currentQuestion])
       if (!responses[currentQuestion]) {
         isQuestionAnswered = false
       }
@@ -203,8 +206,8 @@ quiz = function (element, options) {
 
         if (responseCount === questions.length) {
           $('#submit-response').css('display', 'none')
-          $element.append('<div>Exam filled in successfully. Thank you.</div>')
-          $element.append('<button>Print responses</button>')
+          $element.append('<div>Thank you for your responses.<br /><br /> </div>')
+          $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
         }
       }
 
