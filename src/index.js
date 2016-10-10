@@ -313,6 +313,4 @@ quiz = function (element, options) {
   })
 }
 
-
-
 module.exports = quiz
