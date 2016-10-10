@@ -1,5 +1,6 @@
-responseCount = 0
-currentQuestion = 0
+//responseCount = 0
+//currentQuestion = 0
+var QUIZ = 'quiz'
 
 function getFormHtml() {
   return $('<form class="ui form"></form>');
@@ -163,27 +164,54 @@ function getResponseCount(responses, questions) {
   return responseCount;
 }
 
-function printProgressBar(responses, questions) {
-  var responseCount = getResponseCount(responses, questions);
+function printProgressBar(quizData, questions) {
+  quizData.responseCount = getResponseCount(quizData.responses, questions);
 
-  $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+  $('#progress').css('width', (quizData.responseCount / questions.length * 100) + '%')
 }
 
-function printQuestionnaire (element, data) {
+function getQuizData() {
+  var quizData;
+
+  try {
+    quizData = JSON.parse(localStorage.getItem(QUIZ))
+  } catch (e) {}
+
+  if(quizData === null)
+    quizData = {}
+
+  quizData.responses = quizData.responses || []
+  quizData.currentQuestion = quizData.currentQuestion || 0
+  quizData.responseCount = quizData.responseCount || -1
+
+  return quizData;
+}
+
+function printSubmitButton($element) {
+  $element.append(GetButtonHtml())
+}
+
+function GetButtonHtml() {
+  return '<button id="submit-response" class="ui primary button">Submit response</button>';
+}
+
+function CheckQuizFinished(quizData, data, $element) {
+  if (IsQuizFinished(quizData, data)) {
+    $('#submit-response').css('display', 'none')
+    $element.append('<div>Thank you for your responses.<br/><br/> </div>')
+    $element.append('<button class="ui primary button" onclick="window.print()">Print responses</button>')
+  }
+}
+
+function IsQuizFinished(quizData, data) {
+  return quizData.responseCount === data.questions.length;
+}
+
+function printQuiz (element, data) {
   $element = $(element)
   questions = data.questions
 
-  try {
-    quizData = JSON.parse(localStorage.getItem('quiz'))
-    responses = quizData.responses || []
-    currentQuestion = quizData.currentQuestion || -1
-    responseCount = quizData.responseCount || -1
-  } catch (e) {}
-
-  if (quizData == null) {
-    quizData = { responses: [] }
-    responses = quizData.responses
-  }
+  quizData = getQuizData()
 
   $questions = getFormHtml()
 
@@ -193,88 +221,95 @@ function printQuestionnaire (element, data) {
     .append(getH1Html(data.title))
     .append($questions)
 
-
+  responses = quizData.responses
+  currentQuestion = quizData.currentQuestion
+  responseCount = quizData.responseCount
   data.questions.forEach(processQuestion);
 
-  $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
+  printSubmitButton($element);
 
-  if (responseCount === questions.length) {
-    $('#submit-response').css('display', 'none')
-    $element.append('<div>Thank you for your responses.<br/><br/> </div>')
-    $element.append('<button class="ui primary button" onclick="window.print()">Print responses</button>')
-  }
+  CheckQuizFinished(quizData, data, $element);
 
   $('#submit-response').on('click', function (){
-    var $inputs = $('[name^=question_' + currentQuestion + ']')
-  
-    var question = questions[currentQuestion]
+    storeAnswer(data, quizData);
+    
+    printProgressBar(quizData, data.questions);
 
-    console.log($inputs)
-
-    switch (question.input.type) {
-      case 'checkbox':
-      case 'radio':
-        responses[currentQuestion] = []
-        $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
-          responses[currentQuestion].push(input.value)
-        })
-        if (responses[currentQuestion].length === 0) {
-          responses[currentQuestion] = null
-        }
-        break
-      case 'inputs':
-        responses[currentQuestion] = []
-        $inputs.each(function (i, input) {
-          responses[currentQuestion].push(input.value)
-        })
-        break
-      default:
-        responses[currentQuestion] = $inputs.val()
-    }
-
-    printProgressBar(responses, questions);
-
-    var isQuestionAnswered = true
-
-    console.log('response', currentQuestion, responses[currentQuestion])
-    if (!responses[currentQuestion]) {
-      isQuestionAnswered = false
-    }
-
-    if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-      for (j = 0; j < responses[currentQuestion].length; j++) {
-        if (!responses[currentQuestion][j]) {
-          isQuestionAnswered = false
-        }
-      }
-    }
-
-    if (!isQuestionAnswered) {
+    if (!isQuestionAnswered(quizData)) {
       alert('You must give a response')
     } else {
-      $questions.find('#question-' + currentQuestion).css('display', 'none')
-      currentQuestion = currentQuestion + 1
-      $questions.find('#question-' + currentQuestion).css('display', 'block')
-
-      if (responseCount === questions.length) {
-        $('#submit-response').css('display', 'none')
-        $element.append('<div>Exam filled in successfully. Thank you.</div>')
-        $element.append('<button>Print responses</button>')
-      }
+      showNextQuestion($questions, $element, quizData, data);
     }
 
-    quizData.responses = responses
-    quizData.responseCount = responseCount
-    quizData.currentQuestion = currentQuestion
-    localStorage.setItem('quiz', JSON.stringify(quizData))
+    localStorage.setItem(QUIZ, JSON.stringify(quizData))
   });
+}
+
+function storeAnswer(data, quizData) {
+  var $inputs = $('[name^=question_' + quizData.currentQuestion + ']')
+  
+  var question = data.questions[quizData.currentQuestion]
+
+  console.log($inputs)
+
+  switch (question.input.type) {
+    case 'checkbox':
+    case 'radio':
+      quizData.responses[quizData.currentQuestion] = []
+      $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
+        quizData.responses[quizData.currentQuestion].push(input.value)
+      })
+      if (quizData.responses[quizData.currentQuestion].length === 0) {
+        quizData.responses[quizData.currentQuestion] = null
+      }
+      break
+    case 'inputs':
+      quizData.responses[quizData.currentQuestion] = []
+      $inputs.each(function (i, input) {
+        quizData.responses[quizData.currentQuestion].push(input.value)
+      })
+      break
+    default:
+      quizData.responses[quizData.currentQuestion] = $inputs.val()
+  }
+}
+
+function showNextQuestion($questions, $element, quizData, data) {
+  $questions.find('#question-' + quizData.currentQuestion).css('display', 'none')
+  quizData.currentQuestion++
+  $questions.find('#question-' + quizData.currentQuestion).css('display', 'block')
+  debugger;
+  if (quizData.responseCount === data.questions.length) {
+    $('#submit-response').css('display', 'none')
+    $element.append('<div>Exam filled in successfully. Thank you.</div>')
+    $element.append('<button>Print responses</button>')
+  }
+}
+
+function isQuestionAnswered(quizData) {
+  var result = true
+
+  console.log('response', quizData.currentQuestion, quizData.responses[quizData.currentQuestion])
+  if (!quizData.responses[quizData.currentQuestion]) {
+    result = false
+  }
+
+  if (!!quizData.responses[quizData.currentQuestion] && !!quizData.responses[quizData.currentQuestion].length) {
+    for (j = 0; j < quizData.responses[quizData.currentQuestion].length; j++) {
+      if (!quizData.responses[quizData.currentQuestion][j]) {
+        result = false
+      }
+    }
+  }
+
+  return result;
 }
 
 quiz = function (element, options) {
   $.ajax({
     url: options.url
   }).done(function(data) {
-    printQuestionnaire(element, data)
+    printQuiz(element, data)
   })
 }
 
