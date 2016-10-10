@@ -1,9 +1,138 @@
 responseCount = 0
 currentQuestion = 0
 
+function GetFormHtml() {
+  return $('<form class="ui form"></form>');
+}
+
+function GetProgressBarHtml() {
+  return '<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
+        + '</div>';
+}
+
+function GetH1Html(title) {
+  return '<h1 class="ui header">' + title + '</h1>';
+}
+
+function GetPreCodeHtml(code) {
+  return '<pre><code>' + code + '</code></pre>';
+}
+
+function GetRadioCheckboxHtml(question, responses, i) {
+  var input = '<div class="inline fields">';
+
+  for (j = 0; j < question.input.options.length; j++) {
+    var option = question.input.options[j]
+    var type = question.input.type
+
+    if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
+      var checked = 'checked'
+    } else {
+      var checked = ''
+    }
+
+    input += '<div class="field">'
+      + '<div class="ui checkbox ' + type + '">'
+      + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
+      + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
+      + '</div>'
+      + '</div>'
+  }
+  input += '</div>'
+
+  return input;
+}
+
+function GetInputHtml(question, responses, i) {
+  var input = '<table>';
+
+  for (j = 0; j < question.input.options.length; j++) {
+    var option = question.input.options[j]
+    var type = 'checkbox'
+
+    if (!!responses[i]) {
+      var value = responses[i][j]
+    } else {
+      var value = ''
+    }
+
+    input += '<tr>'
+      + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
+      + '<td width="15px"></td>'
+      + '<td><div class="ui input">'
+      + '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />'
+      + '</div></td>'
+      + '</tr>'
+      + '<tr><td colspan="3">&nbsp;</tr></tr>'
+  }
+  input += '</table>'
+
+  return input;
+}
+
+function GetDefaultInputHtml(responses, i) {
+  if (!!responses[i]) {
+    var value = responses[i]
+  } else {
+    var value = ''
+  }
+  return '<div class="ui input fluid">'
+    + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
+    + '</div>'
+}
+
+function GetQuestionHtml(i, question, responses) {
+  var input = GetInput(question, responses, i);
+  var code = GetQuestionCode(question.code);
+
+  return $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
+        + '<div class="content">'
+        + '<div class="header">' + question.problem + '</div>'
+        + '</div>'
+        + '<div class="content">'
+        + code
+        + '</div>'
+        + '<div class="content">'
+        + input
+        + '</div>'
+        + '</div>'
+      ).css('display', 'none')
+}
+
+function GetQuestionCode(code) {
+  return code !== undefined
+    ? GetPreCodeHtml(code)
+    : '';
+}
+
+function GetInput(question, responses, i) {
+  if (question.input === undefined) {
+    question.input = { type: 'input' }
+  }
+
+  switch (question.input.type) {
+    case 'checkbox':
+    case 'radio':
+      return GetRadioCheckboxHtml(question, responses, i);
+      break
+
+    case 'inputs':
+      return GetInputHtml(question, responses, i);
+      break
+    default:
+      return GetDefaultInputHtml(responses, i);
+  }
+}
+
+function AddProgressBarToBody() {
+  $(document.body).append(GetProgressBarHtml())
+}
+
+
 quiz = function (element, options) {
   $element = $(element)
-
+  console.log('aaa ' + options.url);
   $.ajax({
     url: options.url
   }).done(function (data) {
@@ -21,106 +150,23 @@ quiz = function (element, options) {
       responses = quizData.responses
     }
 
-    $questions = $('<form class="ui form"></form>')
-    $(document.body)
-      .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
-        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
-        + '</div>')
+    $questions = GetFormHtml()
+
+    AddProgressBarToBody();
+    
     $element
-      .append('<h1 class="ui header">' + data.title + '</h1>')
+      .append(GetH1Html(data.title))
       .append($questions)
 
     for (var i = 0; i < data.questions.length; i++) {
       question = data.questions[i]
 
-      if (question.code !== undefined) {
-        var code = '<pre><code>' + question.code + '</code></pre>'
-      } else {
-        var code = ''
-      }
-
-      if (question.input === undefined) {
-        question.input = { type: 'input' }
-      }
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-          var input = '<div class="inline fields">'
-          for (j = 0; j < question.input.options.length; j++) {
-            var option = question.input.options[j]
-            var type = question.input.type
-
-            if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-              var checked = 'checked'
-            } else {
-              var checked = ''
-            }
-
-            input += '<div class="field">'
-              + '<div class="ui checkbox ' + type + '">'
-              + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
-              + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
-              + '</div>'
-              + '</div>'
-          }
-          input += '</div>'
-          break
-
-        case 'inputs':
-          var input = '<table>'
-          for (j = 0; j < question.input.options.length; j++) {
-            var option = question.input.options[j]
-            var type = 'checkbox'
-
-            if (!!responses[i]) {
-              var value = responses[i][j]
-            } else {
-              var value = ''
-            }
-
-            input += '<tr>'
-              + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
-              + '<td width="15px"></td>'
-              + '<td><div class="ui input">'
-              + '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />'
-              + '</div></td>'
-              + '</tr>'
-              + '<tr><td colspan="3">&nbsp;</tr></tr>'
-          }
-          input += '</table>'
-          break
-        default:
-          if (!!responses[i]) {
-            var value = responses[i]
-          } else {
-            var value = ''
-          }
-          var input = '<div class="ui input fluid">'
-            + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
-            + '</div>'
-      }
-
-      $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
-        + '<div class="content">'
-        + '<div class="header">' + question.problem + '</div>'
-        + '</div>'
-        + '<div class="content">'
-        + code
-        + '</div>'
-        + '<div class="content">'
-        + input
-        + '</div>'
-        + '</div>'
-      ).css('display', 'none')
-
-      $questions.append($question)
+      $questions.append(GetQuestionHtml(i, question, responses));
 
       $('pre code').each(function (i, block) {
         hljs.highlightBlock(block)
       })
 
-      // $questions.find('input').on('keypress', onValueChange)
-      // $questions.find('input').on('change', onValueChange)
       $questions.find('#question-' + currentQuestion).css('display', 'block')
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
     }
