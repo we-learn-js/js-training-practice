@@ -1,25 +1,25 @@
 responseCount = 0
 currentQuestion = 0
 
-function GetFormHtml() {
+function getFormHtml() {
   return $('<form class="ui form"></form>');
 }
 
-function GetProgressBarHtml() {
+function getProgressBarHtml() {
   return '<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
         + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
         + '</div>';
 }
 
-function GetH1Html(title) {
+function getH1Html(title) {
   return '<h1 class="ui header">' + title + '</h1>';
 }
 
-function GetPreCodeHtml(code) {
+function getPreCodeHtml(code) {
   return '<pre><code>' + code + '</code></pre>';
 }
 
-function GetRadioCheckboxHtml(question, responses, i) {
+function getRadioCheckboxHtml(question, responses, i) {
   var input = '<div class="inline fields">';
 
   for (j = 0; j < question.input.options.length; j++) {
@@ -44,7 +44,7 @@ function GetRadioCheckboxHtml(question, responses, i) {
   return input;
 }
 
-function GetInputHtml(question, responses, i) {
+function getInputHtml(question, responses, i) {
   var input = '<table>';
 
   for (j = 0; j < question.input.options.length; j++) {
@@ -71,7 +71,7 @@ function GetInputHtml(question, responses, i) {
   return input;
 }
 
-function GetDefaultInputHtml(responses, i) {
+function getDefaultInputHtml(responses, i) {
   if (!!responses[i]) {
     var value = responses[i]
   } else {
@@ -82,9 +82,9 @@ function GetDefaultInputHtml(responses, i) {
     + '</div>'
 }
 
-function GetQuestionHtml(i, question, responses) {
-  var input = GetInput(question, responses, i);
-  var code = GetQuestionCode(question.code);
+function getQuestionHtml(i, question, responses) {
+  var input = getInput(question, responses, i);
+  var code = getQuestionCode(question.code);
 
   return $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
         + '<div class="content">'
@@ -100,13 +100,13 @@ function GetQuestionHtml(i, question, responses) {
       ).css('display', 'none')
 }
 
-function GetQuestionCode(code) {
+function getQuestionCode(code) {
   return code !== undefined
-    ? GetPreCodeHtml(code)
+    ? getPreCodeHtml(code)
     : '';
 }
 
-function GetInput(question, responses, i) {
+function getInput(question, responses, i) {
   if (question.input === undefined) {
     question.input = { type: 'input' }
   }
@@ -114,21 +114,31 @@ function GetInput(question, responses, i) {
   switch (question.input.type) {
     case 'checkbox':
     case 'radio':
-      return GetRadioCheckboxHtml(question, responses, i);
+      return getRadioCheckboxHtml(question, responses, i);
       break
 
     case 'inputs':
-      return GetInputHtml(question, responses, i);
+      return getInputHtml(question, responses, i);
       break
     default:
-      return GetDefaultInputHtml(responses, i);
+      return getDefaultInputHtml(responses, i);
   }
 }
 
-function AddProgressBarToBody() {
-  $(document.body).append(GetProgressBarHtml())
+function addProgressBarToBody() {
+  $(document.body).append(getProgressBarHtml())
 }
 
+function processQuestion(question, i) {
+  $questions.append(getQuestionHtml(i, question, responses));
+
+  $('pre code').each(function (i, block) {
+    hljs.highlightBlock(block)
+  })
+
+  $questions.find('#question-' + currentQuestion).css('display', 'block')
+  $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+}
 
 quiz = function (element, options) {
   $element = $(element)
@@ -150,26 +160,17 @@ quiz = function (element, options) {
       responses = quizData.responses
     }
 
-    $questions = GetFormHtml()
+    $questions = getFormHtml()
 
-    AddProgressBarToBody();
+    addProgressBarToBody();
     
     $element
-      .append(GetH1Html(data.title))
+      .append(getH1Html(data.title))
       .append($questions)
 
-    for (var i = 0; i < data.questions.length; i++) {
-      question = data.questions[i]
 
-      $questions.append(GetQuestionHtml(i, question, responses));
+    data.questions.forEach(processQuestion);
 
-      $('pre code').each(function (i, block) {
-        hljs.highlightBlock(block)
-      })
-
-      $questions.find('#question-' + currentQuestion).css('display', 'block')
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
-    }
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
 
     if (responseCount === questions.length) {
