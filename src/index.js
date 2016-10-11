@@ -30,8 +30,7 @@ quiz = function (element, options) {
       .append('<h1 class="ui header">' + data.title + '</h1>')
       .append($questions)
 
-    for (var i = 0; i < data.questions.length; i++) {
-      question = data.questions[i]
+      data.questions.forEach(function(question,i){
 
       var code=question.code!==undefined?'<pre><code>' + question.code + '</code></pre>':'';
 
@@ -42,8 +41,8 @@ quiz = function (element, options) {
         case 'checkbox':
         case 'radio':
           var input = '<div class="inline fields">'
-          for (j = 0; j < question.input.options.length; j++) {
-            var option = question.input.options[j]
+          question.input.options.forEach(function(option,j){
+
             var type = question.input.type
 
             var checked=(!!responses[i] && responses[i].indexOf(option.label) !== -1)?'checked':''
@@ -54,21 +53,15 @@ quiz = function (element, options) {
               + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
               + '</div>'
               + '</div>'
-          }
+          });
           input += '</div>'
           break
 
         case 'inputs':
           var input = '<table>'
-          for (j = 0; j < question.input.options.length; j++) {
-            var option = question.input.options[j]
+          question.input.options.forEach(function(option,j){
             var type = 'checkbox'
 
-            if (!!responses[i]) {
-              var value = responses[i][j]
-            } else {
-              var value = ''
-            }
             var value=(!!responses[i])?responses[i][j]:'';
 
             input += '<tr>'
@@ -79,7 +72,7 @@ quiz = function (element, options) {
               + '</div></td>'
               + '</tr>'
               + '<tr><td colspan="3">&nbsp;</tr></tr>'
-          }
+          });
           input += '</table>'
           break
         default:
@@ -114,7 +107,10 @@ quiz = function (element, options) {
 
       $questions.find('#question-' + currentQuestion).css('display', 'block')
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
-    }
+    });
+
+    /// final forEach
+
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
 
     if (responseCount === questions.length) {
@@ -157,22 +153,22 @@ quiz = function (element, options) {
       }
 
       var responseCount = 0
-      for (i = 0; i < responses.length; i++) {
+      responses.forEach(function(responses,i){
         question = questions[i]
         switch (question.input.type) {
           case 'checkbox':
           case 'radio':
           case 'inputs':
-            if (!!responses[i] && !!responses[i].join('')) {
+            if (!!responses && !!responses.join('')) {
               responseCount++
             }
             break
           default:
-            if (!!responses[i]) {
+            if (!!responses) {
               responseCount++
             }
         }
-      }
+      });
 
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
 
@@ -183,11 +179,11 @@ quiz = function (element, options) {
       }
 
       if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-        for (j = 0; j < responses[currentQuestion].length; j++) {
-          if (!responses[currentQuestion][j]) {
+        responses.forEach(function(valor){
+          if (!valor) {
             isQuestionAnswered = false
           }
-        }
+        });
       }
 
       if (!isQuestionAnswered) {
