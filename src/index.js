@@ -6,7 +6,9 @@ quiz = function (element, options) {
 
   $.ajax({
     url: options.url
-  }).done(function (data) {
+  }).done(function (data) { proceso(data)});
+
+function proceso(data){
     questions = data.questions
 
     try {
@@ -76,11 +78,8 @@ quiz = function (element, options) {
           input += '</table>'
           break
         default:
-          if (!!responses[i]) {
-            var value = responses[i]
-          } else {
-            var value = ''
-          }
+          value=(!!responses[i])?responses[i]:'';
+
           var input = '<div class="ui input fluid">'
             + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
             + '</div>'
@@ -130,20 +129,17 @@ quiz = function (element, options) {
     $('#submit-response').on('click', function () {
       var $inputs = $('[name^=question_' + currentQuestion + ']')
       var question = questions[currentQuestion]
-
+      responses[currentQuestion] = []
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
-          responses[currentQuestion] = []
+
           $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
             responses[currentQuestion].push(input.value)
           })
-          if (responses[currentQuestion].length === 0) {
-            responses[currentQuestion] = null
-          }
           break
         case 'inputs':
-          responses[currentQuestion] = []
+
           $inputs.each(function (i, input) {
             responses[currentQuestion].push(input.value)
           })
@@ -172,21 +168,7 @@ quiz = function (element, options) {
 
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
 
-      isQuestionAnswered = true
-
       if (!responses[currentQuestion]) {
-        isQuestionAnswered = false
-      }
-
-      if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-        responses.forEach(function(valor){
-          if (!valor) {
-            isQuestionAnswered = false
-          }
-        });
-      }
-
-      if (!isQuestionAnswered) {
         alert('You must give a response')
       } else {
         $questions.find('#question-' + currentQuestion).css('display', 'none')
@@ -205,7 +187,7 @@ quiz = function (element, options) {
       quizData.currentQuestion = currentQuestion
       localStorage.setItem('quiz', JSON.stringify(quizData))
     })
-  })
+  }
 }
 
 module.exports = quiz
