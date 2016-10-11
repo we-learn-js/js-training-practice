@@ -133,7 +133,7 @@ function addProgressBarToBody() {
 }
 
 function processQuestion(question, i) {
-  $questions.append(getQuestionHtml(i, question, responses));
+  $questions.append(getQuestionHtml(i, question, quizData.responses));
 
   $('pre code').each(function (i, block) {
     hljs.highlightBlock(block)
@@ -195,7 +195,7 @@ function GetButtonHtml() {
   return '<button id="submit-response" class="ui primary button">Submit response</button>';
 }
 
-function CheckQuizFinished(quizData, data, $element) {
+function checkQuizFinished(quizData, data, $element) {
   if (IsQuizFinished(quizData, data)) {
     $('#submit-response').css('display', 'none')
     $element.append('<div>Thank you for your responses.<br/><br/> </div>')
@@ -220,14 +220,11 @@ function printQuiz (element, data) {
     .append(getH1Html(data.title))
     .append($questions)
 
-  responses = quizData.responses
-  currentQuestion = quizData.currentQuestion
-  responseCount = quizData.responseCount
   questions.forEach(processQuestion);
 
   printSubmitButton($element);
 
-  CheckQuizFinished(quizData, data, $element);
+  checkQuizFinished(quizData, data, $element);
 
   $('#submit-response').on('click', function (){
     storeAnswer();
@@ -277,7 +274,7 @@ function showNextQuestion($questions, $element) {
   $questions.find('#question-' + quizData.currentQuestion).css('display', 'none')
   quizData.currentQuestion++
   $questions.find('#question-' + quizData.currentQuestion).css('display', 'block')
-  debugger;
+  
   if (quizData.responseCount === questions.length) {
     $('#submit-response').css('display', 'none')
     $element.append('<div>Exam filled in successfully. Thank you.</div>')
