@@ -250,7 +250,7 @@ function submitResponseClick($element) {
   updateResponseCount();
   printProgressBar();
 
-  if (!isCurrentQuestionAnswered()) {
+  if (!isCurrentQuestionAnswered(quizData.responses[quizData.currentQuestion])) {
     alert('You must give a response')
   } else {
     showNextQuestion($questions, $element);
@@ -308,22 +308,12 @@ function checkAnswer(prev, current) {
   return prev;
 }
 
-function isCurrentQuestionAnswered() {
-  var result = true
-
-  console.log('response', quizData.currentQuestion, quizData.responses[quizData.currentQuestion])
-  if (!quizData.responses[quizData.currentQuestion]) {
-    result = false
-  }
-
-  if (!!quizData.responses[quizData.currentQuestion]
-      && !!quizData.responses[quizData.currentQuestion].length
-      && !!quizData.responses[quizData.currentQuestion].reduce) {
-    
-    result = quizData.responses[quizData.currentQuestion].reduce(checkAnswer, true);
-  }
-
-  return result;
+function isCurrentQuestionAnswered(question) {
+  return !!question
+          ? !!!question.reduce
+            ? true
+            : question.reduce(checkAnswer, true)
+          : false;
 }
 
 quiz = function (element, options) {
