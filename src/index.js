@@ -301,11 +301,9 @@ function showNextQuestion($questions, $element) {
 }
 
 function checkAnswer(prev, current) {
-  if (!current) {
-    return false
-  }
-
-  return prev;
+  return !current
+    ? false
+    : prev;
 }
 
 function isCurrentQuestionAnswered(question) {
