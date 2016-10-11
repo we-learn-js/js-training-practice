@@ -11,7 +11,6 @@ quiz = function (element, options) {
     function (data) {
       questions = data.questions
       init(data)
-      bindSubmit()
     }
   )
 
@@ -64,23 +63,21 @@ quiz = function (element, options) {
   function printCheckboxRadio(question, responses, i){
 
     var input = '<div class="inline fields">'
-
     question.input.options.map(function( option, j){
+    var type = question.input.type
 
-      var type = question.input.type
+    if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
+      var checked = 'checked'
+    } else {
+      var checked = ''
+    }
 
-      if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-        var checked = 'checked'
-      } else {
-        var checked = ''
-      }
-
-      input += '<div class="field">'
-        + '<div class="ui checkbox ' + type + '">'
-        + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
-        + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
-        + '</div>'
-        + '</div>'
+    input += '<div class="field">'
+      + '<div class="ui checkbox ' + type + '">'
+      + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
+      + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
+      + '</div>'
+      + '</div>'
     })
     input += '</div>'
     return input;
@@ -148,7 +145,6 @@ quiz = function (element, options) {
     }
   }
 
-
   function init(data){
     try {
       quizData = JSON.parse(localStorage.getItem('quiz'))
@@ -184,6 +180,8 @@ quiz = function (element, options) {
     if (responseCount === questions.length) {
       showThanks()
     }
+
+    bindSubmit()
   }
 
   function bindSubmit(){
@@ -201,13 +199,13 @@ quiz = function (element, options) {
           if (responses[currentQuestion].length === 0) {
             responses[currentQuestion] = null
           }
-        break
+          break
         case 'inputs':
           responses[currentQuestion] = []
           $inputs.each(function (i, input) {
             responses[currentQuestion].push(input.value)
           })
-        break
+          break
         default:
           responses[currentQuestion] = $inputs.val()
       }
@@ -233,7 +231,6 @@ quiz = function (element, options) {
         }
       })
       updateProgress(responseCount, questions.length)
-
 
       if (!responses[currentQuestion]) {
         alert('You must give a response')
