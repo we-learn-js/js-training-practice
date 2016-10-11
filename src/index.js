@@ -8,6 +8,62 @@ quiz = function (element, options) {
     url: options.url
   }).done(function (data) { proceso(data)});
 
+function PrintCheckboxRadio(question,responses,i){
+  var input = '<div class="inline fields">'
+  question.input.options.forEach(function(option,j){
+
+  var type = question.input.type
+
+  var checked=(!!responses[i] && responses[i].indexOf(option.label) !== -1)?'checked':''
+
+  input += '<div class="field">'
+    + '<div class="ui checkbox ' + type + '">'
+    + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
+    + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
+    + '</div>'
+    + '</div>'
+  });
+  input += '</div>'
+  return input
+}
+
+function PrintInputs(question,responses,i){
+  var input = '<table>'
+  question.input.options.forEach(function(option,j){
+    var type = 'checkbox'
+
+    var value=(!!responses[i])?responses[i][j]:'';
+
+    input += '<tr>'
+      + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
+      + '<td width="15px"></td>'
+      + '<td><div class="ui input">'
+      + '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />'
+      + '</div></td>'
+      + '</tr>'
+      + '<tr><td colspan="3">&nbsp;</tr></tr>'
+  });
+  input += '</table>'
+  return input
+}
+
+function  PrintQuestion(question,i,input,code) {
+  return '<div id="question-' + i + '" class="ui card" style="width: 100%;">'
+    + '<div class="content">'
+    + '<div class="header">' + question.problem + '</div>'
+    + '</div>'
+    + '<div class="content">'
+    + code
+    + '</div>'
+    + '<div class="content">'
+    + input
+    + '</div>'
+    + '</div>'
+}
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
 function proceso(data){
     questions = data.questions
 
@@ -42,40 +98,11 @@ function proceso(data){
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
-          var input = '<div class="inline fields">'
-          question.input.options.forEach(function(option,j){
-
-            var type = question.input.type
-
-            var checked=(!!responses[i] && responses[i].indexOf(option.label) !== -1)?'checked':''
-
-            input += '<div class="field">'
-              + '<div class="ui checkbox ' + type + '">'
-              + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
-              + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
-              + '</div>'
-              + '</div>'
-          });
-          input += '</div>'
+          var input = PrintCheckboxRadio(question,responses,i)
           break
 
         case 'inputs':
-          var input = '<table>'
-          question.input.options.forEach(function(option,j){
-            var type = 'checkbox'
-
-            var value=(!!responses[i])?responses[i][j]:'';
-
-            input += '<tr>'
-              + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
-              + '<td width="15px"></td>'
-              + '<td><div class="ui input">'
-              + '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />'
-              + '</div></td>'
-              + '</tr>'
-              + '<tr><td colspan="3">&nbsp;</tr></tr>'
-          });
-          input += '</table>'
+          var input =PrintInputs(question,responses,i)
           break
         default:
           value=(!!responses[i])?responses[i]:'';
@@ -85,18 +112,7 @@ function proceso(data){
             + '</div>'
       }
 
-      $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
-        + '<div class="content">'
-        + '<div class="header">' + question.problem + '</div>'
-        + '</div>'
-        + '<div class="content">'
-        + code
-        + '</div>'
-        + '<div class="content">'
-        + input
-        + '</div>'
-        + '</div>'
-      ).css('display', 'none')
+      $question = $(PrintQuestion(question,i,input,code)).css('display', 'none')
 
       $questions.append($question)
 
