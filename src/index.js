@@ -14,6 +14,18 @@ quiz = function (element, options) {
     }
   )
 
+  function init(data){
+    getQuizData()
+    initProgressBar()
+    printTitle(data.title)
+    printForm($questions)
+    printQuiz(data)
+    printSubmitButton()
+    printResetButton()
+    bindSubmitButton()
+    checkLastQuestion(responseCount, questions.length)
+  }
+
   function initProgressBar(){
     $(document.body)
       .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
@@ -171,18 +183,6 @@ quiz = function (element, options) {
       showNextQuestion(currentQuestion)
       updateProgressBar(responseCount, questions.length)
     })
-  }
-
-  function init(data){
-    getQuizData()
-    initProgressBar()
-    printTitle(data.title)
-    printForm($questions)
-    printQuiz(data)
-    printSubmitButton()
-    printResetButton()
-    bindSubmitButton()
-    checkLastQuestion(responseCount, questions.length)
   }
 
   function setAnswers(){
