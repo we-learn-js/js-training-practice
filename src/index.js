@@ -63,21 +63,21 @@ quiz = function (element, options) {
   function printCheckboxRadio(question, responses, i){
 
     var input = '<div class="inline fields">'
-    question.input.options.map(function( option, j){
-    var type = question.input.type
+    question.input.options.forEach(function( option, j){
+      var type = question.input.type
 
-    if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-      var checked = 'checked'
-    } else {
-      var checked = ''
-    }
+      if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
+        var checked = 'checked'
+      } else {
+        var checked = ''
+      }
 
-    input += '<div class="field">'
-      + '<div class="ui checkbox ' + type + '">'
-      + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
-      + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
-      + '</div>'
-      + '</div>'
+      input += '<div class="field">'
+        + '<div class="ui checkbox ' + type + '">'
+        + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
+        + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
+        + '</div>'
+        + '</div>'
     })
     input += '</div>'
     return input;
@@ -85,7 +85,7 @@ quiz = function (element, options) {
 
   function printInputs(question, i){
     var input = '<table>'
-    question.input.options.map(function(option, j){
+    question.input.options.forEach(function(option, j){
 
       if (!!responses[i]) {
         var value = responses[i][j]
@@ -162,7 +162,7 @@ quiz = function (element, options) {
     printTitle(data.title)
     printForm($questions)
 
-    data.questions.map(function(question, i){
+    data.questions.forEach(function(question, i){
 
       if (question.input === undefined) {
         question.input = { type: 'input' }
@@ -212,7 +212,7 @@ quiz = function (element, options) {
 
       var responseCount = 0
 
-      responses.map(function(response, i){
+      responses.forEach(function(response, i){
 
         question = questions[i]
 
