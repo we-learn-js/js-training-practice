@@ -209,8 +209,12 @@ function isQuizFinished(quizData, data) {
   return quizData.responseCount === questions.length;
 }
 
+function getQuestions(data) {
+  return data.questions;
+}
+
 function printQuiz (element, data) {
-  questions = data.questions
+  questions = getQuestions(data)
   quizData2 = getQuizData()
 
   addProgressBarToBody();
@@ -221,7 +225,16 @@ function printQuiz (element, data) {
     .append(getH1Html(data.title))
     .append($questions)
 
-  questions.forEach(processQuestion);
+  questions.forEach(function (question, i) {
+    $questions.append(getQuestionHtml(i, question, quizData2.responses));
+
+    $('pre code').each(function (i, block) {
+      hljs.highlightBlock(block)
+    })
+
+    $questions.find('#question-' + quizData2.currentQuestion).css('display', 'block')
+    $('#progress').css('width', (quizData2.responseCount / questions.length * 100) + '%')
+  });
 
   printSubmitButton($element);
 
@@ -287,6 +300,14 @@ function showNextQuestion($questions, $element) {
   }
 }
 
+function checkAnswer(prev, current) {
+  if (!current) {
+    return false
+  }
+
+  return prev;
+}
+
 function isCurrentQuestionAnswered() {
   var result = true
 
@@ -295,12 +316,11 @@ function isCurrentQuestionAnswered() {
     result = false
   }
 
-  if (!!quizData.responses[quizData.currentQuestion] && !!quizData.responses[quizData.currentQuestion].length) {
-    for (j = 0; j < quizData.responses[quizData.currentQuestion].length; j++) {
-      if (!quizData.responses[quizData.currentQuestion][j]) {
-        result = false
-      }
-    }
+  if (!!quizData.responses[quizData.currentQuestion]
+      && !!quizData.responses[quizData.currentQuestion].length
+      && !!quizData.responses[quizData.currentQuestion].reduce) {
+    
+    result = quizData.responses[quizData.currentQuestion].reduce(checkAnswer, true);
   }
 
   return result;
