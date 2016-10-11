@@ -21,7 +21,7 @@ quiz = function (element, options) {
         + '</div>')
   }
 
-  function updateProgress(responseCount, questionsLength){
+  function updateProgressBar(responseCount, questionsLength){
     $('#progress').css('width', (responseCount / questionsLength * 100) + '%')
   }
 
@@ -145,7 +145,7 @@ quiz = function (element, options) {
     }
   }
 
-  function init(data){
+  function getQuizData(){
     try {
       quizData = JSON.parse(localStorage.getItem('quiz'))
       responses = quizData.responses || []
@@ -157,11 +157,9 @@ quiz = function (element, options) {
       quizData = { responses: [] }
       responses = quizData.responses
     }
+  }
 
-    initProgressBar()
-    printTitle(data.title)
-    printForm($questions)
-
+  function printQuiz(data){
     data.questions.forEach(function(question, i){
 
       if (question.input === undefined) {
@@ -171,66 +169,90 @@ quiz = function (element, options) {
       printResponses(question, responses, i)
       printQuestions(question.problem, input, i)
       showNextQuestion(currentQuestion)
-      updateProgress(responseCount, questions.length)
+      updateProgressBar(responseCount, questions.length)
     })
-
-    printSubmitButton()
-    printResetButton()
-
-    if (responseCount === questions.length) {
-      showThanks()
-    }
-
-    bindSubmit()
   }
 
-  function bindSubmit(){
-    $('#submit-response').bind('click', function () {
-      var $inputs = $('[name^=question_' + currentQuestion + ']')
-      var question = questions[currentQuestion]
+  function init(data){
+    getQuizData()
+    initProgressBar()
+    printTitle(data.title)
+    printForm($questions)
+    printQuiz(data)
+    printSubmitButton()
+    printResetButton()
+    bindSubmitButton()
+    checkLastQuestion(responseCount, questions.length)
+  }
+
+  function setAnswers(){
+    var $inputs = $('[name^=question_' + currentQuestion + ']')
+    var question = questions[currentQuestion]
+
+    switch (question.input.type) {
+      case 'checkbox':
+      case 'radio':
+        responses[currentQuestion] = []
+        $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
+          responses[currentQuestion].push(input.value)
+        })
+        if (responses[currentQuestion].length === 0) {
+          responses[currentQuestion] = null
+        }
+        break
+      case 'inputs':
+        responses[currentQuestion] = []
+        $inputs.each(function (i, input) {
+          responses[currentQuestion].push(input.value)
+        })
+        break
+      default:
+        responses[currentQuestion] = $inputs.val()
+    }
+  }
+
+  function responseCounter(){
+    var responseCount = 0
+
+    responses.forEach(function(response, i){
+      question = questions[i]
 
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
-          responses[currentQuestion] = []
-          $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
-          if (responses[currentQuestion].length === 0) {
-            responses[currentQuestion] = null
+        case 'inputs':
+          if (!!responses[i] && !!responses[i].join('')) {
+            responseCount++
           }
           break
-        case 'inputs':
-          responses[currentQuestion] = []
-          $inputs.each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
-          break
         default:
-          responses[currentQuestion] = $inputs.val()
+          if (!!responses[i]) {
+            responseCount++
+          }
       }
+    })
+    return responseCount;
+  }
 
-      var responseCount = 0
+  function storeData(responses, responseCount, currentQuestion ){
+    quizData.responses = responses
+    quizData.responseCount = responseCount
+    quizData.currentQuestion = currentQuestion
+    localStorage.setItem('quiz', JSON.stringify(quizData))
+  }
 
-      responses.forEach(function(response, i){
+  function checkLastQuestion(responseCount, questionsLength){
+    if (responseCount === questionsLength) {
+      showThanks();
+    }
+  }
 
-        question = questions[i]
+  function bindSubmitButton(){
+    $('#submit-response').bind('click', function () {
 
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            if (!!responses[i] && !!responses[i].join('')) {
-              responseCount++
-            }
-            break
-          default:
-            if (!!responses[i]) {
-              responseCount++
-            }
-        }
-      })
-      updateProgress(responseCount, questions.length)
+      setAnswers()
+      responseCount = responseCounter() //immutability fail :/
+      updateProgressBar(responseCount, questions.length)
 
       if (!responses[currentQuestion]) {
         alert('You must give a response')
@@ -238,16 +260,9 @@ quiz = function (element, options) {
         hideCurrentQuestion(currentQuestion)
         currentQuestion = currentQuestion + 1
         showNextQuestion(currentQuestion )
-
-        if (responseCount === questions.length) {
-          showThanks();
-        }
+        checkLastQuestion(responseCount, questions.length)
       }
-
-      quizData.responses = responses
-      quizData.responseCount = responseCount
-      quizData.currentQuestion = currentQuestion
-      localStorage.setItem('quiz', JSON.stringify(quizData))
+      storeData(responses, responseCount, currentQuestion )
     })
   }
 }
