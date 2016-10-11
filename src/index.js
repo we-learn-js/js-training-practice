@@ -174,7 +174,7 @@ function printProgressBar() {
   $('#progress').css('width', (quizData.responseCount / questions.length * 100) + '%')
 }
 
-function setQuizData() {
+function getQuizData() {
   try {
     quizData = JSON.parse(localStorage.getItem(QUIZ))
   } catch (e) {}
@@ -185,6 +185,8 @@ function setQuizData() {
   quizData.responses = quizData.responses || []
   quizData.currentQuestion = quizData.currentQuestion || 0
   quizData.responseCount = quizData.responseCount || -1
+
+  return quizData;
 }
 
 function printSubmitButton($element) {
@@ -196,26 +198,25 @@ function GetButtonHtml() {
 }
 
 function checkQuizFinished(quizData, data, $element) {
-  if (IsQuizFinished(quizData, data)) {
+  if (isQuizFinished(quizData, data)) {
     $('#submit-response').css('display', 'none')
     $element.append('<div>Thank you for your responses.<br/><br/> </div>')
     $element.append('<button class="ui primary button" onclick="window.print()">Print responses</button>')
   }
 }
 
-function IsQuizFinished(quizData, data) {
+function isQuizFinished(quizData, data) {
   return quizData.responseCount === questions.length;
 }
 
 function printQuiz (element, data) {
-  $element = $(element)
   questions = data.questions
-  setQuizData()
-
-  $questions = getFormElement()
+  quizData2 = getQuizData()
 
   addProgressBarToBody();
   
+  $element = $(element)
+  $questions = getFormElement()
   $element
     .append(getH1Html(data.title))
     .append($questions)
@@ -227,18 +228,22 @@ function printQuiz (element, data) {
   checkQuizFinished(quizData, data, $element);
 
   $('#submit-response').on('click', function (){
-    storeAnswer();
-    updateResponseCount();
-    printProgressBar();
-
-    if (!isCurrentQuestionAnswered()) {
-      alert('You must give a response')
-    } else {
-      showNextQuestion($questions, $element);
-    }
-
-    localStorage.setItem(QUIZ, JSON.stringify(quizData))
+    submitResponseClick($element);
   });
+}
+
+function submitResponseClick($element) {
+  storeAnswer();
+  updateResponseCount();
+  printProgressBar();
+
+  if (!isCurrentQuestionAnswered()) {
+    alert('You must give a response')
+  } else {
+    showNextQuestion($questions, $element);
+  }
+
+  localStorage.setItem(QUIZ, JSON.stringify(quizData))
 }
 
 function storeAnswer() {
