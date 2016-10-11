@@ -147,27 +147,28 @@ function updateResponseCount() {
   quizData.responseCount = getResponseCount();
 }
 
-function getResponseCount() {
-  var responseCount = 0
+function countAnswer(count, answer, index) {
+  question = questions[index]
 
-  for (i = 0; i < quizData.responses.length; i++) {
-    question = questions[i]
-    switch (question.input.type) {
+  switch (question.input.type) {
       case 'checkbox':
       case 'radio':
       case 'inputs':
-        if (!!quizData.responses[i] && !!quizData.responses[i].join('')) {
-          responseCount++
+        if (!!answer && !!answer.join('')) {
+          count++
         }
         break
       default:
-        if (!!quizData.responses[i]) {
-          responseCount++
+        if (!!answer) {
+          count++
         }
     }
-  }
 
-  return responseCount;
+  return count;
+}
+
+function getResponseCount() {
+  return quizData.responses.reduce(countAnswer, 0);
 }
 
 function printProgressBar() {
