@@ -26,6 +26,7 @@ quiz = function (element, options) {
     $questions.find('#question-' + currentQuestion).css('display', 'block')
   }
 
+ // Check input types
   function isCheckBox(type) {
     return type == 'checkbox'
   }
@@ -38,9 +39,13 @@ quiz = function (element, options) {
 
   $.ajax({
     url: options.url
-  }).done(function (data) {
+    })
+    .done(function (data) {
     questions = data.questions
+    init(data)
+  })
 
+  function init(data){
     try {
       quizData = JSON.parse(localStorage.getItem('quiz'))
       responses = quizData.responses || []
@@ -78,8 +83,9 @@ quiz = function (element, options) {
         case 'checkbox':
         case 'radio':
           var input = '<div class="inline fields">'
-          for (j = 0; j < question.input.options.length; j++) {
-            var option = question.input.options[j]
+
+          question.input.options.map(function( option, j){
+
             var type = question.input.type
 
             if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
@@ -94,7 +100,7 @@ quiz = function (element, options) {
               + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
               + '</div>'
               + '</div>'
-          }
+          })
           input += '</div>'
           break
 
@@ -195,9 +201,12 @@ quiz = function (element, options) {
 
       var responseCount = 0
 
+      // responses.map(function(response, i){
+      //
+      // })
       for (i = 0; i < responses.length; i++) {
 
-        console.log(responses.length);
+        //console.log(responses.length);
         question = questions[i]
 
 
@@ -222,15 +231,16 @@ quiz = function (element, options) {
 
       if (!responses[currentQuestion]) {
         isQuestionAnswered = false
+        console.log('no answer');
       }
 
-      if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-        for (j = 0; j < responses[currentQuestion].length; j++) {
-          if (!responses[currentQuestion][j]) {
-            isQuestionAnswered = false
-          }
-        }
-      }
+      // if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
+      //   for (j = 0; j < responses[currentQuestion].length; j++) {
+      //     if (!responses[currentQuestion][j]) {
+      //       isQuestionAnswered = false
+      //     }
+      //   }
+      // }
 
       if (!isQuestionAnswered) {
         alert('You must give a response')
@@ -249,7 +259,7 @@ quiz = function (element, options) {
       quizData.currentQuestion = currentQuestion
       localStorage.setItem('quiz', JSON.stringify(quizData))
     })
-  })
+  }
 }
 
 module.exports = quiz
