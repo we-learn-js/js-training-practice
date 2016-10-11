@@ -75,7 +75,7 @@ quiz = function (element, options) {
   function printCheckboxRadio(question, responses, i){
 
     var input = '<div class="inline fields">'
-    question.input.options.forEach(function( option, j){
+    question.input.options.forEach((option, j) => {
       var type = question.input.type
 
       if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
@@ -97,7 +97,7 @@ quiz = function (element, options) {
 
   function printInputs(question, i){
     var input = '<table>'
-    question.input.options.forEach(function(option, j){
+    question.input.options.forEach((option, j) => {
 
       if (!!responses[i]) {
         var value = responses[i][j]
@@ -172,7 +172,7 @@ quiz = function (element, options) {
   }
 
   function printQuiz(data){
-    data.questions.forEach(function(question, i){
+    data.questions.forEach((question, i) => {
 
       if (question.input === undefined) {
         question.input = { type: 'input' }
@@ -214,7 +214,7 @@ quiz = function (element, options) {
   function responseCounter(){
     var responseCount = 0
 
-    responses.forEach(function(response, i){
+    responses.forEach((response, i) => {
       question = questions[i]
 
       switch (question.input.type) {
