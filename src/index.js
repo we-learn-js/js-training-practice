@@ -3,30 +3,40 @@ currentQuestion = 0
 
 quiz = function (element, options) {
   $element = $(element)
+  $questions = $('<form class="ui form"></form>')
 
-  // Update progress bar
+  $.ajax({
+    url: options.url
+  })
+  .done(function (data) {
+    questions = data.questions
+    init(data)
+  })
+
+  function initProgressBar(){
+    $(document.body)
+      .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
+        + '</div>')
+  }
   function updateProgress(responseCount, questionsLength){
     $('#progress').css('width', (responseCount / questionsLength * 100) + '%')
   }
 
-  // Show thanks message (hopefully at the end of the quiz)
-  function showThanks($element){
+  function showThanks(){
     $('#submit-response').css('display', 'none')
     $element.append('<div>Thank you for your responses.<br /><br /> </div>')
     $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
   }
 
-  // Hide current question
   function hideCurrentQuestion(currentQuestion){
     $questions.find('#question-' + currentQuestion).css('display', 'none')
   }
 
-  // Show next question
   function showNextQuestion(currentQuestion){
     $questions.find('#question-' + currentQuestion).css('display', 'block')
   }
 
- // Check input types
   function isCheckBox(type) {
     return type == 'checkbox'
   }
@@ -37,13 +47,16 @@ quiz = function (element, options) {
     return type == 'inputs'
   }
 
-  $.ajax({
-    url: options.url
-    })
-    .done(function (data) {
-    questions = data.questions
-    init(data)
-  })
+  function printTitle(title){
+    $element.append('<h1 class="ui header">' + title + '</h1>')
+  }
+  function printForm(questions){
+    $element.append(questions)
+  }
+  function printSubmit(){
+    $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
+  }
+
 
   function init(data){
     try {
@@ -58,15 +71,9 @@ quiz = function (element, options) {
       responses = quizData.responses
     }
 
-    $questions = $('<form class="ui form"></form>')
-    $(document.body)
-      .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
-        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
-        + '</div>')
-    $element
-      .append('<h1 class="ui header">' + data.title + '</h1>')
-      .append($questions)
-
+    initProgressBar()
+    printTitle(data.title)
+    printForm($questions )
 
     data.questions.map(function(question, i){
 
@@ -79,6 +86,7 @@ quiz = function (element, options) {
       if (question.input === undefined) {
         question.input = { type: 'input' }
       }
+
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
@@ -160,10 +168,12 @@ quiz = function (element, options) {
       updateProgress(responseCount, questions.length)
 
     })
-    $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
+
+    printSubmit()
+
 
     if (responseCount === questions.length) {
-      showThanks($element)
+      showThanks()
     }
 
     $resetButton = $('<button class="ui button negative">Reset</button>')
@@ -231,7 +241,6 @@ quiz = function (element, options) {
 
       if (!responses[currentQuestion]) {
         isQuestionAnswered = false
-        console.log('no answer');
       }
 
       // if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
@@ -250,7 +259,7 @@ quiz = function (element, options) {
         showNextQuestion(currentQuestion )
 
         if (responseCount === questions.length) {
-          showThanks($element);
+          showThanks();
         }
       }
 
