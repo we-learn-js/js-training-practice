@@ -33,11 +33,7 @@ quiz = function (element, options) {
     for (var i = 0; i < data.questions.length; i++) {
       question = data.questions[i]
 
-      if (question.code !== undefined) {
-        var code = '<pre><code>' + question.code + '</code></pre>'
-      } else {
-        var code = ''
-      }
+      var code=question.code!==undefined?'<pre><code>' + question.code + '</code></pre>':'';
 
       if (question.input === undefined) {
         question.input = { type: 'input' }
@@ -50,11 +46,7 @@ quiz = function (element, options) {
             var option = question.input.options[j]
             var type = question.input.type
 
-            if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-              var checked = 'checked'
-            } else {
-              var checked = ''
-            }
+            var checked=(!!responses[i] && responses[i].indexOf(option.label) !== -1)?'checked':''
 
             input += '<div class="field">'
               + '<div class="ui checkbox ' + type + '">'
@@ -77,6 +69,7 @@ quiz = function (element, options) {
             } else {
               var value = ''
             }
+            var value=(!!responses[i])?responses[i][j]:'';
 
             input += '<tr>'
               + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
