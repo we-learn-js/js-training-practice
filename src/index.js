@@ -169,10 +169,10 @@ quiz = function (element, options) {
         isQuestionAnswered = false
       }
 
-      if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-        responses[currentQuestion].forEach((resp) => {
+      if (!!responses.currentQuestion && !!responses.currentQuestion.length) {
+        responses.currentQuestion.forEach((resp) => {
           if (!resp) isQuestionAnswered = false
-        })
+      })
       }
 
       if (!isQuestionAnswered) {
