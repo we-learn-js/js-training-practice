@@ -57,6 +57,12 @@ function getMultipleInputsField (name, idx, label, value) {
     + '<tr><td colspan="3">&nbsp;</tr></tr>'
 }
 
+function getInputField (name, value) {
+  return '<div class="ui input fluid">'
+    + '<input type="text" placeholder="Response..." name="' + name + '" value="' + value + '" />'
+    + '</div>'
+}
+
 quiz = function (element, options) {
   $element = $(element)
 
@@ -87,7 +93,6 @@ quiz = function (element, options) {
         case 'checkbox':
         case 'radio':
           var input = '<div class="inline fields">'
-
           question.input.options.forEach( function(option, j) {
             var type = question.input.type
             var checked = isOptionInResponse(option, responses[i])
@@ -101,21 +106,14 @@ quiz = function (element, options) {
         case 'inputs':
           var input = '<table>'
           question.input.options.forEach( function(option, j) {
-            var option = question.input.options[j]
             var value = !!responses[i] ? responses[i][j] : ''
             input += getMultipleInputsField('question_' + i, j, option.label, value)
           })
           input += '</table>'
           break
         default:
-          if (!!responses[i]) {
-            var value = responses[i]
-          } else {
-            var value = ''
-          }
-          var input = '<div class="ui input fluid">'
-            + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
-            + '</div>'
+          var value = responses[i] ? responses[i] : ''
+          var input = getInputField('question_' + i, value)
       }
 
       $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
