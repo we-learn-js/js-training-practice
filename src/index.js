@@ -141,58 +141,27 @@ quiz = function (element, options) {
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
-          responses[currentQuestion] = []
-          $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
+
+          validateInputs(responses, currentQuestion, $('[name=' + $inputs.attr('name') + ']:checked'));
+
           if (responses[currentQuestion].length === 0) {
             responses[currentQuestion] = null
           }
           break
         case 'inputs':
-          responses[currentQuestion] = []
-          $inputs.each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
+
+          validateInputs(responses, currentQuestion, $inputs);
+          
           break
         default:
           responses[currentQuestion] = $inputs.val()
       }
+      
+      var responseCount = countResponses(responses, questions);
 
-      var responseCount = 0
-      for (i = 0; i < responses.length; i++) {
-        question = questions[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            if (!!responses[i] && !!responses[i].join('')) {
-              responseCount++
-            }
-            break
-          default:
-            if (!!responses[i]) {
-              responseCount++
-            }
-        }
-      }
+      printProgressBar(responseCount, questions);
 
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
-
-      isQuestionAnswered = true
-
-      console.log('response', currentQuestion, responses[currentQuestion])
-      if (!responses[currentQuestion]) {
-        isQuestionAnswered = false
-      }
-
-      if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-        for (j = 0; j < responses[currentQuestion].length; j++) {
-          if (!responses[currentQuestion][j]) {
-            isQuestionAnswered = false
-          }
-        }
-      }
+      isQuestionAnswered = validateQuestionAnswered(responses, currentQuestion);
 
       if (!isQuestionAnswered) {
         alert('You must give a response')
@@ -217,3 +186,56 @@ quiz = function (element, options) {
 }
 
 module.exports = quiz
+
+function validateInputs(responses, currentQuestion, inputValue){
+  responses[currentQuestion] = []
+  inputValue.each(function (i, input) {
+    responses[currentQuestion].push(input.value)
+  })
+}
+
+function printProgressBar(responseCount, questions){
+  $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+}
+
+function countResponses(responses, questions){
+
+  responseCount = 0;
+
+  responses.forEach(function(response,i){
+    question = questions[i]
+    switch (question.input.type) {
+      case 'checkbox':
+      case 'radio':
+      case 'inputs':
+        if (!!response && !!response.join('')) {
+          responseCount++
+        }
+        break
+      default:
+        if (!!response) {
+          responseCount++
+        }
+    }
+  });
+
+  return responseCount;
+}
+
+function validateQuestionAnswered (responses, currentQuestion){
+
+  isQuestionAnswered = true
+  if (!responses[currentQuestion]) {
+    isQuestionAnswered = false
+  }
+
+  if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
+    
+    responses.forEach(function(response){
+      if (!response) {
+        isQuestionAnswered = false
+      }
+    });
+  }
+  return isQuestionAnswered;
+}
