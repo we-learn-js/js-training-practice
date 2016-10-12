@@ -32,6 +32,20 @@ function createTitleElement(title) {
   return $('<h1 class="ui header">' + title + '</h1>')
 }
 
+function isOptionInResponse (option, response) {
+  return !!response && response.indexOf(option.label) !== -1
+}
+
+function getMultipleChoiceField(type, name, idx, label, checked){
+  checked = checked && 'checked'
+  return '<div class="field">'
+    + '<div class="ui checkbox ' + type + '">'
+    + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
+    + '<label for="' + name + '_' + idx + '">' + label + '</label>'
+    + '</div>'
+    + '</div>'
+}
+
 quiz = function (element, options) {
   $element = $(element)
 
@@ -66,18 +80,12 @@ quiz = function (element, options) {
           question.input.options.forEach( function(option, j) {
             var type = question.input.type
 
-            if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-              var checked = 'checked'
-            } else {
-              var checked = ''
-            }
+            var checked = isOptionInResponse(option, responses[i])
 
-            input += '<div class="field">'
-              + '<div class="ui checkbox ' + type + '">'
-              + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
-              + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
-              + '</div>'
-              + '</div>'
+            input += getMultipleChoiceField(
+              type, 'question_' + i,  j, option.label,  checked
+            )
+
           })
           input += '</div>'
           break
