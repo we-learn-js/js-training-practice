@@ -63,6 +63,14 @@ function getInputField (name, value) {
     + '</div>'
 }
 
+function getFieldName (idx){
+  return 'question_' + idx
+}
+
+function getFieldId (idx){
+  return 'question-' + idx
+}
+
 quiz = function (element, options) {
   $element = $(element)
 
@@ -97,7 +105,7 @@ quiz = function (element, options) {
             var type = question.input.type
             var checked = isOptionInResponse(option, responses[i])
             input += getMultipleChoiceField(
-              type, 'question_' + i,  j, option.label,  checked
+              type, getFieldName(i),  j, option.label,  checked
             )
           })
           input += '</div>'
@@ -107,16 +115,16 @@ quiz = function (element, options) {
           var input = '<table>'
           question.input.options.forEach( function(option, j) {
             var value = !!responses[i] ? responses[i][j] : ''
-            input += getMultipleInputsField('question_' + i, j, option.label, value)
+            input += getMultipleInputsField(getFieldName(i), j, option.label, value)
           })
           input += '</table>'
           break
         default:
           var value = responses[i] ? responses[i] : ''
-          var input = getInputField('question_' + i, value)
+          var input = getInputField(getFieldName(i), value)
       }
 
-      $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
+      $question = $('<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
         + '<div class="content">'
         + '<div class="header">' + question.problem + '</div>'
         + '</div>'
@@ -135,7 +143,7 @@ quiz = function (element, options) {
         hljs.highlightBlock(block)
       })
 
-      $questions.find('#question-' + currentQuestion).css('display', 'block')
+      $questions.find('#' + getFieldId(currentQuestion)).css('display', 'block')
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
     })
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
@@ -155,7 +163,7 @@ quiz = function (element, options) {
     $element.append($resetButton)
 
     $('#submit-response').on('click', function () {
-      var $inputs = $('[name^=question_' + currentQuestion + ']')
+      var $inputs = $('[name^=' + getFieldName(currentQuestion) + ']')
       var question = questions[currentQuestion]
 
       switch (question.input.type) {
@@ -216,9 +224,9 @@ quiz = function (element, options) {
       if (!isQuestionAnswered) {
         alert('You must give a response')
       } else {
-        $questions.find('#question-' + currentQuestion).css('display', 'none')
+        $questions.find(getFieldId(currentQuestion)).css('display', 'none')
         currentQuestion = currentQuestion + 1
-        $questions.find('#question-' + currentQuestion).css('display', 'block')
+        $questions.find('#' + getFieldId(currentQuestion)).css('display', 'block')
 
         if (responseCount === questions.length) {
           $('#submit-response').css('display', 'none')
