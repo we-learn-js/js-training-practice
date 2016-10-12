@@ -1,25 +1,19 @@
 var quizData;
 var questions;
-//responseCount = 0
-//currentQuestion = 0
 var QUIZ = 'quiz'
-
-function getFormElement() {
-  return $('<form class="ui form"></form>');
-}
-
-function getProgressBarHtml() {
-  return '<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+var FORM_TEMPLATE = '<form class="ui form"></form>';
+var PROGRESS_BAR_HTML = '<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
         + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
         + '</div>';
-}
+var H1_HTML_TEMPLATE = '<h1 class="ui header">{0}</h1>';
+var PRE_CODE_HTML = '<pre><code>{0}</code></pre>';
 
 function getH1Html(title) {
-  return '<h1 class="ui header">' + title + '</h1>';
+  return H1_HTML_TEMPLATE.replace('{0}', title);
 }
 
 function getPreCodeHtml(code) {
-  return '<pre><code>' + code + '</code></pre>';
+  return PRE_CODE_HTML.replace('{0}', code);
 }
 
 function getRadioCheckboxHtml(question, responses, i) {
@@ -133,7 +127,7 @@ function getInput(question, responses, i) {
 }
 
 function addProgressBarToBody() {
-  $(document.body).append(getProgressBarHtml())
+  $(document.body).append(PROGRESS_BAR_HTML);
 }
 
 function highlightPreCodes() {
@@ -241,7 +235,7 @@ function printQuiz (element, data) {
   addProgressBarToBody();
   
   $element = $(element)
-  $questions = getFormElement()
+  $questions = $(FORM_TEMPLATE)
   $element
     .append(getH1Html(data.title))
     .append($questions)
