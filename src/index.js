@@ -55,15 +55,9 @@ quiz = function (element, options) {
       .append($questions)
 
     data.questions.forEach( function(question, i) {
-      if (question.code !== undefined) {
-        var code = '<pre><code>' + question.code + '</code></pre>'
-      } else {
-        var code = ''
-      }
+      var code = question.code && '<pre><code>' + question.code + '</code></pre>'
+      question.input = question.input || { type: 'input' }
 
-      if (question.input === undefined) {
-        question.input = { type: 'input' }
-      }
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
