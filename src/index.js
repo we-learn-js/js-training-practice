@@ -14,6 +14,16 @@ var RADIO_CHECKBOX_OPTION_HTML_TEMPLATE = '<div class="field">'
       + '<label for="question_{2}_{3}">{4}</label>'
       + '</div>'
       + '</div>';
+var INPUT_OPTION_HTML_TEMPLATE = '<tr>'
+      + '<td><label for="question_{0}_{1}">{2}</label></td>'
+      + '<td width="15px"></td>'
+      + '<td><div class="ui input">'
+      + '<input type="text" placeholder="Response..." name="question_{0}" id="question_{0}_{1}" value="{3}" />'
+      + '</div></td>'
+      + '</tr>'
+      + '<tr><td colspan="3">&nbsp;</tr></tr>';
+
+var INPUT_HTML_TEMPLATE = '<table>{0}</table>';
 
 function getH1Html(title) {
   return H1_HTML_TEMPLATE.replace('{0}', title);
@@ -49,35 +59,25 @@ function getRadioCheckboxHtml(question, responses, i) {
   return RADIO_CHECKBOX_HTML_TEMPLATE.replace('{0}', inputOptionsHtml.join(''));
 }
 
-//function getInputRowHtml(prev, currentOption, )
+function getInputOptionHtml(option, j, responses, i) {
+  var value = (!!responses[i])
+          ? responses[i][j]
+          : '';
+
+  return INPUT_OPTION_HTML_TEMPLATE
+          .replace('{0}', i)
+          .replace('{0}', i)
+          .replace('{0}', i)
+          .replace('{1}', j)
+          .replace('{1}', j)
+          .replace('{2}', option.label)
+          .replace('{3}', value);
+}
 
 function getInputHtml(question, responses, i) {
-  var input = '<table>';
+  var inputOptionsHtml = question.input.options.map(function(option, j) { return getInputOptionHtml(option, j, responses, i) });
 
-  //question.input.options.reduce(getInputRowHtml, '');
-
-  for (j = 0; j < question.input.options.length; j++) {
-    var option = question.input.options[j]
-    var type = 'checkbox'
-
-    if (!!responses[i]) {
-      var value = responses[i][j]
-    } else {
-      var value = ''
-    }
-
-    input += '<tr>'
-      + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
-      + '<td width="15px"></td>'
-      + '<td><div class="ui input">'
-      + '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />'
-      + '</div></td>'
-      + '</tr>'
-      + '<tr><td colspan="3">&nbsp;</tr></tr>'
-  }
-  input += '</table>'
-
-  return input;
+  return INPUT_HTML_TEMPLATE.replace('{0}', inputOptionsHtml.join(''));
 }
 
 function getDefaultInputHtml(responses, i) {
