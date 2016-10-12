@@ -8,7 +8,7 @@ quiz = function (element, options) {
     url: options.url
   }).done(function (data) { proceso(data)});
 
-function InicializaProceso(){
+function InitProcess(){
   try {
     quizData = JSON.parse(localStorage.getItem('quiz'))
     responses = quizData.responses || []
@@ -20,6 +20,13 @@ function InicializaProceso(){
     quizData = { responses: [] }
     responses = quizData.responses
   }
+}
+
+function EndProcess(){
+  quizData.responses = responses
+  quizData.responseCount = responseCount
+  quizData.currentQuestion = currentQuestion
+  localStorage.setItem('quiz', JSON.stringify(quizData))
 }
 
 function PrintCheckboxRadio(question,responses,i){
@@ -95,6 +102,36 @@ function ResponseCount(){
   });
   return responseCount;
 }
+
+function PrintBarProgressHtml(){
+  $(document.body)
+    .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+      + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
+      + '</div>')
+}
+
+function PrintEndQuestions(responseCount){
+  if (responseCount === questions.length) {
+    $('#submit-response').css('display', 'none')
+    $element.append('<div>Thank you for your responses.<br /><br /> </div>')
+    $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+  }
+}
+
+function ShowNextQuestion(questions,responseCount,currentQuestion){
+  var _currentQuestion=currentQuestion;
+  if (responseCount<responses.length) {
+    alert('You must give a response')
+  } else {
+    questions.find('#question-' + _currentQuestion).css('display', 'none')
+    _currentQuestion++
+    questions.find('#question-' + _currentQuestion).css('display', 'block')
+
+    PrintEndQuestions(responseCount)
+
+  }
+  return _currentQuestion
+}
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -102,13 +139,13 @@ function ResponseCount(){
 function proceso(data){
     questions = data.questions
 
-    InicializaProceso()
+    InitProcess()
 
     $questions = $('<form class="ui form"></form>')
-    $(document.body)
-      .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
-        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
-        + '</div>')
+
+    PrintBarProgressHtml()
+
+
     $element
       .append('<h1 class="ui header">' + data.title + '</h1>')
       .append($questions)
@@ -137,9 +174,7 @@ function proceso(data){
             + '</div>'
       }
 
-      $question = $(PrintQuestion(question,i,input,code)).css('display', 'none')
-
-      $questions.append($question)
+      $questions.append($(PrintQuestion(question,i,input,code)).css('display', 'none'))
 
       $questions.find('#question-' + currentQuestion).css('display', 'block')
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
@@ -149,11 +184,7 @@ function proceso(data){
 
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
 
-    if (responseCount === questions.length) {
-      $('#submit-response').css('display', 'none')
-      $element.append('<div>Thank you for your responses.<br /><br /> </div>')
-      $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-    }
+    PrintEndQuestions(responseCount)
 
     $resetButton = $('<button class="ui button negative">Reset</button>')
     $resetButton.on('click', function(){
@@ -185,29 +216,14 @@ function proceso(data){
           responses[currentQuestion] = $inputs.val()
       }
 
-      var responseCount = ResponseCount()
+      var responseCount = ResponseCount();
 
+      $('#progress').css('width', (responseCount / questions.length * 100) + '%');
 
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+      currentQuestion= ShowNextQuestion($questions,responseCount,currentQuestion);
 
-      if (responseCount<responses.length) {
-        alert('You must give a response')
-      } else {
-        $questions.find('#question-' + currentQuestion).css('display', 'none')
-        currentQuestion = currentQuestion + 1
-        $questions.find('#question-' + currentQuestion).css('display', 'block')
+      EndProcess()
 
-        if (responseCount === questions.length) {
-          $('#submit-response').css('display', 'none')
-          $element.append('<div>Thank you for your responses.<br /><br /> </div>')
-          $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-        }
-      }
-
-      quizData.responses = responses
-      quizData.responseCount = responseCount
-      quizData.currentQuestion = currentQuestion
-      localStorage.setItem('quiz', JSON.stringify(quizData))
     })
   }
 }
