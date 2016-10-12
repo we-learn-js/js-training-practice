@@ -38,7 +38,7 @@ quiz = function (element, options) {
   getQuizConfig(options.url, function(data){
 
     questions = data.questions
-    
+
     quizData = getQuizData ()
     responses = quizData.responses
     currentQuestion = quizData.currentQuestion
@@ -54,9 +54,7 @@ quiz = function (element, options) {
       .append(createTitleElement(data.title))
       .append($questions)
 
-    for (var i = 0; i < data.questions.length; i++) {
-      question = data.questions[i]
-
+    data.questions.forEach( function(question, i) {
       if (question.code !== undefined) {
         var code = '<pre><code>' + question.code + '</code></pre>'
       } else {
@@ -70,8 +68,8 @@ quiz = function (element, options) {
         case 'checkbox':
         case 'radio':
           var input = '<div class="inline fields">'
-          for (j = 0; j < question.input.options.length; j++) {
-            var option = question.input.options[j]
+
+          question.input.options.forEach( function(option, j) {
             var type = question.input.type
 
             if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
@@ -86,13 +84,13 @@ quiz = function (element, options) {
               + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
               + '</div>'
               + '</div>'
-          }
+          })
           input += '</div>'
           break
 
         case 'inputs':
           var input = '<table>'
-          for (j = 0; j < question.input.options.length; j++) {
+          question.input.options.forEach( function(option, j) {
             var option = question.input.options[j]
             var type = 'checkbox'
 
@@ -110,7 +108,7 @@ quiz = function (element, options) {
               + '</div></td>'
               + '</tr>'
               + '<tr><td colspan="3">&nbsp;</tr></tr>'
-          }
+          })
           input += '</table>'
           break
         default:
@@ -145,7 +143,7 @@ quiz = function (element, options) {
 
       $questions.find('#question-' + currentQuestion).css('display', 'block')
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
-    }
+    })
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
 
     if (responseCount === questions.length) {
@@ -188,7 +186,7 @@ quiz = function (element, options) {
       }
 
       var responseCount = 0
-      for (i = 0; i < responses.length; i++) {
+      responses.forEach( function(response, i) {
         question = questions[i]
         switch (question.input.type) {
           case 'checkbox':
@@ -203,7 +201,7 @@ quiz = function (element, options) {
               responseCount++
             }
         }
-      }
+      })
 
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
 
@@ -214,11 +212,11 @@ quiz = function (element, options) {
       }
 
       if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-        for (j = 0; j < responses[currentQuestion].length; j++) {
+        responses[currentQuestion].forEach(function(response, j){
           if (!responses[currentQuestion][j]) {
             isQuestionAnswered = false
           }
-        }
+        })
       }
 
       if (!isQuestionAnswered) {
