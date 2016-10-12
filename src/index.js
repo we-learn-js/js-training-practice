@@ -8,6 +8,12 @@ var PROGRESS_BAR_HTML = '<div style="position: fixed; bottom: 0; background: #ee
 var H1_HTML_TEMPLATE = '<h1 class="ui header">{0}</h1>';
 var PRE_CODE_HTML = '<pre><code>{0}</code></pre>';
 var RADIO_CHECKBOX_HTML_TEMPLATE = '<div class="inline fields">{0}</div>';
+var RADIO_CHECKBOX_OPTION_HTML_TEMPLATE = '<div class="field">'
+      + '<div class="ui checkbox {0}">'
+      + '<input type="{0}" {1} name="question_{2}" id="question_{2}_{3}" value="{4}">'
+      + '<label for="question_{2}_{3}">{4}</label>'
+      + '</div>'
+      + '</div>';
 
 function getH1Html(title) {
   return H1_HTML_TEMPLATE.replace('{0}', title);
@@ -17,28 +23,30 @@ function getPreCodeHtml(code) {
   return PRE_CODE_HTML.replace('{0}', code);
 }
 
+function getRadioCheckboxOptionHtml(option, j, question, responses, i) {
+  var type = question.input.type
+
+  var checked = (!!responses[i] && responses[i].indexOf(option.label) !== -1)
+    ? 'checked'
+    : '';
+
+  return RADIO_CHECKBOX_OPTION_HTML_TEMPLATE
+          .replace('{0}', type)
+          .replace('{0}', type)
+          .replace('{1}', checked)
+          .replace('{2}', i)
+          .replace('{2}', i)
+          .replace('{2}', i)
+          .replace('{3}', j)
+          .replace('{3}', j)
+          .replace('{4}', option.label)
+          .replace('{4}', option.label);
+}
+
 function getRadioCheckboxHtml(question, responses, i) {
-  var inputOptions = '';
+  var inputOptionsHtml = question.input.options.map(function(option, j) { return getRadioCheckboxOptionHtml(option, j, question, responses, i) });
 
-  for (j = 0; j < question.input.options.length; j++) {
-    var option = question.input.options[j]
-    var type = question.input.type
-
-    if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-      var checked = 'checked'
-    } else {
-      var checked = ''
-    }
-
-    inputOptions += '<div class="field">'
-      + '<div class="ui checkbox ' + type + '">'
-      + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
-      + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
-      + '</div>'
-      + '</div>'
-  }
-
-  return RADIO_CHECKBOX_HTML_TEMPLATE.replace('{0}', inputOptions);
+  return RADIO_CHECKBOX_HTML_TEMPLATE.replace('{0}', inputOptionsHtml.join(''));
 }
 
 //function getInputRowHtml(prev, currentOption, )
