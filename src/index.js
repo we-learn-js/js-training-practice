@@ -156,6 +156,10 @@ function GetInputType(obj){
   var _obj=obj
   return _obj === undefined?{ type: 'input' }:_obj
 }
+
+function MoveProgresBar(responseCount){
+  $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+}
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -184,7 +188,8 @@ function proceso(data){
       $questions.append($(PrintQuestion(question,i,input,code)).css('display', 'none'))
 
       $questions.find('#question-' + currentQuestion).css('display', 'block')
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+      MoveProgresBar(responseCount)
+
     });
 
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
@@ -222,8 +227,8 @@ function proceso(data){
 
       var responseCount = ResponseCount();
 
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%');
-
+      MoveProgresBar(responseCount)
+      
       currentQuestion= ShowNextQuestion($questions,responseCount,currentQuestion);
 
       EndProcess()
