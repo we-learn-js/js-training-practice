@@ -29,6 +29,18 @@ function EndProcess(){
   localStorage.setItem('quiz', JSON.stringify(quizData))
 }
 
+function PrintByObjectType(type,question,responses,i){
+  switch (type) {
+    case 'checkbox':
+    case 'radio':
+      return PrintCheckboxRadio(question,responses,i)
+    case 'inputs':
+      return PrintInputs(question,responses,i)
+    default:
+      return PrintDefault(responses,i)
+  }
+}
+
 function PrintCheckboxRadio(question,responses,i){
   var input = '<div class="inline fields">'
   question.input.options.forEach(function(option,j){
@@ -167,17 +179,7 @@ function proceso(data){
 
       question.input=GetInputType(question.input)
 
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-          var input = PrintCheckboxRadio(question,responses,i)
-          break
-        case 'inputs':
-          var input =PrintInputs(question,responses,i)
-          break
-        default:
-          var input =PrintDefault(responses,i)
-      }
+      var input =PrintByObjectType(question.input.type,question,responses,i)
 
       $questions.append($(PrintQuestion(question,i,input,code)).css('display', 'none'))
 
