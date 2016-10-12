@@ -25,6 +25,10 @@ var INPUT_OPTION_HTML_TEMPLATE = '<tr>'
 
 var INPUT_HTML_TEMPLATE = '<table>{0}</table>';
 
+var DEFAULT_INPUT_HTML = '<div class="ui input fluid">'
+    + '<input type="text" placeholder="Response..." name="question_{0}" value="{1}" />'
+    + '</div>'; // i value
+
 function getH1Html(title) {
   return H1_HTML_TEMPLATE.replace('{0}', title);
 }
@@ -81,14 +85,13 @@ function getInputHtml(question, responses, i) {
 }
 
 function getDefaultInputHtml(responses, i) {
-  if (!!responses[i]) {
-    var value = responses[i]
-  } else {
-    var value = ''
-  }
-  return '<div class="ui input fluid">'
-    + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
-    + '</div>'
+  var value = (!!responses[i])
+                ? responses[i]
+                : '';
+
+  return DEFAULT_INPUT_HTML
+    .replace('{0}', i)
+    .replace('{1}', value);
 }
 
 function getQuestionHtml(i, question, responses) {
