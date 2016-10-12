@@ -161,18 +161,18 @@ function proceso(data){
       }
 
       var responseCount = 0
-      responses.forEach(function(responses,i){
+      responses.forEach(function(response,i){
         question = questions[i]
         switch (question.input.type) {
           case 'checkbox':
           case 'radio':
           case 'inputs':
-            if (!!responses && !!responses.join('')) {
+            if (!!response && !!response.join('')) {
               responseCount++
             }
             break
           default:
-            if (!!responses) {
+            if (!!response) {
               responseCount++
             }
         }
@@ -180,7 +180,7 @@ function proceso(data){
 
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
 
-      if (!responses[currentQuestion]) {
+      if (responseCount<responses.length) {
         alert('You must give a response')
       } else {
         $questions.find('#question-' + currentQuestion).css('display', 'none')
