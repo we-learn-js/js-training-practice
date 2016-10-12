@@ -47,8 +47,12 @@ function getRadioCheckboxHtml(question, responses, i) {
   return input;
 }
 
+//function getInputRowHtml(prev, currentOption, )
+
 function getInputHtml(question, responses, i) {
   var input = '<table>';
+
+  //question.input.options.reduce(getInputRowHtml, '');
 
   for (j = 0; j < question.input.options.length; j++) {
     var option = question.input.options[j]
@@ -132,14 +136,30 @@ function addProgressBarToBody() {
   $(document.body).append(getProgressBarHtml())
 }
 
-function processQuestion(question, i) {
-  $questions.append(getQuestionHtml(i, question, quizData.responses));
-
+function highlightPreCodes() {
   $('pre code').each(function (i, block) {
     hljs.highlightBlock(block)
   })
+}
 
-  $questions.find('#question-' + quizData.currentQuestion).css('display', 'block')
+function setDisplayToQuestion(index, display) {
+  $questions.find('#question-' + index).css('display', display);
+}
+
+function showQuestionWithIndex(index) {
+  setDisplayToQuestion(index, 'block');
+}
+
+function hideQuestionWithIndex(index) {
+  setDisplayToQuestion(index, 'none');
+}
+
+function processQuestion(question, i) {
+  $questions.append(getQuestionHtml(i, question, quizData.responses));
+
+  highlightPreCodes();
+  
+  showQuestionWithIndex(quizData.currentQuestion);
   $('#progress').css('width', (quizData.responseCount / questions.length * 100) + '%')
 }
 
@@ -233,7 +253,7 @@ function printQuiz (element, data) {
       hljs.highlightBlock(block)
     })
 
-    $questions.find('#question-' + quizData2.currentQuestion).css('display', 'block')
+    showQuestionWithIndex(quizData2.currentQuestion);
     $('#progress').css('width', (quizData2.responseCount / questions.length * 100) + '%')
   });
 
@@ -290,9 +310,9 @@ function storeAnswer() {
 }
 
 function showNextQuestion($questions, $element) {
-  $questions.find('#question-' + quizData.currentQuestion).css('display', 'none')
+  hideQuestionWithIndex(quizData.currentQuestion);
   quizData.currentQuestion++
-  $questions.find('#question-' + quizData.currentQuestion).css('display', 'block')
+  showQuestionWithIndex(quizData.currentQuestion);
   
   if (quizData.responseCount === questions.length) {
     $('#submit-response').css('display', 'none')
