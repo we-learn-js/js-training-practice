@@ -139,6 +139,11 @@ function ShowNextQuestion(questions,responseCount,currentQuestion){
   }
   return _currentQuestion
 }
+
+function GetInputType(obj){
+  var _obj=obj
+  return _obj === undefined?{ type: 'input' }:_obj
+}
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -160,21 +165,18 @@ function proceso(data){
 
       var code=question.code!==undefined?'<pre><code>' + question.code + '</code></pre>':'';
 
-      if (question.input === undefined) {
-        question.input = { type: 'input' }
-      }
+      question.input=GetInputType(question.input)
+
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
           var input = PrintCheckboxRadio(question,responses,i)
           break
-
         case 'inputs':
           var input =PrintInputs(question,responses,i)
           break
         default:
           var input =PrintDefault(responses,i)
-
       }
 
       $questions.append($(PrintQuestion(question,i,input,code)).css('display', 'none'))
@@ -208,7 +210,6 @@ function proceso(data){
           })
           break
         case 'inputs':
-
           $inputs.each(function (i, input) {
             responses[currentQuestion].push(input.value)
           })
