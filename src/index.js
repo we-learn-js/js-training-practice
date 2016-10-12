@@ -161,34 +161,9 @@ quiz = function (element, options) {
 
       printProgressBar(responseCount, questions);
 
-      isQuestionAnswered = true
+      isQuestionAnswered = validateQuestionAnswered(responses, currentQuestion);
 
-      console.log('response', currentQuestion, responses[currentQuestion])
-      if (!responses[currentQuestion]) {
-        isQuestionAnswered = false
-      }
-
-      if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-        for (j = 0; j < responses[currentQuestion].length; j++) {
-          if (!responses[currentQuestion][j]) {
-            isQuestionAnswered = false
-          }
-        }
-      }
-
-      if (!isQuestionAnswered) {
-        alert('You must give a response')
-      } else {
-        $questions.find('#question-' + currentQuestion).css('display', 'none')
-        currentQuestion = currentQuestion + 1
-        $questions.find('#question-' + currentQuestion).css('display', 'block')
-
-        if (responseCount === questions.length) {
-          $('#submit-response').css('display', 'none')
-          $element.append('<div>Exam filled in successfully. Thank you.</div>')
-          $element.append('<button>Print responses</button>')
-        }
-      }
+      showNextQuestion(isQuestionAnswered, currentQuestion, element);
 
       quizData.responses = responses
       quizData.responseCount = responseCount
@@ -233,4 +208,39 @@ function countResponses(responses, questions){
   });
 
   return responseCount;
+}
+
+function validateQuestionAnswered (responses, currentQuestion){
+  isQuestionAnswered = true
+  //console.log('response', currentQuestion, responses[currentQuestion])
+  if (!responses[currentQuestion]) {
+    isQuestionAnswered = false
+  }
+
+  if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
+    for (j = 0; j < responses[currentQuestion].length; j++) {
+      if (!responses[currentQuestion][j]) {
+        isQuestionAnswered = false
+      }
+    }
+  }
+  return isQuestionAnswered;
+}
+
+function showNextQuestion(isQuestionAnswered, currentQuestion, element) {
+  console.log("passeu passeu")
+  if (!isQuestionAnswered) {
+    alert('You must give a response')
+    } else {
+    $questions.find('#question-' + currentQuestion).css('display', 'none')
+    currentQuestion = currentQuestion + 1
+    $questions.find('#question-' + currentQuestion).css('display', 'block')
+
+    if (responseCount === questions.length) {
+      $('#submit-response').css('display', 'none')
+      element.append('<div>Exam filled in successfully. Thank you.</div>')
+      element.append('<button>Print responses</button>')
+    }
+  }
+
 }
