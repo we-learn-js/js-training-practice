@@ -8,6 +8,20 @@ quiz = function (element, options) {
     url: options.url
   }).done(function (data) { proceso(data)});
 
+function InicializaProceso(){
+  try {
+    quizData = JSON.parse(localStorage.getItem('quiz'))
+    responses = quizData.responses || []
+    currentQuestion = quizData.currentQuestion || -1
+    responseCount = quizData.responseCount || -1
+  } catch (e) {}
+
+  if (quizData == null) {
+    quizData = { responses: [] }
+    responses = quizData.responses
+  }
+}
+
 function PrintCheckboxRadio(question,responses,i){
   var input = '<div class="inline fields">'
   question.input.options.forEach(function(option,j){
@@ -60,6 +74,27 @@ function  PrintQuestion(question,i,input,code) {
     + '</div>'
     + '</div>'
 }
+
+function ResponseCount(){
+  var responseCount=0
+  responses.forEach(function(response,i){
+    question = questions[i]
+    switch (question.input.type) {
+      case 'checkbox':
+      case 'radio':
+      case 'inputs':
+        if (!!response && !!response.join('')) {
+          responseCount++
+        }
+        break
+      default:
+        if (!!response) {
+          responseCount++
+        }
+    }
+  });
+  return responseCount;
+}
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -67,17 +102,7 @@ function  PrintQuestion(question,i,input,code) {
 function proceso(data){
     questions = data.questions
 
-    try {
-      quizData = JSON.parse(localStorage.getItem('quiz'))
-      responses = quizData.responses || []
-      currentQuestion = quizData.currentQuestion || -1
-      responseCount = quizData.responseCount || -1
-    } catch (e) {}
-
-    if (quizData == null) {
-      quizData = { responses: [] }
-      responses = quizData.responses
-    }
+    InicializaProceso()
 
     $questions = $('<form class="ui form"></form>')
     $(document.body)
@@ -160,23 +185,8 @@ function proceso(data){
           responses[currentQuestion] = $inputs.val()
       }
 
-      var responseCount = 0
-      responses.forEach(function(response,i){
-        question = questions[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            if (!!response && !!response.join('')) {
-              responseCount++
-            }
-            break
-          default:
-            if (!!response) {
-              responseCount++
-            }
-        }
-      });
+      var responseCount = ResponseCount()
+
 
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
 
