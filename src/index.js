@@ -68,6 +68,13 @@ function PrintInputs(question,responses,i){
   return input
 }
 
+function PrintDefault(responses,i){
+  value=(!!responses[i])?responses[i]:'';
+
+  return '<div class="ui input fluid">'
+    + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
+    + '</div>'
+}
 function  PrintQuestion(question,i,input,code) {
   return '<div id="question-' + i + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
@@ -145,7 +152,6 @@ function proceso(data){
 
     PrintBarProgressHtml()
 
-
     $element
       .append('<h1 class="ui header">' + data.title + '</h1>')
       .append($questions)
@@ -167,11 +173,8 @@ function proceso(data){
           var input =PrintInputs(question,responses,i)
           break
         default:
-          value=(!!responses[i])?responses[i]:'';
+          var input =PrintDefault(responses,i)
 
-          var input = '<div class="ui input fluid">'
-            + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
-            + '</div>'
       }
 
       $questions.append($(PrintQuestion(question,i,input,code)).css('display', 'none'))
@@ -179,8 +182,6 @@ function proceso(data){
       $questions.find('#question-' + currentQuestion).css('display', 'block')
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
     });
-
-    /// final forEach
 
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
 
