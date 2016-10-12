@@ -156,24 +156,8 @@ quiz = function (element, options) {
         default:
           responses[currentQuestion] = $inputs.val()
       }
-
-      var responseCount = 0
-      for (i = 0; i < responses.length; i++) {
-        question = questions[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            if (!!responses[i] && !!responses[i].join('')) {
-              responseCount++
-            }
-            break
-          default:
-            if (!!responses[i]) {
-              responseCount++
-            }
-        }
-      }
+      
+      var responseCount = countResponses(responses, questions);
 
       printProgressBar(responseCount, questions);
 
@@ -225,4 +209,28 @@ function validateInputs(responses, currentQuestion, inputValue){
 
 function printProgressBar(responseCount, questions){
   $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+}
+
+function countResponses(responses, questions){
+
+  responseCount = 0;
+
+  responses.forEach(function(response,i){
+    question = questions[i]
+    switch (question.input.type) {
+      case 'checkbox':
+      case 'radio':
+      case 'inputs':
+        if (!!response && !!response.join('')) {
+          responseCount++
+        }
+        break
+      default:
+        if (!!response) {
+          responseCount++
+        }
+    }
+  });
+
+  return responseCount;
 }
