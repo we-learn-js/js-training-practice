@@ -7,6 +7,7 @@ var PROGRESS_BAR_HTML = '<div style="position: fixed; bottom: 0; background: #ee
         + '</div>';
 var H1_HTML_TEMPLATE = '<h1 class="ui header">{0}</h1>';
 var PRE_CODE_HTML = '<pre><code>{0}</code></pre>';
+var RADIO_CHECKBOX_HTML_TEMPLATE = '<div class="inline fields">{0}</div>';
 
 function getH1Html(title) {
   return H1_HTML_TEMPLATE.replace('{0}', title);
@@ -17,7 +18,7 @@ function getPreCodeHtml(code) {
 }
 
 function getRadioCheckboxHtml(question, responses, i) {
-  var input = '<div class="inline fields">';
+  var inputOptions = '';
 
   for (j = 0; j < question.input.options.length; j++) {
     var option = question.input.options[j]
@@ -29,16 +30,15 @@ function getRadioCheckboxHtml(question, responses, i) {
       var checked = ''
     }
 
-    input += '<div class="field">'
+    inputOptions += '<div class="field">'
       + '<div class="ui checkbox ' + type + '">'
       + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
       + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
       + '</div>'
       + '</div>'
   }
-  input += '</div>'
 
-  return input;
+  return RADIO_CHECKBOX_HTML_TEMPLATE.replace('{0}', inputOptions);
 }
 
 //function getInputRowHtml(prev, currentOption, )
