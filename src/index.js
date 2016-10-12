@@ -101,7 +101,7 @@ function  PrintQuestion(question,i,input,code) {
     + '</div>'
 }
 
-function ResponseCount(){
+function ResponseCount(responses){
   var responseCount=0
   responses.forEach(function(response,i){
     question = questions[i]
@@ -160,6 +160,28 @@ function GetInputType(obj){
 function MoveProgresBar(responseCount){
   $('#progress').css('width', (responseCount / questions.length * 100) + '%')
 }
+
+function SaveResponse(type,inputs,responses,currentQuestion){
+  var _responses=responses
+  _responses[currentQuestion]=[]
+  switch (type) {
+    case 'checkbox':
+    case 'radio':
+
+      $('[name=' + inputs.attr('name') + ']:checked').each(function (i, input) {
+        _responses[currentQuestion].push(input.value)
+      })
+      break
+    case 'inputs':
+      inputs.each(function (i, input) {
+        _responses[currentQuestion].push(input.value)
+      })
+      break
+    default:
+      _responses[currentQuestion] = inputs.val()
+  }
+  return _responses;
+}
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -206,29 +228,13 @@ function proceso(data){
 
     $('#submit-response').on('click', function () {
       var $inputs = $('[name^=question_' + currentQuestion + ']')
-      var question = questions[currentQuestion]
-      responses[currentQuestion] = []
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
 
-          $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
-          break
-        case 'inputs':
-          $inputs.each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
-          break
-        default:
-          responses[currentQuestion] = $inputs.val()
-      }
+      responses = SaveResponse(questions[currentQuestion].input.type,$inputs,responses,currentQuestion)
 
-      var responseCount = ResponseCount();
+      var responseCount = ResponseCount(responses);
 
       MoveProgresBar(responseCount)
-      
+
       currentQuestion= ShowNextQuestion($questions,responseCount,currentQuestion);
 
       EndProcess()
