@@ -1,6 +1,10 @@
 # JS Training: practice project
 
-# How to launch dev mode?
+**Install project dependencies**
+
+```
+$ npm install
+```
 
 
 **Launch the project on dev mode**
