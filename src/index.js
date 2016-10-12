@@ -5,6 +5,18 @@ function getQuizConfig (url, callback) {
   $.ajax({ url: url }).done( callback )
 }
 
+function getStoredQuizData () {
+  storedData = localStorage.getItem('quiz')
+  return (storedData) ? JSON.parse(storedData) : {}
+}
+
+function getQuizData () {
+  quizData = getStoredQuizData()
+  quizData.responses = quizData.responses || []
+  quizData.currentQuestion = quizData.currentQuestion || 0
+  quizData.responseCount = quizData.responseCount || 0
+  return quizData
+}
 
 quiz = function (element, options) {
   $element = $(element)
@@ -12,17 +24,11 @@ quiz = function (element, options) {
   getQuizConfig(options.url, function(data){
     questions = data.questions
 
-    try {
-      quizData = JSON.parse(localStorage.getItem('quiz'))
-      responses = quizData.responses || []
-      currentQuestion = quizData.currentQuestion || -1
-      responseCount = quizData.responseCount || -1
-    } catch (e) {}
-
-    if (quizData == null) {
-      quizData = { responses: [] }
-      responses = quizData.responses
-    }
+    quizData = getQuizData ()
+    responses = quizData.responses
+    currentQuestion = quizData.currentQuestion
+    responseCount = quizData.responseCount
+    responses = quizData.responses
 
     $questions = $('<form class="ui form"></form>')
     $(document.body)
