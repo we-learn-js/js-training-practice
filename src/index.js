@@ -163,7 +163,19 @@ quiz = function (element, options) {
 
       isQuestionAnswered = validateQuestionAnswered(responses, currentQuestion);
 
-      showNextQuestion(isQuestionAnswered, currentQuestion, element);
+      if (!isQuestionAnswered) {
+        alert('You must give a response')
+      } else {
+        $questions.find('#question-' + currentQuestion).css('display', 'none')
+        currentQuestion = currentQuestion + 1
+        $questions.find('#question-' + currentQuestion).css('display', 'block')
+
+        if (responseCount === questions.length) {
+          $('#submit-response').css('display', 'none')
+          $element.append('<div>Exam filled in successfully. Thank you.</div>')
+          $element.append('<button>Print responses</button>')
+        }
+      }
 
       quizData.responses = responses
       quizData.responseCount = responseCount
@@ -211,36 +223,19 @@ function countResponses(responses, questions){
 }
 
 function validateQuestionAnswered (responses, currentQuestion){
+
   isQuestionAnswered = true
-  //console.log('response', currentQuestion, responses[currentQuestion])
   if (!responses[currentQuestion]) {
     isQuestionAnswered = false
   }
 
   if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-    for (j = 0; j < responses[currentQuestion].length; j++) {
-      if (!responses[currentQuestion][j]) {
+    
+    responses.forEach(function(response){
+      if (!response) {
         isQuestionAnswered = false
       }
-    }
+    });
   }
   return isQuestionAnswered;
-}
-
-function showNextQuestion(isQuestionAnswered, currentQuestion, element) {
-  console.log("passeu passeu")
-  if (!isQuestionAnswered) {
-    alert('You must give a response')
-    } else {
-    $questions.find('#question-' + currentQuestion).css('display', 'none')
-    currentQuestion = currentQuestion + 1
-    $questions.find('#question-' + currentQuestion).css('display', 'block')
-
-    if (responseCount === questions.length) {
-      $('#submit-response').css('display', 'none')
-      element.append('<div>Exam filled in successfully. Thank you.</div>')
-      element.append('<button>Print responses</button>')
-    }
-  }
-
 }
