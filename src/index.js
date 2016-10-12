@@ -18,7 +18,6 @@ function ShowQuestion(question) {
 }
 
 function HideQuestion(question) {
-  console.log('#question-' + question);
   $questions.find('#question-' + question).css('display', 'hide')
 }
 
@@ -100,7 +99,7 @@ function IsQuestionAnswered(currentQuestion, responses) {
   return isQuestionAnswered
 }
 
-function GetResponseCounter(responses, question, i) {
+function GetResponseCounter(responses, question) {
   var responseCount = 0
   for (i = 0; i < responses.length; i++) {
     question = questions[i]
@@ -121,7 +120,7 @@ function GetResponseCounter(responses, question, i) {
   return responseCount
 }
 
-function printQuestion(problem, code, input, index) {
+function PrintQuestion(problem, code, input, index) {
   $question = $('<div id="question-' + index + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
     + '<div class="header">' + problem + '</div>'
@@ -159,6 +158,54 @@ function StoreData(responses, responseCount, currentQuestion){
     localStorage.setItem('quiz', JSON.stringify(quizData))
 }
 
+function PrintForm() {
+  $questions = $('<form class="ui form"></form>')
+}
+
+function PrintTitle(title) {
+  $element
+    .append('<h1 class="ui header">' + title + '</h1>')
+    .append($questions)
+}
+
+function PrintPageQuestion(data) {
+  PrintTitle(data.title)
+
+  for (var i = 0; i < data.questions.length; i++) {
+    question = data.questions[i]
+    var code = GetCodeQuestion(question)
+
+    if (question.input === undefined) {
+      question.input = { type: 'input' }
+    }
+    switch (question.input.type) {
+      case 'checkbox':
+      case 'radio':
+        var input = printRadioCheck(question.input, responses, i)
+        break
+      case 'inputs':
+        var input = printInputs(question.input, responses, i)
+        break
+      default:
+        var input = printDefaultInput(responses, i)
+    }
+    PrintQuestion(question.problem, code, input, i)
+
+    $('pre code').each(function (i, block) {
+      hljs.highlightBlock(block)
+    })
+
+    ShowQuestion(currentQuestion);
+    IncrementProgressBar(responseCount, questions.length)
+    var responseCount = GetResponseCounter(responses, question, i)
+  }
+  $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
+}
+
+function SubmitResponse(){
+
+}
+
 quiz = function (element, options) {
   $element = $(element)
 
@@ -166,50 +213,11 @@ quiz = function (element, options) {
     url: options.url
   }).done(function (data) {
     questions = data.questions
-
     GetQuizData()
-
-    $questions = $('<form class="ui form"></form>')
-
-    InitProgressBar();
-
-    $element
-      .append('<h1 class="ui header">' + data.title + '</h1>')
-      .append($questions)
-
-    for (var i = 0; i < data.questions.length; i++) {
-      question = data.questions[i]
-      var code = GetCodeQuestion(question)
-
-      if (question.input === undefined) {
-        question.input = { type: 'input' }
-      }
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-          var input = printRadioCheck(question.input, responses, i)
-          break
-        case 'inputs':
-          var input = printInputs(question.input, responses, i)
-          break
-        default:
-          var input = printDefaultInput(responses, i)
-      }
-      printQuestion(question.problem, code, input, i)
-
-      $('pre code').each(function (i, block) {
-        hljs.highlightBlock(block)
-      })
-
-      // $questions.find('input').on('keypress', onValueChange)
-      // $questions.find('input').on('change', onValueChange)
-      ShowQuestion(currentQuestion);
-      IncrementProgressBar(responseCount, questions.length)
-    }
-    $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
-
+    PrintForm()
+    InitProgressBar()
+    PrintPageQuestion(data)
     ShowFinishMessage(responseCount, questions.length)
-
     $('#submit-response').on('click', function () {
       var $inputs = $('[name^=question_' + currentQuestion + ']')
       var question = questions[currentQuestion]
@@ -237,10 +245,8 @@ quiz = function (element, options) {
           responses[currentQuestion] = $inputs.val()
       }
 
-
-      var responseCount = GetResponseCounter(responses, question, i)
+      var responseCount = GetResponseCounter(responses, question)
       IncrementProgressBar(responseCount, questions.length)
-
       isQuestionAnswered = IsQuestionAnswered(currentQuestion, responses)
       if (!isQuestionAnswered) {
         alert('You must give a response')
@@ -250,7 +256,6 @@ quiz = function (element, options) {
         ShowQuestion(currentQuestion)
         ShowFinishMessage(responseCount, questions.length)
       }
-
       StoreData(responses, responseCount, currentQuestion)
     })
   })
