@@ -116,10 +116,6 @@ function proceso(data){
 
       $questions.append($question)
 
-      $('pre code').each(function (i, block) {
-        hljs.highlightBlock(block)
-      })
-
       $questions.find('#question-' + currentQuestion).css('display', 'block')
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
     });
