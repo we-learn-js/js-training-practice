@@ -46,6 +46,17 @@ function getMultipleChoiceField(type, name, idx, label, checked){
     + '</div>'
 }
 
+function getMultipleInputsField (name, idx, label, value) {
+  return '<tr>'
+    + '<td><label for="' + name + '_' + idx + '">' + label + '</label></td>'
+    + '<td width="15px"></td>'
+    + '<td><div class="ui input">'
+    + '<input type="text" placeholder="Response..." name="' + name + '" id="' + name + '_' + idx + '" value="' + value + '" />'
+    + '</div></td>'
+    + '</tr>'
+    + '<tr><td colspan="3">&nbsp;</tr></tr>'
+}
+
 quiz = function (element, options) {
   $element = $(element)
 
@@ -79,13 +90,10 @@ quiz = function (element, options) {
 
           question.input.options.forEach( function(option, j) {
             var type = question.input.type
-
             var checked = isOptionInResponse(option, responses[i])
-
             input += getMultipleChoiceField(
               type, 'question_' + i,  j, option.label,  checked
             )
-
           })
           input += '</div>'
           break
@@ -94,22 +102,8 @@ quiz = function (element, options) {
           var input = '<table>'
           question.input.options.forEach( function(option, j) {
             var option = question.input.options[j]
-            var type = 'checkbox'
-
-            if (!!responses[i]) {
-              var value = responses[i][j]
-            } else {
-              var value = ''
-            }
-
-            input += '<tr>'
-              + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
-              + '<td width="15px"></td>'
-              + '<td><div class="ui input">'
-              + '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />'
-              + '</div></td>'
-              + '</tr>'
-              + '<tr><td colspan="3">&nbsp;</tr></tr>'
+            var value = !!responses[i] ? responses[i][j] : ''
+            input += getMultipleInputsField('question_' + i, j, option.label, value)
           })
           input += '</table>'
           break
