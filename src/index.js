@@ -1,12 +1,15 @@
 responseCount = 0
 currentQuestion = 0
 
+function getQuizConfig (url, callback) {
+  $.ajax({ url: url }).done( callback )
+}
+
+
 quiz = function (element, options) {
   $element = $(element)
 
-  $.ajax({
-    url: options.url
-  }).done(function (data) {
+  getQuizConfig(options.url, function(data){
     questions = data.questions
 
     try {
