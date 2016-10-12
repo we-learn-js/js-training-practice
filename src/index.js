@@ -141,19 +141,17 @@ quiz = function (element, options) {
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
-          responses[currentQuestion] = []
-          $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
+
+          validateInputs(responses, currentQuestion, $('[name=' + $inputs.attr('name') + ']:checked'));
+
           if (responses[currentQuestion].length === 0) {
             responses[currentQuestion] = null
           }
           break
         case 'inputs':
-          responses[currentQuestion] = []
-          $inputs.each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
+
+          validateInputs(responses, currentQuestion, $inputs);
+          
           break
         default:
           responses[currentQuestion] = $inputs.val()
@@ -177,7 +175,7 @@ quiz = function (element, options) {
         }
       }
 
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+      printProgressBar(responseCount, questions);
 
       isQuestionAnswered = true
 
@@ -217,3 +215,14 @@ quiz = function (element, options) {
 }
 
 module.exports = quiz
+
+function validateInputs(responses, currentQuestion, inputValue){
+  responses[currentQuestion] = []
+  inputValue.each(function (i, input) {
+    responses[currentQuestion].push(input.value)
+  })
+}
+
+function printProgressBar(responseCount, questions){
+  $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+}
