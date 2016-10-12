@@ -18,25 +18,40 @@ function getQuizData () {
   return quizData
 }
 
+function createQuestionsForm () {
+  return $('<form class="ui form"></form>')
+}
+
+function createProgressElement () {
+  return $('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+    + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
+    + '</div>')
+}
+
+function createTitleElement(title) {
+  return $('<h1 class="ui header">' + title + '</h1>')
+}
+
 quiz = function (element, options) {
   $element = $(element)
 
   getQuizConfig(options.url, function(data){
-    questions = data.questions
 
+    questions = data.questions
+    
     quizData = getQuizData ()
     responses = quizData.responses
     currentQuestion = quizData.currentQuestion
     responseCount = quizData.responseCount
     responses = quizData.responses
 
-    $questions = $('<form class="ui form"></form>')
+
+    $questions = createQuestionsForm()
+
     $(document.body)
-      .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
-        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
-        + '</div>')
+      .append(createProgressElement())
     $element
-      .append('<h1 class="ui header">' + data.title + '</h1>')
+      .append(createTitleElement(data.title))
       .append($questions)
 
     for (var i = 0; i < data.questions.length; i++) {
