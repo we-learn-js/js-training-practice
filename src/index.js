@@ -151,6 +151,16 @@ function getQuestionResponse(question, i) {
   }
 }
 
+function isEmptyResponse (response) {
+  return !response || (response.join && !response.join('')) || false
+}
+
+function getResponseCount (responses) {
+  return responses.reduce( function(result, response ) {
+    return isEmptyResponse(response) ? result : ++result
+  }, 0)
+}
+
 quiz = function (element, options) {
   $element = $(element)
 
@@ -195,25 +205,8 @@ quiz = function (element, options) {
 
       var question = questions[currentQuestion]
       responses[currentQuestion] = getQuestionResponse(question, currentQuestion)
+      responseCount = getResponseCount(responses)
 
-
-      var responseCount = 0
-      responses.forEach( function(response, i) {
-        question = questions[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            if (!!responses[i] && !!responses[i].join('')) {
-              responseCount++
-            }
-            break
-          default:
-            if (!!responses[i]) {
-              responseCount++
-            }
-        }
-      })
 
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
 
