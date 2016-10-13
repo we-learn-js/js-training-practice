@@ -159,13 +159,13 @@ function hideQuestionWithIndex(index) {
   setDisplayToQuestion(index, 'none');
 }
 
-function processQuestion(question, i) {
-  $questions.append(getQuestionHtml(i, question, quizData.responses));
+function processQuestion(question, i, responses, currentQuestion, responseCount, questionsCount) {
+  $questions.append(getQuestionHtml(i, question, responses));
 
   highlightPreCodes();
   
-  showQuestionWithIndex(quizData.currentQuestion);
-  $('#progress').css('width', (quizData.responseCount / questions.length * 100) + '%')
+  showQuestionWithIndex(currentQuestion);
+  $('#progress').css('width', (responseCount / questionsCount * 100) + '%')
 }
 
 function updateResponseCount() {
@@ -241,7 +241,7 @@ function getQuestions(data) {
 
 function printQuiz (element, data) {
   questions = getQuestions(data)
-  quizData2 = getQuizData()
+  quizData = getQuizData()
 
   addProgressBarToBody();
   
@@ -251,16 +251,7 @@ function printQuiz (element, data) {
     .append(getH1Html(data.title))
     .append($questions)
 
-  questions.forEach(function (question, i) {
-    $questions.append(getQuestionHtml(i, question, quizData2.responses));
-
-    $('pre code').each(function (i, block) {
-      hljs.highlightBlock(block)
-    })
-
-    showQuestionWithIndex(quizData2.currentQuestion);
-    $('#progress').css('width', (quizData2.responseCount / questions.length * 100) + '%')
-  });
+  questions.forEach(function (question, i) { return processQuestion(question, i, quizData.responses, quizData.currentQuestion, quizData.responseCount, questions.length) });
 
   printSubmitButton($element);
 
