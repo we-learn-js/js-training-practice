@@ -135,6 +135,21 @@ function createResetButton () {
     })
 }
 
+function getQuestionResponse(question, i) {
+  var $inputs = $('[name^=' + getFieldName(i) + ']')
+  switch (question.input.type) {
+    case 'checkbox':
+    case 'radio':
+      return $inputs.filter('[name=' + $inputs.attr('name') + ']:checked')
+        .toArray().map( input => input.value )
+      break
+    case 'inputs':
+      return $inputs.toArray().map( input => input.value )
+      break
+    default:
+      return $inputs.val()
+  }
+}
 
 quiz = function (element, options) {
   $element = $(element)
@@ -176,33 +191,11 @@ quiz = function (element, options) {
       $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
     }
 
-
-
-    
     $('#submit-response').on('click', function () {
-      var $inputs = $('[name^=' + getFieldName(currentQuestion) + ']')
-      var question = questions[currentQuestion]
 
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-          responses[currentQuestion] = []
-          $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
-          if (responses[currentQuestion].length === 0) {
-            responses[currentQuestion] = null
-          }
-          break
-        case 'inputs':
-          responses[currentQuestion] = []
-          $inputs.each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
-          break
-        default:
-          responses[currentQuestion] = $inputs.val()
-      }
+      var question = questions[currentQuestion]
+      responses[currentQuestion] = getQuestionResponse(question, currentQuestion)
+
 
       var responseCount = 0
       responses.forEach( function(response, i) {
