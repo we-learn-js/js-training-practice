@@ -109,6 +109,12 @@ function getQuestionMarkup (question, i) {
   + '</div>'
 }
 
+function createQuestionsElements(questions) {
+  return questions.map( (question, i) => {
+    return $( getQuestionMarkup(question, i) ).css('display', 'none')
+  })
+}
+
 function getFieldName (idx){
   return 'question_' + idx
 }
@@ -116,6 +122,8 @@ function getFieldName (idx){
 function getFieldId (idx){
   return 'question-' + idx
 }
+
+
 
 quiz = function (element, options) {
   $element = $(element)
@@ -135,23 +143,18 @@ quiz = function (element, options) {
 
     $(document.body)
       .append(createProgressElement())
+
     $element
       .append(createTitleElement(data.title))
       .append($questions)
 
-    data.questions.forEach( function(question, i) {
-      $question = $( getQuestionMarkup(question, i) ).css('display', 'none')
+    $questions
+      .append( createQuestionsElements(data.questions) )
+      .find('#' + getFieldId(currentQuestion)).css('display', 'block')
+      .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
 
-      $questions.append($question)
 
-      $('pre code').each(function (i, block) {
-        hljs.highlightBlock(block)
-      })
-
-      $questions.find('#' + getFieldId(currentQuestion)).css('display', 'block')
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
-    })
-    
+    $('#progress').css('width', (responseCount / questions.length * 100) + '%')
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
 
     if (responseCount === questions.length) {
