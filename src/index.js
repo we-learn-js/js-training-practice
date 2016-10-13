@@ -63,6 +63,52 @@ function getInputField (name, value) {
     + '</div>'
 }
 
+function getFieldMarkup (question, i) {
+  switch (question.input.type) {
+    case 'checkbox':
+    case 'radio':
+      var input = '<div class="inline fields">'
+      question.input.options.forEach( function(option, j) {
+        var type = question.input.type
+        var checked = isOptionInResponse(option, responses[i])
+        input += getMultipleChoiceField(
+          type, getFieldName(i),  j, option.label,  checked
+        )
+      })
+      input += '</div>'
+      break
+    case 'inputs':
+      var input = '<table>'
+      question.input.options.forEach( function(option, j) {
+        var value = !!responses[i] ? responses[i][j] : ''
+        input += getMultipleInputsField(getFieldName(i), j, option.label, value)
+      })
+      input += '</table>'
+      break
+    default:
+      var value = responses[i] ? responses[i] : ''
+      var input = getInputField(getFieldName(i), value)
+  }
+
+  return input
+}
+
+function getQuestionMarkup (question, i) {
+  var code = question.code && '<pre><code>' + question.code + '</code></pre>'
+  question.input = question.input || { type: 'input' }
+  return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
+  + '<div class="content">'
+  + '<div class="header">' + question.problem + '</div>'
+  + '</div>'
+  + '<div class="content">'
+  + code
+  + '</div>'
+  + '<div class="content">'
+  + getFieldMarkup(question, i)
+  + '</div>'
+  + '</div>'
+}
+
 function getFieldName (idx){
   return 'question_' + idx
 }
@@ -94,48 +140,7 @@ quiz = function (element, options) {
       .append($questions)
 
     data.questions.forEach( function(question, i) {
-      var code = question.code && '<pre><code>' + question.code + '</code></pre>'
-      question.input = question.input || { type: 'input' }
-
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-          var input = '<div class="inline fields">'
-          question.input.options.forEach( function(option, j) {
-            var type = question.input.type
-            var checked = isOptionInResponse(option, responses[i])
-            input += getMultipleChoiceField(
-              type, getFieldName(i),  j, option.label,  checked
-            )
-          })
-          input += '</div>'
-          break
-
-        case 'inputs':
-          var input = '<table>'
-          question.input.options.forEach( function(option, j) {
-            var value = !!responses[i] ? responses[i][j] : ''
-            input += getMultipleInputsField(getFieldName(i), j, option.label, value)
-          })
-          input += '</table>'
-          break
-        default:
-          var value = responses[i] ? responses[i] : ''
-          var input = getInputField(getFieldName(i), value)
-      }
-
-      $question = $('<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
-        + '<div class="content">'
-        + '<div class="header">' + question.problem + '</div>'
-        + '</div>'
-        + '<div class="content">'
-        + code
-        + '</div>'
-        + '<div class="content">'
-        + input
-        + '</div>'
-        + '</div>'
-      ).css('display', 'none')
+      $question = $( getQuestionMarkup(question, i) ).css('display', 'none')
 
       $questions.append($question)
 
@@ -146,6 +151,7 @@ quiz = function (element, options) {
       $questions.find('#' + getFieldId(currentQuestion)).css('display', 'block')
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
     })
+    
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
 
     if (responseCount === questions.length) {
