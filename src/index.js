@@ -85,7 +85,7 @@ function fillInputInputs(question, responses, i){
 	return input;	  
 }
 
-function fillInputDefault(i){
+function fillInputDefault(responses, i){
 
 	if (!!responses[i]) {
 		var value = responses[i]
@@ -135,7 +135,7 @@ quiz = function (element, options) {
 				break;
 							  
 			default:
-				var input = fillInputDefault(i);
+				var input = fillInputDefault(responses, i);
 				break;
 		}  
 		  
