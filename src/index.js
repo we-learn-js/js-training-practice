@@ -123,6 +123,17 @@ function getFieldId (idx){
   return 'question-' + idx
 }
 
+function createSubmitButton () {
+  return $('<button id="submit-response" class="ui primary button">Submit response</button>')
+}
+
+function createResetButton () {
+  return $('<button class="ui button negative">Reset</button>')
+    .on('click', function(){
+      localStorage.removeItem('quiz')
+      location.reload();
+    })
+}
 
 
 quiz = function (element, options) {
@@ -147,6 +158,8 @@ quiz = function (element, options) {
     $element
       .append(createTitleElement(data.title))
       .append($questions)
+      .append(createSubmitButton())
+      .append(createResetButton())
 
     $questions
       .append( createQuestionsElements(data.questions) )
@@ -155,7 +168,7 @@ quiz = function (element, options) {
 
 
     $('#progress').css('width', (responseCount / questions.length * 100) + '%')
-    $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
+
 
     if (responseCount === questions.length) {
       $('#submit-response').css('display', 'none')
@@ -163,14 +176,9 @@ quiz = function (element, options) {
       $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
     }
 
-    $resetButton = $('<button class="ui button negative">Reset</button>')
-    $resetButton.on('click', function(){
-      localStorage.removeItem('quiz')
-      location.reload();
-    })
 
-    $element.append($resetButton)
 
+    
     $('#submit-response').on('click', function () {
       var $inputs = $('[name^=' + getFieldName(currentQuestion) + ']')
       var question = questions[currentQuestion]
