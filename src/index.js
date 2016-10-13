@@ -14,6 +14,7 @@ quiz = function (element, options) {
     }
   )
 
+
   function init(data){
     getQuizData()
     initProgressBar()
@@ -24,6 +25,10 @@ quiz = function (element, options) {
     printResetButton()
     bindSubmitButton()
     checkLastQuestion(responseCount, questions.length)
+  }
+
+  function hideElement(el){
+    el.hide()
   }
 
   function initProgressBar(){
@@ -38,13 +43,13 @@ quiz = function (element, options) {
   }
 
   function showThanks(){
-    $('#submit-response').css('display', 'none')
+    hideElement($('#submit-response'))
     $element.append('<div>Thank you for your responses.<br /><br /> </div>')
     $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
   }
 
   function hideCurrentQuestion(currentQuestion){
-    $questions.find('#question-' + currentQuestion).css('display', 'none')
+    hideElement($questions.find('#question-' + currentQuestion))
   }
 
   function showNextQuestion(currentQuestion){
@@ -73,7 +78,6 @@ quiz = function (element, options) {
   }
 
   function printCheckboxRadio(question, responses, i){
-
     var input = '<div class="inline fields">'
     question.input.options.forEach((option, j) => {
       var type = question.input.type
@@ -139,7 +143,8 @@ quiz = function (element, options) {
       + input
       + '</div>'
       + '</div>'
-    ).css('display', 'none')
+    )
+    hideElement($question)
     $questions.append($question)
   }
 
