@@ -175,7 +175,7 @@ function processQuestion(question, i, responses, currentQuestion, responseCount,
   highlightPreCodes();
   
   showQuestionWithIndex(currentQuestion);
-  $('#progress').css('width', (responseCount / questionsCount * 100) + '%')
+  printProgressBar(responseCount, questionsCount);
 }
 
 function updateResponseCount() {
@@ -206,8 +206,8 @@ function getResponseCount() {
   return quizData.responses.reduce(countAnswer, 0);
 }
 
-function printProgressBar() {
-  $('#progress').css('width', (quizData.responseCount / questions.length * 100) + '%')
+function printProgressBar(responseCount, totalQuestions) {
+  $('#progress').css('width', (responseCount / totalQuestions * 100) + '%')
 }
 
 function getQuizData() {
@@ -271,7 +271,7 @@ function printQuiz (element, data) {
 function submitResponseClick($element) {
   storeAnswer();
   updateResponseCount();
-  printProgressBar();
+  printProgressBar(quizData.responseCount, questions.length);
 
   if (!isCurrentQuestionAnswered(quizData.responses[quizData.currentQuestion])) {
     alert(NO_RESPONSE_WARNING)
