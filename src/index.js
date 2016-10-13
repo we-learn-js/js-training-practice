@@ -53,15 +53,6 @@ var QUESTION_HTML_TEMPLATE = '<div id="question-{0}" class="ui card" style="widt
 
 var THANKS_MESSAGE = '<div>Exam filled in successfully. Thank you.</div>';
 
-
-function getH1Html(title) {
-  return H1_HTML_TEMPLATE.replace('{0}', title);
-}
-
-function getPreCodeHtml(code) {
-  return PRE_CODE_HTML.replace('{0}', code);
-}
-
 function getRadioCheckboxOptionHtml(option, j, question, responses, i) {
   var type = question.input.type
 
@@ -120,7 +111,7 @@ function getDefaultInputHtml(responses, i) {
 }
 
 function getQuestionHtml(i, question, responses) {
-  var input = getInput(question, responses, i);
+  var input = getInputQuestionHtml(question, responses, i);
   var code = getQuestionCode(question.code);
 
   return $(QUESTION_HTML_TEMPLATE
@@ -133,11 +124,11 @@ function getQuestionHtml(i, question, responses) {
 
 function getQuestionCode(code) {
   return code !== undefined
-    ? getPreCodeHtml(code)
+    ? PRE_CODE_HTML.replace('{0}', code)
     : '';
 }
 
-function getInput(question, responses, i) {
+function getInputQuestionHtml(question, responses, i) {
   if (question.input === undefined) {
     question.input = { type: 'input' }
   }
@@ -263,7 +254,7 @@ function printQuiz (element, data) {
   $element = $(element)
   $questions = $(FORM_TEMPLATE)
   $element
-    .append(getH1Html(data.title))
+    .append(H1_HTML_TEMPLATE.replace('{0}', data.title))
     .append($questions)
 
   questions.forEach(function (question, i) { return processQuestion(question, i, quizData.responses, quizData.currentQuestion, quizData.responseCount, questions.length) });
@@ -295,8 +286,6 @@ function storeAnswer() {
   var $inputs = $('[name^=question_' + quizData.currentQuestion + ']')
   
   var question = questions[quizData.currentQuestion]
-
-  console.log($inputs)
 
   switch (question.input.type) {
     case 'checkbox':
