@@ -2,6 +2,7 @@ responseCount = 0
 currentQuestion = 0
 
 quiz = function (element, options) {
+
   $element = $(element)
 
   $.ajax({
@@ -22,8 +23,10 @@ quiz = function (element, options) {
     }
 
     $questions = $('<form class="ui form"></form>')
-    $(document.body).append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; "><div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div></div>')
+    $(document.body).append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; "><div id="progress" style="background: #1678c2; width: 0%;">&nbsp;</div></div>')
     $element.append('<h1 class="ui header">' + data.title + '</h1>').append($questions)
+
+    $('#progress').css('width', (responseCount / questions.length * 100) + '%')
 
     function inputTotal (i) {
       var input = '<div>'
@@ -34,7 +37,6 @@ quiz = function (element, options) {
         var value = !!responses[i] ? responses[i][j] : '';
 
         if (type === 'checkbox' || type === 'radio') {
-          console.log(type);
           input += '<div class="ui checkbox ' + type + '">'
             + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
             + '<label for="question_' + i + '_' + j + '" style="margin-right:15px;">' + option.label + '</label>'
@@ -65,9 +67,9 @@ quiz = function (element, options) {
         var input = '<div class="ui input fluid">'
           + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
           + '</div>'
+      } else {
+        var input = inputTotal (i)
       }
-      else { var input = inputTotal (i)}
-
 
       $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
         + '<div class="content">'
@@ -78,7 +80,7 @@ quiz = function (element, options) {
         + input
         + '</div>'
         + '</div>'
-      ).hide() // Oculta todas las preguntas
+      ).hide()
 
       $questions.append($question)
 
@@ -86,7 +88,7 @@ quiz = function (element, options) {
         hljs.highlightBlock(block)
       })
 
-      $questions.find('#question-' + currentQuestion).show()
+      $('#question-' + currentQuestion).show()
     }
 
     $element.append('<button id="submit-response" class="ui primary button">Submit response</button><button id="button-reset" class="ui button negative">Reset</button>')
@@ -95,7 +97,6 @@ quiz = function (element, options) {
       localStorage.removeItem('quiz')
       location.reload();
     })
-
 
     $('#submit-response').on('click', function () {
       var $inputs = $('[name^=question_' + currentQuestion + ']')
@@ -121,26 +122,7 @@ quiz = function (element, options) {
         default:
           responses[currentQuestion] = $inputs.val()
       }
-
-      var responseCount = 0
-      for (i = 0; i < responses.length; i++) {
-        question = questions[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            if (!!responses[i] && !!responses[i].join('')) {
-              responseCount++
-            }
-            break
-          default:
-            if (!!responses[i]) {
-              responseCount++
-            }
-        }
-      }
-
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+      console.log (responseCount + ' ' + questions.length * 100)
 
       isQuestionAnswered = true
 
@@ -159,12 +141,14 @@ quiz = function (element, options) {
       if (!isQuestionAnswered) {
         alert('You must give a response')
       } else {
-        $questions.find('#question-' + currentQuestion).hide()
-        currentQuestion = currentQuestion + 1
-        $questions.find('#question-' + currentQuestion).show()
+        ++responseCount
+        $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+        $('#question-' + currentQuestion).hide()
+        ++currentQuestion
+        $('#question-' + currentQuestion).show()
 
         if (responseCount === questions.length) {
-          $('#submit-response').css('display', 'none')
+          $('#submit-response').hide();
           $element.append('<div>Thank you for your responses.<br /><br /> </div>')
           $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
         }
