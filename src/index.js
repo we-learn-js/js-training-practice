@@ -1,19 +1,18 @@
 var quizData;
 var questions;
-var QUIZ = 'quiz'
+
+var BUTTON_HTML = '<button id="submit-response" class="ui primary button">Submit response</button>';
+
+var DEFAULT_INPUT_HTML = '<div class="ui input fluid">'
+    + '<input type="text" placeholder="Response..." name="question_{0}" value="{1}" />'
+    + '</div>'; // i value
+
 var FORM_TEMPLATE = '<form class="ui form"></form>';
-var PROGRESS_BAR_HTML = '<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
-        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
-        + '</div>';
+
 var H1_HTML_TEMPLATE = '<h1 class="ui header">{0}</h1>';
-var PRE_CODE_HTML = '<pre><code>{0}</code></pre>';
-var RADIO_CHECKBOX_HTML_TEMPLATE = '<div class="inline fields">{0}</div>';
-var RADIO_CHECKBOX_OPTION_HTML_TEMPLATE = '<div class="field">'
-      + '<div class="ui checkbox {0}">'
-      + '<input type="{0}" {1} name="question_{2}" id="question_{2}_{3}" value="{4}">'
-      + '<label for="question_{2}_{3}">{4}</label>'
-      + '</div>'
-      + '</div>';
+
+var INPUT_HTML_TEMPLATE = '<table>{0}</table>';
+
 var INPUT_OPTION_HTML_TEMPLATE = '<tr>'
       + '<td><label for="question_{0}_{1}">{2}</label></td>'
       + '<td width="15px"></td>'
@@ -23,11 +22,37 @@ var INPUT_OPTION_HTML_TEMPLATE = '<tr>'
       + '</tr>'
       + '<tr><td colspan="3">&nbsp;</tr></tr>';
 
-var INPUT_HTML_TEMPLATE = '<table>{0}</table>';
+var NO_RESPONSE_WARNING = 'You must give a response';
 
-var DEFAULT_INPUT_HTML = '<div class="ui input fluid">'
-    + '<input type="text" placeholder="Response..." name="question_{0}" value="{1}" />'
-    + '</div>'; // i value
+var PRE_CODE_HTML = '<pre><code>{0}</code></pre>';
+
+var PRINT_BUTTON_HTML = '<button class="ui primary button" onclick="window.print()">Print responses</button>';
+
+var PROGRESS_BAR_HTML = '<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
+        + '</div>';
+
+var QUIZ = 'quiz'
+
+var RADIO_CHECKBOX_HTML_TEMPLATE = '<div class="inline fields">{0}</div>';
+
+var RADIO_CHECKBOX_OPTION_HTML_TEMPLATE = '<div class="field">'
+      + '<div class="ui checkbox {0}">'
+      + '<input type="{0}" {1} name="question_{2}" id="question_{2}_{3}" value="{4}">'
+      + '<label for="question_{2}_{3}">{4}</label>'
+      + '</div>'
+      + '</div>';
+
+var QUESTION_HTML_TEMPLATE = '<div id="question-{0}" class="ui card" style="width: 100%;">'
+        + '<div class="content">'
+        + '<div class="header">{1}</div>'
+        + '</div>'
+        + '<div class="content">{2}</div>'
+        + '<div class="content">{3}</div>'
+        + '</div>';
+
+var THANKS_MESSAGE = '<div>Exam filled in successfully. Thank you.</div>';
+
 
 function getH1Html(title) {
   return H1_HTML_TEMPLATE.replace('{0}', title);
@@ -98,18 +123,12 @@ function getQuestionHtml(i, question, responses) {
   var input = getInput(question, responses, i);
   var code = getQuestionCode(question.code);
 
-  return $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
-        + '<div class="content">'
-        + '<div class="header">' + question.problem + '</div>'
-        + '</div>'
-        + '<div class="content">'
-        + code
-        + '</div>'
-        + '<div class="content">'
-        + input
-        + '</div>'
-        + '</div>'
-      ).css('display', 'none')
+  return $(QUESTION_HTML_TEMPLATE
+            .replace('{0}', i)
+            .replace('{1}', question.problem)
+            .replace('{2}', code)
+            .replace('{3}', input)
+          ).css('display', 'none')
 }
 
 function getQuestionCode(code) {
@@ -216,18 +235,14 @@ function getQuizData() {
 }
 
 function printSubmitButton($element) {
-  $element.append(GetButtonHtml())
-}
-
-function GetButtonHtml() {
-  return '<button id="submit-response" class="ui primary button">Submit response</button>';
+  $element.append(BUTTON_HTML)
 }
 
 function checkQuizFinished(quizData, data, $element) {
   if (isQuizFinished(quizData, data)) {
     $('#submit-response').css('display', 'none')
-    $element.append('<div>Thank you for your responses.<br/><br/> </div>')
-    $element.append('<button class="ui primary button" onclick="window.print()">Print responses</button>')
+    $element.append(THANKS_MESSAGE)
+    $element.append(PRINT_BUTTON_HTML)
   }
 }
 
@@ -268,7 +283,7 @@ function submitResponseClick($element) {
   printProgressBar();
 
   if (!isCurrentQuestionAnswered(quizData.responses[quizData.currentQuestion])) {
-    alert('You must give a response')
+    alert(NO_RESPONSE_WARNING)
   } else {
     showNextQuestion($questions, $element);
   }
@@ -312,8 +327,8 @@ function showNextQuestion($questions, $element) {
   
   if (quizData.responseCount === questions.length) {
     $('#submit-response').css('display', 'none')
-    $element.append('<div>Exam filled in successfully. Thank you.</div>')
-    $element.append('<button>Print responses</button>')
+    $element.append(THANKS_MESSAGE)
+    $element.append(PRINT_BUTTON_HTML)
   }
 }
 
