@@ -210,19 +210,7 @@ quiz = function (element, options) {
 
       $('#progress').css('width', (responseCount / questions.length * 100) + '%')
 
-      isQuestionAnswered = true
-
-      if (!responses[currentQuestion]) {
-        isQuestionAnswered = false
-      }
-
-      if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-        responses[currentQuestion].forEach(function(response, j){
-          if (!responses[currentQuestion][j]) {
-            isQuestionAnswered = false
-          }
-        })
-      }
+      isQuestionAnswered = !isEmptyResponse(responses[currentQuestion])
 
       if (!isQuestionAnswered) {
         alert('You must give a response')
