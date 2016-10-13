@@ -161,6 +161,27 @@ function getResponseCount (responses) {
   }, 0)
 }
 
+function showQuestion (idx, show) {
+  var display = show ? 'block' : 'none'
+  console.log(getFieldId(idx), display)
+  $('#' + getFieldId(idx)).css('display', display )
+}
+
+function showNextQuestion ($questions) {
+  showQuestion(currentQuestion, false)
+  showQuestion(++currentQuestion, true)
+}
+
+function showTextEndMessage () {
+  $('#submit-response').css('display', 'none')
+  $element.append('<div>Thank you for your responses.<br /><br /> </div>')
+  $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+}
+
+function updateProgressBar (questions, responses) {
+  $('#progress').css('width', (responses / questions * 100) + '%')
+}
+
 quiz = function (element, options) {
   $element = $(element)
 
@@ -202,27 +223,17 @@ quiz = function (element, options) {
     }
 
     $('#submit-response').on('click', function () {
-
-      var question = questions[currentQuestion]
-      responses[currentQuestion] = getQuestionResponse(question, currentQuestion)
+      responses[currentQuestion] = getQuestionResponse(questions[currentQuestion], currentQuestion)
       responseCount = getResponseCount(responses)
 
-
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
-
-      isQuestionAnswered = !isEmptyResponse(responses[currentQuestion])
-
-      if (!isQuestionAnswered) {
+      if ( isEmptyResponse(responses[currentQuestion]) ) {
         alert('You must give a response')
       } else {
-        $questions.find(getFieldId(currentQuestion)).css('display', 'none')
-        currentQuestion = currentQuestion + 1
-        $questions.find('#' + getFieldId(currentQuestion)).css('display', 'block')
-
-        if (responseCount === questions.length) {
-          $('#submit-response').css('display', 'none')
-          $element.append('<div>Thank you for your responses.<br /><br /> </div>')
-          $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+        if (questions.length === responseCount){
+          showTextEndMessage()
+        } else {
+          showNextQuestion($questions)
+          updateProgressBar(questions.length, responseCount)
         }
       }
 
