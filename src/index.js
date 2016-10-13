@@ -1,3 +1,4 @@
+$element = null
 responseCount = 0
 currentQuestion = 0
 
@@ -101,7 +102,7 @@ function getQuestionMarkup (question, i) {
   + '<div class="header">' + question.problem + '</div>'
   + '</div>'
   + '<div class="content">'
-  + code
+  + (code || '')
   + '</div>'
   + '<div class="content">'
   + getFieldMarkup(question, i)
@@ -123,8 +124,11 @@ function getFieldId (idx){
   return 'question-' + idx
 }
 
-function createSubmitButton () {
+function createSubmitButton ($questions, questions) {
   return $('<button id="submit-response" class="ui primary button">Submit response</button>')
+    .on('click', function(){
+      processResponse($questions, questions)
+    })
 }
 
 function createResetButton () {
@@ -163,7 +167,6 @@ function getResponseCount (responses) {
 
 function showQuestion (idx, show) {
   var display = show ? 'block' : 'none'
-  console.log(getFieldId(idx), display)
   $('#' + getFieldId(idx)).css('display', display )
 }
 
@@ -204,11 +207,11 @@ function processResponse ($questions, questions) {
 }
 
 function updateQuizStatus($questions, questions, responseCount) {
+  showCurrentQuestion($questions)
+  updateProgressBar(questions.length, responseCount)
+
   if (questions.length === responseCount){
     showTextEndMessage()
-  } else {
-    showCurrentQuestion($questions)
-    updateProgressBar(questions.length, responseCount)
   }
 }
 
@@ -217,39 +220,34 @@ function saveQuizData (changes) {
   localStorage.setItem('quiz', JSON.stringify(quizData))
 }
 
+function buildQuiz (title, questions) {
+  quizData = getQuizData ()
+  responses = quizData.responses
+  currentQuestion = quizData.currentQuestion
+  responseCount = quizData.responseCount
+
+  $questions = createQuestionsForm()
+
+  $(document.body)
+    .append(createProgressElement())
+
+  $element
+    .append(createTitleElement(title))
+    .append($questions)
+    .append(createSubmitButton($questions, questions))
+    .append(createResetButton())
+
+  $questions
+    .append( createQuestionsElements(questions) )
+    .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
+
+  updateQuizStatus($questions, questions, responseCount)
+}
+
 quiz = function (element, options) {
   $element = $(element)
-
   getQuizConfig(options.url, function(data){
-
-    questions = data.questions
-    quizData = getQuizData ()
-    responses = quizData.responses
-    currentQuestion = quizData.currentQuestion
-    responseCount = quizData.responseCount
-
-
-    $questions = createQuestionsForm()
-
-    $(document.body)
-      .append(createProgressElement())
-
-    $element
-      .append(createTitleElement(data.title))
-      .append($questions)
-      .append(createSubmitButton())
-      .append(createResetButton())
-
-    $questions
-      .append( createQuestionsElements(data.questions) )
-      .find('#' + getFieldId(currentQuestion)).css('display', 'block')
-      .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
-
-    updateQuizStatus($questions, questions, responseCount)
-
-    $('#submit-response').on('click', function(){
-      processResponse($questions, questions)
-    })
+    buildQuiz(data.title, data.questions)
   })
 }
 
