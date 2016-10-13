@@ -231,7 +231,7 @@ function printSubmitButton($element) {
 
 function checkQuizFinished(quizData, data, $element) {
   if (isQuizFinished(quizData, data)) {
-    $('#submit-response').css('display', 'none')
+    hideSubmitButton()
     $element.append(THANKS_MESSAGE)
     $element.append(PRINT_BUTTON_HTML)
   }
@@ -245,10 +245,7 @@ function getQuestions(data) {
   return data.questions;
 }
 
-function printQuiz (element, data) {
-  questions = getQuestions(data)
-  quizData = getQuizData()
-
+function printHtml(element, questions, quizData) {
   addProgressBarToBody();
   
   $element = $(element)
@@ -266,6 +263,13 @@ function printQuiz (element, data) {
   $('#submit-response').on('click', function (){
     submitResponseClick($element);
   });
+}
+
+function printQuiz (element, data) {
+  questions = getQuestions(data)
+  quizData = getQuizData()
+
+  printHtml(element, questions, quizData);
 }
 
 function submitResponseClick($element) {
@@ -309,13 +313,17 @@ function storeAnswer() {
   }
 }
 
+function hideSubmitButton() {
+  $('#submit-response').css('display', 'none')
+}
+
 function showNextQuestion($questions, $element) {
   hideQuestionWithIndex(quizData.currentQuestion);
   quizData.currentQuestion++
   showQuestionWithIndex(quizData.currentQuestion);
   
   if (quizData.responseCount === questions.length) {
-    $('#submit-response').css('display', 'none')
+    hideSubmitButton();
     $element.append(THANKS_MESSAGE)
     $element.append(PRINT_BUTTON_HTML)
   }
