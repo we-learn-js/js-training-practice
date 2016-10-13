@@ -167,9 +167,9 @@ function showQuestion (idx, show) {
   $('#' + getFieldId(idx)).css('display', display )
 }
 
-function showNextQuestion ($questions) {
-  showQuestion(currentQuestion, false)
-  showQuestion(++currentQuestion, true)
+function showCurrentQuestion ($questions) {
+  showQuestion(currentQuestion-1, false)
+  showQuestion(currentQuestion, true)
 }
 
 function showTextEndMessage () {
@@ -182,18 +182,51 @@ function updateProgressBar (questions, responses) {
   $('#progress').css('width', (responses / questions * 100) + '%')
 }
 
+function processResponse ($questions, questions) {
+  quizData = getQuizData ()
+  currentQuestion = quizData.currentQuestion
+  responses = quizData.responses
+
+  responses[currentQuestion] = getQuestionResponse(questions[currentQuestion], currentQuestion)
+
+  if ( isEmptyResponse(responses[currentQuestion]) ) {
+    alert('You must give a response')
+  } else {
+    responseCount = getResponseCount(responses)
+    currentQuestion++
+    updateQuizStatus($questions, questions, responseCount)
+    saveQuizData({
+      responses: responses,
+      responseCount: responseCount,
+      currentQuestion: currentQuestion
+    })
+  }
+}
+
+function updateQuizStatus($questions, questions, responseCount) {
+  if (questions.length === responseCount){
+    showTextEndMessage()
+  } else {
+    showCurrentQuestion($questions)
+    updateProgressBar(questions.length, responseCount)
+  }
+}
+
+function saveQuizData (changes) {
+  quizData = Object.assign(getQuizData(), changes)
+  localStorage.setItem('quiz', JSON.stringify(quizData))
+}
+
 quiz = function (element, options) {
   $element = $(element)
 
   getQuizConfig(options.url, function(data){
 
     questions = data.questions
-
     quizData = getQuizData ()
     responses = quizData.responses
     currentQuestion = quizData.currentQuestion
     responseCount = quizData.responseCount
-    responses = quizData.responses
 
 
     $questions = createQuestionsForm()
@@ -212,35 +245,10 @@ quiz = function (element, options) {
       .find('#' + getFieldId(currentQuestion)).css('display', 'block')
       .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
 
+    updateQuizStatus($questions, questions, responseCount)
 
-    $('#progress').css('width', (responseCount / questions.length * 100) + '%')
-
-
-    if (responseCount === questions.length) {
-      $('#submit-response').css('display', 'none')
-      $element.append('<div>Thank you for your responses.<br /><br /> </div>')
-      $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-    }
-
-    $('#submit-response').on('click', function () {
-      responses[currentQuestion] = getQuestionResponse(questions[currentQuestion], currentQuestion)
-      responseCount = getResponseCount(responses)
-
-      if ( isEmptyResponse(responses[currentQuestion]) ) {
-        alert('You must give a response')
-      } else {
-        if (questions.length === responseCount){
-          showTextEndMessage()
-        } else {
-          showNextQuestion($questions)
-          updateProgressBar(questions.length, responseCount)
-        }
-      }
-
-      quizData.responses = responses
-      quizData.responseCount = responseCount
-      quizData.currentQuestion = currentQuestion
-      localStorage.setItem('quiz', JSON.stringify(quizData))
+    $('#submit-response').on('click', function(){
+      processResponse($questions, questions)
     })
   })
 }
