@@ -245,7 +245,7 @@ function getQuestions(data) {
   return data.questions;
 }
 
-function printHtml(element, questions, quizData) {
+function printHtml(element, questions, quizData, data) {
   addProgressBarToBody();
   
   $element = $(element)
@@ -269,7 +269,7 @@ function printQuiz (element, data) {
   questions = getQuestions(data)
   quizData = getQuizData()
 
-  printHtml(element, questions, quizData);
+  printHtml(element, questions, quizData, data);
 }
 
 function submitResponseClick($element) {
