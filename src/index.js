@@ -82,11 +82,8 @@ quiz = function (element, options) {
     question.input.options.forEach((option, j) => {
       var type = question.input.type
 
-      if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-        var checked = 'checked'
-      } else {
-        var checked = ''
-      }
+      var checked = !!responses[i] && responses[i].indexOf(option.label) !== -1
+      ? 'checked' : ''
 
       input += '<div class="field">'
         + '<div class="ui checkbox ' + type + '">'
@@ -103,11 +100,7 @@ quiz = function (element, options) {
     var input = '<table>'
     question.input.options.forEach((option, j) => {
 
-      if (!!responses[i]) {
-        var value = responses[i][j]
-      } else {
-        var value = ''
-      }
+      var value = !!responses[i] ? responses[i][j] : ''
 
       input += '<tr>'
         + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
@@ -123,11 +116,7 @@ quiz = function (element, options) {
   }
 
   function printDefaultInput(responses, i){
-    if (!!responses[i]) {
-      var value = responses[i]
-    } else {
-      var value = ''
-    }
+    var value = !!responses[i] ? responses[i] : ''
     var input = '<div class="ui input fluid">'
       + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
       + '</div>'
