@@ -1,14 +1,157 @@
-responseCount = 0
-currentQuestion = 0
 
 quiz = function (element, options) {
-  $element = $(element)
+  var responseCount = 0,
+      currentQuestion = 0,
+      $element = $(element),
+      $questions = $('<form class="ui form"></form>')
 
   $.ajax({
     url: options.url
-  }).done(function (data) {
-    questions = data.questions
+  }).done(
+    function (data) {
+      questions = data.questions
+      init(data)
+    }
+  )
 
+
+  function init(data){
+    getQuizData()
+    initProgressBar()
+    printTitle(data.title)
+    printForm($questions)
+    printQuiz(data)
+    printSubmitButton()
+    printResetButton()
+    bindSubmitButton()
+    checkLastQuestion(responseCount, questions.length)
+  }
+
+  function hideElement(el){
+    el.hide()
+  }
+
+  function initProgressBar(){
+    $(document.body)
+      .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
+        + '</div>')
+  }
+
+  function updateProgressBar(responseCount, questionsLength){
+    $('#progress').css('width', (responseCount / questionsLength * 100) + '%')
+  }
+
+  function showThanks(){
+    hideElement($('#submit-response'))
+    $element.append('<div>Thank you for your responses.<br /><br /> </div>')
+    $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+  }
+
+  function hideCurrentQuestion(currentQuestion){
+    hideElement($questions.find('#question-' + currentQuestion))
+  }
+
+  function showNextQuestion(currentQuestion){
+    $questions.find('#question-' + currentQuestion).css('display', 'block')
+  }
+
+  function printTitle(title){
+    $element.append('<h1 class="ui header">' + title + '</h1>')
+  }
+
+  function printForm(questions){
+    $element.append(questions)
+  }
+
+  function printSubmitButton(){
+    $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
+  }
+
+  function printResetButton(){
+    $resetButton = $('<button class="ui button negative">Reset</button>')
+    $resetButton.on('click', function(){
+      localStorage.removeItem('quiz')
+      location.reload();
+    })
+    $element.append($resetButton)
+  }
+
+  function printCheckboxRadio(question, responses, i){
+    var input = '<div class="inline fields">'
+    question.input.options.forEach((option, j) => {
+      var type = question.input.type
+
+      var checked = !!responses[i] && responses[i].indexOf(option.label) !== -1
+      ? 'checked' : ''
+
+      input += '<div class="field">'
+        + '<div class="ui checkbox ' + type + '">'
+        + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
+        + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
+        + '</div>'
+        + '</div>'
+    })
+    input += '</div>'
+    return input;
+  }
+
+  function printInputs(question, i){
+    var input = '<table>'
+    question.input.options.forEach((option, j) => {
+
+      var value = !!responses[i] ? responses[i][j] : ''
+
+      input += '<tr>'
+        + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
+        + '<td width="15px"></td>'
+        + '<td><div class="ui input">'
+        + '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />'
+        + '</div></td>'
+        + '</tr>'
+        + '<tr><td colspan="3">&nbsp;</tr></tr>'
+    })
+    input += '</table>'
+    return input;
+  }
+
+  function printDefaultInput(responses, i){
+    var value = !!responses[i] ? responses[i] : ''
+    var input = '<div class="ui input fluid">'
+      + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
+      + '</div>'
+      return input;
+  }
+
+  function printQuestions(problem, input, i){
+    $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
+      + '<div class="content">'
+      + '<div class="header">' + problem + '</div>'
+      + '</div>'
+      + '<div class="content">'
+      + input
+      + '</div>'
+      + '</div>'
+    )
+    hideElement($question)
+    $questions.append($question)
+  }
+
+  function printResponses(question, responses, i){
+    switch (question.input.type) {
+      case 'checkbox':
+      case 'radio':
+        input = printCheckboxRadio(question, responses, i)
+        break
+      case 'inputs':
+        input = printInputs(question, i)
+        break
+      default:
+        input = printDefaultInput(responses, i)
+    }
+  }
+
+  function getQuizData(){
     try {
       quizData = JSON.parse(localStorage.getItem('quiz'))
       responses = quizData.responses || []
@@ -20,200 +163,102 @@ quiz = function (element, options) {
       quizData = { responses: [] }
       responses = quizData.responses
     }
+  }
 
-    $questions = $('<form class="ui form"></form>')
-    $(document.body)
-      .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
-        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
-        + '</div>')
-    $element
-      .append('<h1 class="ui header">' + data.title + '</h1>')
-      .append($questions)
-
-    for (var i = 0; i < data.questions.length; i++) {
-      question = data.questions[i]
-
-      if (question.code !== undefined) {
-        var code = '<pre><code>' + question.code + '</code></pre>'
-      } else {
-        var code = ''
-      }
+  function printQuiz(data){
+    data.questions.forEach((question, i) => {
 
       if (question.input === undefined) {
         question.input = { type: 'input' }
       }
+
+      printResponses(question, responses, i)
+      printQuestions(question.problem, input, i)
+      showNextQuestion(currentQuestion)
+      updateProgressBar(responseCount, questions.length)
+    })
+  }
+
+  function setAnswers(){
+    var $inputs = $('[name^=question_' + currentQuestion + ']')
+    var question = questions[currentQuestion]
+
+    switch (question.input.type) {
+      case 'checkbox':
+      case 'radio':
+        responses[currentQuestion] = []
+        $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
+          responses[currentQuestion].push(input.value)
+        })
+        if (responses[currentQuestion].length === 0) {
+          responses[currentQuestion] = null
+        }
+        break
+      case 'inputs':
+        responses[currentQuestion] = []
+        $inputs.each(function (i, input) {
+          responses[currentQuestion].push(input.value)
+        })
+        break
+      default:
+        responses[currentQuestion] = $inputs.val()
+    }
+  }
+
+  function responseCounter(){
+    var responseCount = 0
+
+    responses.forEach((response, i) => {
+      question = questions[i]
+
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
-          var input = '<div class="inline fields">'
-          for (j = 0; j < question.input.options.length; j++) {
-            var option = question.input.options[j]
-            var type = question.input.type
-
-            if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-              var checked = 'checked'
-            } else {
-              var checked = ''
-            }
-
-            input += '<div class="field">'
-              + '<div class="ui checkbox ' + type + '">'
-              + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
-              + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
-              + '</div>'
-              + '</div>'
-          }
-          input += '</div>'
-          break
-
         case 'inputs':
-          var input = '<table>'
-          for (j = 0; j < question.input.options.length; j++) {
-            var option = question.input.options[j]
-            var type = 'checkbox'
-
-            if (!!responses[i]) {
-              var value = responses[i][j]
-            } else {
-              var value = ''
-            }
-
-            input += '<tr>'
-              + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
-              + '<td width="15px"></td>'
-              + '<td><div class="ui input">'
-              + '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />'
-              + '</div></td>'
-              + '</tr>'
-              + '<tr><td colspan="3">&nbsp;</tr></tr>'
+          if (!!responses[i] && !!responses[i].join('')) {
+            responseCount++
           }
-          input += '</table>'
           break
         default:
           if (!!responses[i]) {
-            var value = responses[i]
-          } else {
-            var value = ''
+            responseCount++
           }
-          var input = '<div class="ui input fluid">'
-            + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
-            + '</div>'
       }
+    })
+    return responseCount;
+  }
 
-      $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
-        + '<div class="content">'
-        + '<div class="header">' + question.problem + '</div>'
-        + '</div>'
-        + '<div class="content">'
-        + code
-        + '</div>'
-        + '<div class="content">'
-        + input
-        + '</div>'
-        + '</div>'
-      ).css('display', 'none')
+  function storeData(responses, responseCount, currentQuestion ){
+    quizData.responses = responses
+    quizData.responseCount = responseCount
+    quizData.currentQuestion = currentQuestion
+    localStorage.setItem('quiz', JSON.stringify(quizData))
+  }
 
-      $questions.append($question)
-
-      $('pre code').each(function (i, block) {
-        hljs.highlightBlock(block)
-      })
-
-      // $questions.find('input').on('keypress', onValueChange)
-      // $questions.find('input').on('change', onValueChange)
-      $questions.find('#question-' + currentQuestion).css('display', 'block')
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
+  function checkLastQuestion(responseCount, questionsLength){
+    if (responseCount === questionsLength) {
+      showThanks();
     }
-    $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
+  }
 
-    if (responseCount === questions.length) {
-      $('#submit-response').css('display', 'none')
-      $element.append('<div>Thank you for your responses.<br/><br/> </div>')
-      $element.append('<button class="ui primary button" onclick="window.print()">Print responses</button>')
-    }
+  function bindSubmitButton(){
+    $('#submit-response').bind('click', function () {
 
-    $('#submit-response').on('click', function () {
-      var $inputs = $('[name^=question_' + currentQuestion + ']')
-      var question = questions[currentQuestion]
+      setAnswers()
+      responseCount = responseCounter() //immutability fail :/
+      updateProgressBar(responseCount, questions.length)
 
-      console.log($inputs)
-
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-          responses[currentQuestion] = []
-          $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
-          if (responses[currentQuestion].length === 0) {
-            responses[currentQuestion] = null
-          }
-          break
-        case 'inputs':
-          responses[currentQuestion] = []
-          $inputs.each(function (i, input) {
-            responses[currentQuestion].push(input.value)
-          })
-          break
-        default:
-          responses[currentQuestion] = $inputs.val()
-      }
-
-      var responseCount = 0
-      for (i = 0; i < responses.length; i++) {
-        question = questions[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            if (!!responses[i] && !!responses[i].join('')) {
-              responseCount++
-            }
-            break
-          default:
-            if (!!responses[i]) {
-              responseCount++
-            }
-        }
-      }
-
-      $('#progress').css('width', (responseCount / questions.length * 100) + '%')
-
-      isQuestionAnswered = true
-
-      console.log('response', currentQuestion, responses[currentQuestion])
       if (!responses[currentQuestion]) {
-        isQuestionAnswered = false
-      }
-
-      if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-        for (j = 0; j < responses[currentQuestion].length; j++) {
-          if (!responses[currentQuestion][j]) {
-            isQuestionAnswered = false
-          }
-        }
-      }
-
-      if (!isQuestionAnswered) {
         alert('You must give a response')
       } else {
-        $questions.find('#question-' + currentQuestion).css('display', 'none')
+        hideCurrentQuestion(currentQuestion)
         currentQuestion = currentQuestion + 1
-        $questions.find('#question-' + currentQuestion).css('display', 'block')
-
-        if (responseCount === questions.length) {
-          $('#submit-response').css('display', 'none')
-          $element.append('<div>Exam filled in successfully. Thank you.</div>')
-          $element.append('<button>Print responses</button>')
-        }
+        showNextQuestion(currentQuestion )
+        checkLastQuestion(responseCount, questions.length)
       }
-
-      quizData.responses = responses
-      quizData.responseCount = responseCount
-      quizData.currentQuestion = currentQuestion
-      localStorage.setItem('quiz', JSON.stringify(quizData))
+      storeData(responses, responseCount, currentQuestion )
     })
-  })
+  }
 }
 
 module.exports = quiz
