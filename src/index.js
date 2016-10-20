@@ -1,9 +1,5 @@
 quiz = function (element, options) {
 
-  var responseCount = 0
-  var currentQuestion = 0
-  var $element = $(element)
-
   function getQuizConfig (url, callback) {
     $.ajax({ url: url }).done( callback )
   }
@@ -66,14 +62,14 @@ quiz = function (element, options) {
       + '</div>'
   }
 
-  function getFieldMarkup (question, i) {
+  function getFieldMarkup (question, response,  i) {
     switch (question.input.type) {
       case 'checkbox':
       case 'radio':
         var input = '<div class="inline fields">'
         question.input.options.forEach( function(option, j) {
           var type = question.input.type
-          var checked = isOptionInResponse(option, responses[i])
+          var checked = isOptionInResponse(option, response)
           input += getMultipleChoiceField(
             type, getFieldName(i),  j, option.label,  checked
           )
@@ -83,20 +79,20 @@ quiz = function (element, options) {
       case 'inputs':
         var input = '<table>'
         question.input.options.forEach( function(option, j) {
-          var value = !!responses[i] ? responses[i][j] : ''
+          var value = !!response ? response[j] : ''
           input += getMultipleInputsField(getFieldName(i), j, option.label, value)
         })
         input += '</table>'
         break
       default:
-        var value = responses[i] ? responses[i] : ''
+        var value = response ? response : ''
         var input = getInputField(getFieldName(i), value)
     }
 
     return input
   }
 
-  function getQuestionMarkup (question, i) {
+  function getQuestionMarkup (question, response,  i) {
     var code = question.code && '<pre><code>' + question.code + '</code></pre>'
     question.input = question.input || { type: 'input' }
     return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
@@ -107,14 +103,15 @@ quiz = function (element, options) {
     + (code || '')
     + '</div>'
     + '<div class="content">'
-    + getFieldMarkup(question, i)
+    + getFieldMarkup(question, response,  i)
     + '</div>'
     + '</div>'
   }
 
-  function createQuestionsElements(questions) {
+  function createQuestionsElements(questions, responses) {
     return questions.map( (question, i) => {
-      return $( getQuestionMarkup(question, i) ).css('display', 'none')
+
+      return $( getQuestionMarkup(question, responses[i], i) ).css('display', 'none')
     })
   }
 
@@ -172,15 +169,16 @@ quiz = function (element, options) {
     $('#' + getFieldId(idx)).css('display', display )
   }
 
-  function showCurrentQuestion ($questions) {
-    showQuestion(currentQuestion-1, false)
-    showQuestion(currentQuestion, true)
+  function showCurrentQuestion (current) {
+    showQuestion(current-1, false)
+    showQuestion(current, true)
   }
 
   function showTextEndMessage () {
     $('#submit-response').css('display', 'none')
-    $element.append('<div>Thank you for your responses.<br /><br /> </div>')
-    $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+    $(element)
+      .append('<div>Thank you for your responses.<br /><br /> </div>')
+      .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
   }
 
   function updateProgressBar (questions, responses) {
@@ -188,28 +186,27 @@ quiz = function (element, options) {
   }
 
   function processResponse ($questions, questions) {
-    quizData = getQuizData ()
-    currentQuestion = quizData.currentQuestion
-    responses = quizData.responses
+    var quizData = getQuizData ()
+    var currentQuestion = quizData.currentQuestion
+    var responses = quizData.responses
 
     responses[currentQuestion] = getQuestionResponse(questions[currentQuestion], currentQuestion)
 
     if ( isEmptyResponse(responses[currentQuestion]) ) {
       alert('You must give a response')
     } else {
-      responseCount = getResponseCount(responses)
-      currentQuestion++
+      var responseCount = getResponseCount(responses)
       updateQuizStatus($questions, questions, responseCount)
       saveQuizData({
         responses: responses,
         responseCount: responseCount,
-        currentQuestion: currentQuestion
+        currentQuestion: ++currentQuestion
       })
     }
   }
 
   function updateQuizStatus($questions, questions, responseCount) {
-    showCurrentQuestion($questions)
+    showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
     if (questions.length === responseCount){
@@ -222,11 +219,10 @@ quiz = function (element, options) {
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
-  function buildQuiz (title, questions) {
-    quizData = getQuizData ()
-    responses = quizData.responses
-    currentQuestion = quizData.currentQuestion
-    responseCount = quizData.responseCount
+  function buildQuiz (title, questions, $element) {
+    var quizData = getQuizData ()
+    var responses = quizData.responses
+    var responseCount = quizData.responseCount
 
     $questions = createQuestionsForm()
 
@@ -240,7 +236,7 @@ quiz = function (element, options) {
       .append(createResetButton())
 
     $questions
-      .append( createQuestionsElements(questions) )
+      .append( createQuestionsElements(questions, responses) )
       .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
 
     updateQuizStatus($questions, questions, responseCount)
@@ -248,7 +244,7 @@ quiz = function (element, options) {
 
 
   getQuizConfig(options.url, function(data){
-    buildQuiz(data.title, data.questions)
+    buildQuiz(data.title, data.questions, $(element))
   })
 }
 
