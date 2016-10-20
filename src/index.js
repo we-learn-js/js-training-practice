@@ -1,7 +1,17 @@
 quiz = function (element, options) {
 
-  function getQuizConfig (url, callback) {
+  function getJson(url, callback) {
     $.ajax({ url: url }).done( callback )
+  }
+
+  function getQuizConfig (callback) {
+    getJson(options.url, callback)
+  }
+
+  function getQuizResponse (i, callback) {
+    getJson(options.responsesUrl.replace(':index', i), function (response){
+      callback(response.response)
+    })
   }
 
   function getStoredQuizData () {
@@ -188,20 +198,41 @@ quiz = function (element, options) {
   function processResponse ($questions, questions) {
     var quizData = getQuizData ()
     var currentQuestion = quizData.currentQuestion
+    var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
     var responses = quizData.responses
-
-    responses[currentQuestion] = getQuestionResponse(questions[currentQuestion], currentQuestion)
+    responses[currentQuestion] = response
 
     if ( isEmptyResponse(responses[currentQuestion]) ) {
       alert('You must give a response')
     } else {
       var responseCount = getResponseCount(responses)
-      updateQuizStatus($questions, questions, responseCount)
-      saveQuizData({
-        responses: responses,
-        responseCount: responseCount,
-        currentQuestion: ++currentQuestion
+
+      getQuizResponse(currentQuestion, function(correctResponse){
+        if( isResponseCorrect(response, correctResponse) ) {
+          alert('Response is correct!')
+        } else {
+          alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
+        }
+
+        updateQuizStatus($questions, questions, responseCount)
+        saveQuizData({
+          responses: responses,
+          responseCount: responseCount,
+          currentQuestion: ++currentQuestion
+        })
       })
+    }
+  }
+
+  function isResponseCorrect (userResponse, correctResponse){
+    return serializeResponse(userResponse) == serializeResponse(correctResponse)
+  }
+
+  function serializeResponse (response) {
+    if (response.join) {
+      return response.sort().join(', ')
+    } else {
+      return response
     }
   }
 
@@ -243,7 +274,7 @@ quiz = function (element, options) {
   }
 
 
-  getQuizConfig(options.url, function(data){
+  getQuizConfig( function(data){
     buildQuiz(data.title, data.questions, $(element))
   })
 }
