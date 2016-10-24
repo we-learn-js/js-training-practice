@@ -2,7 +2,6 @@ quiz = function (element, options) {
 
   function getJson(url) {
     return Promise.resolve($.ajax({ url: url }));
-    //$.ajax({ url: url }).done( callback )
   }
 
   function getQuizConfig () {
