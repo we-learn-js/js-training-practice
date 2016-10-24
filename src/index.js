@@ -7,7 +7,6 @@ quiz = function (element, options) {
   function getQuizConfig () {
     getJson(options.url).then(
       function(data){
-        console.log('1-',data);
         buildQuiz(data.title, data.questions, $(element))
       }
     );
