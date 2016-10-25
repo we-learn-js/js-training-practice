@@ -16,12 +16,12 @@ quiz = function (element, options) {
   }
 
   function getStoredQuizData () {
-    storedData = localStorage.getItem('quiz')
+    const storedData = localStorage.getItem('quiz')
     return (storedData) ? JSON.parse(storedData) : {}
   }
 
   function getQuizData () {
-    quizData = getStoredQuizData()
+    let quizData = getStoredQuizData()
     quizData.responses = quizData.responses || []
     quizData.currentQuestion = quizData.currentQuestion || 0
     quizData.responseCount = quizData.responseCount || 0
@@ -249,7 +249,7 @@ quiz = function (element, options) {
   }
 
   function saveQuizData (changes) {
-    quizData = Object.assign(getQuizData(), changes)
+    const quizData = Object.assign(getQuizData(), changes)
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
@@ -258,7 +258,7 @@ quiz = function (element, options) {
     var responses = quizData.responses
     var responseCount = quizData.responseCount
 
-    $questions = createQuestionsForm()
+    let $questions = createQuestionsForm()
 
     $(document.body)
       .append(createProgressElement())
