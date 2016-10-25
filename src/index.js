@@ -1,26 +1,29 @@
 quiz = function (element, options) {
+  "use strict";
 
-  function getJson(url, callback) {
-    $.ajax({ url: url }).done( callback )
-  }
-
-  function getQuizConfig (callback) {
-    getJson(options.url, callback)
-  }
-
-  function getQuizResponse (i, callback) {
-    getJson(options.responsesUrl.replace(':index', i), function (response){
-      callback(response.response)
+  function getJson(url) {
+    return new Promise((resolve, reject) =>{
+      $.getJSON(url)
+        .done( resolve )
+        .fail( reject )
     })
   }
 
+  function getQuizConfig () {
+    return getJson(options.url)
+  }
+
+  function getQuizResponse (i) {
+    return getJson(options.responsesUrl.replace(':index', i))
+  }
+
   function getStoredQuizData () {
-    storedData = localStorage.getItem('quiz')
+    const storedData = localStorage.getItem('quiz')
     return (storedData) ? JSON.parse(storedData) : {}
   }
 
   function getQuizData () {
-    quizData = getStoredQuizData()
+    let quizData = getStoredQuizData()
     quizData.responses = quizData.responses || []
     quizData.currentQuestion = quizData.currentQuestion || 0
     quizData.responseCount = quizData.responseCount || 0
@@ -207,20 +210,20 @@ quiz = function (element, options) {
     } else {
       var responseCount = getResponseCount(responses)
 
-      getQuizResponse(currentQuestion, function(correctResponse){
-        if( isResponseCorrect(response, correctResponse) ) {
-          alert('Response is correct!')
-        } else {
-          alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
-        }
-
-        updateQuizStatus($questions, questions, responseCount)
-        saveQuizData({
+    getQuizResponse(currentQuestion)
+      .then( response => response.response )
+      .then( correctResponse =>
+        isResponseCorrect(response, correctResponse)
+        ? 'Response is correct!'
+        : 'Response is not correct! It was: ' + serializeResponse(correctResponse))
+      .then(text => alert(text))
+      .then(()=> updateQuizStatus(questions, responseCount))
+      .then(()=> saveQuizData({
           responses: responses,
           responseCount: responseCount,
           currentQuestion: ++currentQuestion
         })
-      })
+      )
     }
   }
 
@@ -236,7 +239,7 @@ quiz = function (element, options) {
     }
   }
 
-  function updateQuizStatus($questions, questions, responseCount) {
+  function updateQuizStatus(questions, responseCount) {
     showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
@@ -246,7 +249,7 @@ quiz = function (element, options) {
   }
 
   function saveQuizData (changes) {
-    quizData = Object.assign(getQuizData(), changes)
+    const quizData = Object.assign(getQuizData(), changes)
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
@@ -255,7 +258,7 @@ quiz = function (element, options) {
     var responses = quizData.responses
     var responseCount = quizData.responseCount
 
-    $questions = createQuestionsForm()
+    let $questions = createQuestionsForm()
 
     $(document.body)
       .append(createProgressElement())
@@ -270,13 +273,14 @@ quiz = function (element, options) {
       .append( createQuestionsElements(questions, responses) )
       .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
 
-    updateQuizStatus($questions, questions, responseCount)
+    updateQuizStatus(questions, responseCount)
   }
 
 
-  getQuizConfig( function(data){
-    buildQuiz(data.title, data.questions, $(element))
-  })
+  getQuizConfig()
+    .then( data =>{
+      buildQuiz(data.title, data.questions, $(element))
+    })
 }
 
 module.exports = quiz
