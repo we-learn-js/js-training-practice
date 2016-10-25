@@ -3,7 +3,9 @@ quiz = function (element, options) {
 
   function getJson(url) {
     return new Promise((resolve, reject) =>{
-      $.ajax({ url: url }).done( resolve )
+      $.getJSON(url)
+        .done( resolve )
+        .fail( reject )
     })
   }
 
