@@ -1,264 +1,282 @@
-
 quiz = function (element, options) {
-  var responseCount = 0,
-      currentQuestion = 0,
-      $element = $(element),
-      $questions = $('<form class="ui form"></form>')
 
-  $.ajax({
-    url: options.url
-  }).done(
-    function (data) {
-      questions = data.questions
-      init(data)
-    }
-  )
-
-
-  function init(data){
-    getQuizData()
-    initProgressBar()
-    printTitle(data.title)
-    printForm($questions)
-    printQuiz(data)
-    printSubmitButton()
-    printResetButton()
-    bindSubmitButton()
-    checkLastQuestion(responseCount, questions.length)
+  function getJson(url, callback) {
+    $.ajax({ url: url }).done( callback )
   }
 
-  function hideElement(el){
-    el.hide()
+  function getQuizConfig (callback) {
+    getJson(options.url, callback)
   }
 
-  function initProgressBar(){
-    $(document.body)
-      .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
-        + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
-        + '</div>')
-  }
-
-  function updateProgressBar(responseCount, questionsLength){
-    $('#progress').css('width', (responseCount / questionsLength * 100) + '%')
-  }
-
-  function showThanks(){
-    hideElement($('#submit-response'))
-    $element.append('<div>Thank you for your responses.<br /><br /> </div>')
-    $element.append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-  }
-
-  function hideCurrentQuestion(currentQuestion){
-    hideElement($questions.find('#question-' + currentQuestion))
-  }
-
-  function showNextQuestion(currentQuestion){
-    $questions.find('#question-' + currentQuestion).css('display', 'block')
-  }
-
-  function printTitle(title){
-    $element.append('<h1 class="ui header">' + title + '</h1>')
-  }
-
-  function printForm(questions){
-    $element.append(questions)
-  }
-
-  function printSubmitButton(){
-    $element.append('<button id="submit-response" class="ui primary button">Submit response</button>')
-  }
-
-  function printResetButton(){
-    $resetButton = $('<button class="ui button negative">Reset</button>')
-    $resetButton.on('click', function(){
-      localStorage.removeItem('quiz')
-      location.reload();
+  function getQuizResponse (i, callback) {
+    getJson(options.responsesUrl.replace(':index', i), function (response){
+      callback(response.response)
     })
-    $element.append($resetButton)
   }
 
-  function printCheckboxRadio(question, responses, i){
-    var input = '<div class="inline fields">'
-    question.input.options.forEach((option, j) => {
-      var type = question.input.type
-
-      var checked = !!responses[i] && responses[i].indexOf(option.label) !== -1
-      ? 'checked' : ''
-
-      input += '<div class="field">'
-        + '<div class="ui checkbox ' + type + '">'
-        + '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">'
-        + '<label for="question_' + i + '_' + j + '">' + option.label + '</label>'
-        + '</div>'
-        + '</div>'
-    })
-    input += '</div>'
-    return input;
+  function getStoredQuizData () {
+    storedData = localStorage.getItem('quiz')
+    return (storedData) ? JSON.parse(storedData) : {}
   }
 
-  function printInputs(question, i){
-    var input = '<table>'
-    question.input.options.forEach((option, j) => {
-
-      var value = !!responses[i] ? responses[i][j] : ''
-
-      input += '<tr>'
-        + '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>'
-        + '<td width="15px"></td>'
-        + '<td><div class="ui input">'
-        + '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />'
-        + '</div></td>'
-        + '</tr>'
-        + '<tr><td colspan="3">&nbsp;</tr></tr>'
-    })
-    input += '</table>'
-    return input;
+  function getQuizData () {
+    quizData = getStoredQuizData()
+    quizData.responses = quizData.responses || []
+    quizData.currentQuestion = quizData.currentQuestion || 0
+    quizData.responseCount = quizData.responseCount || 0
+    return quizData
   }
 
-  function printDefaultInput(responses, i){
-    var value = !!responses[i] ? responses[i] : ''
-    var input = '<div class="ui input fluid">'
-      + '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />'
-      + '</div>'
-      return input;
+  function createQuestionsForm () {
+    return $('<form class="ui form"></form>')
   }
 
-  function printQuestions(problem, input, i){
-    $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">'
-      + '<div class="content">'
-      + '<div class="header">' + problem + '</div>'
-      + '</div>'
-      + '<div class="content">'
-      + input
+  function createProgressElement () {
+    return $('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+      + '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
+      + '</div>')
+  }
+
+  function createTitleElement(title) {
+    return $('<h1 class="ui header">' + title + '</h1>')
+  }
+
+  function isOptionInResponse (option, response) {
+    return !!response && response.indexOf(option.label) !== -1
+  }
+
+  function getMultipleChoiceField(type, name, idx, label, checked){
+    checked = checked && 'checked'
+    return '<div class="field">'
+      + '<div class="ui checkbox ' + type + '">'
+      + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
+      + '<label for="' + name + '_' + idx + '">' + label + '</label>'
       + '</div>'
       + '</div>'
-    )
-    hideElement($question)
-    $questions.append($question)
   }
 
-  function printResponses(question, responses, i){
+  function getMultipleInputsField (name, idx, label, value) {
+    return '<tr>'
+      + '<td><label for="' + name + '_' + idx + '">' + label + '</label></td>'
+      + '<td width="15px"></td>'
+      + '<td><div class="ui input">'
+      + '<input type="text" placeholder="Response..." name="' + name + '" id="' + name + '_' + idx + '" value="' + value + '" />'
+      + '</div></td>'
+      + '</tr>'
+      + '<tr><td colspan="3">&nbsp;</tr></tr>'
+  }
+
+  function getInputField (name, value) {
+    return '<div class="ui input fluid">'
+      + '<input type="text" placeholder="Response..." name="' + name + '" value="' + value + '" />'
+      + '</div>'
+  }
+
+  function getFieldMarkup (question, response,  i) {
     switch (question.input.type) {
       case 'checkbox':
       case 'radio':
-        input = printCheckboxRadio(question, responses, i)
+        var input = '<div class="inline fields">'
+        question.input.options.forEach( function(option, j) {
+          var type = question.input.type
+          var checked = isOptionInResponse(option, response)
+          input += getMultipleChoiceField(
+            type, getFieldName(i),  j, option.label,  checked
+          )
+        })
+        input += '</div>'
         break
       case 'inputs':
-        input = printInputs(question, i)
+        var input = '<table>'
+        question.input.options.forEach( function(option, j) {
+          var value = !!response ? response[j] : ''
+          input += getMultipleInputsField(getFieldName(i), j, option.label, value)
+        })
+        input += '</table>'
         break
       default:
-        input = printDefaultInput(responses, i)
+        var value = response ? response : ''
+        var input = getInputField(getFieldName(i), value)
     }
+
+    return input
   }
 
-  function getQuizData(){
-    try {
-      quizData = JSON.parse(localStorage.getItem('quiz'))
-      responses = quizData.responses || []
-      currentQuestion = quizData.currentQuestion || -1
-      responseCount = quizData.responseCount || -1
-    } catch (e) {}
-
-    if (quizData == null) {
-      quizData = { responses: [] }
-      responses = quizData.responses
-    }
+  function getQuestionMarkup (question, response,  i) {
+    var code = question.code && '<pre><code>' + question.code + '</code></pre>'
+    question.input = question.input || { type: 'input' }
+    return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
+    + '<div class="content">'
+    + '<div class="header">' + question.problem + '</div>'
+    + '</div>'
+    + '<div class="content">'
+    + (code || '')
+    + '</div>'
+    + '<div class="content">'
+    + getFieldMarkup(question, response,  i)
+    + '</div>'
+    + '</div>'
   }
 
-  function printQuiz(data){
-    data.questions.forEach((question, i) => {
+  function createQuestionsElements(questions, responses) {
+    return questions.map( (question, i) => {
 
-      if (question.input === undefined) {
-        question.input = { type: 'input' }
-      }
-
-      printResponses(question, responses, i)
-      printQuestions(question.problem, input, i)
-      showNextQuestion(currentQuestion)
-      updateProgressBar(responseCount, questions.length)
+      return $( getQuestionMarkup(question, responses[i], i) ).css('display', 'none')
     })
   }
 
-  function setAnswers(){
-    var $inputs = $('[name^=question_' + currentQuestion + ']')
-    var question = questions[currentQuestion]
+  function getFieldName (idx){
+    return 'question_' + idx
+  }
 
+  function getFieldId (idx){
+    return 'question-' + idx
+  }
+
+  function createSubmitButton ($questions, questions) {
+    return $('<button id="submit-response" class="ui primary button">Submit response</button>')
+      .on('click', function(){
+        processResponse($questions, questions)
+      })
+  }
+
+  function createResetButton () {
+    return $('<button class="ui button negative">Reset</button>')
+      .on('click', function(){
+        localStorage.removeItem('quiz')
+        location.reload();
+      })
+  }
+
+  function getQuestionResponse(question, i) {
+    var $inputs = $('[name^=' + getFieldName(i) + ']')
     switch (question.input.type) {
       case 'checkbox':
       case 'radio':
-        responses[currentQuestion] = []
-        $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
-          responses[currentQuestion].push(input.value)
-        })
-        if (responses[currentQuestion].length === 0) {
-          responses[currentQuestion] = null
+        return $inputs.filter('[name=' + $inputs.attr('name') + ']:checked')
+          .toArray().map( input => input.value )
+        break
+      case 'inputs':
+        return $inputs.toArray().map( input => input.value )
+        break
+      default:
+        return $inputs.val()
+    }
+  }
+
+  function isEmptyResponse (response) {
+    return !response || (response.join && !response.join('')) || false
+  }
+
+  function getResponseCount (responses) {
+    return responses.reduce( function(result, response ) {
+      return isEmptyResponse(response) ? result : ++result
+    }, 0)
+  }
+
+  function showQuestion (idx, show) {
+    var display = show ? 'block' : 'none'
+    $('#' + getFieldId(idx)).css('display', display )
+  }
+
+  function showCurrentQuestion (current) {
+    showQuestion(current-1, false)
+    showQuestion(current, true)
+  }
+
+  function showTextEndMessage () {
+    $('#submit-response').css('display', 'none')
+    $(element)
+      .append('<div>Thank you for your responses.<br /><br /> </div>')
+      .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+  }
+
+  function updateProgressBar (questions, responses) {
+    $('#progress').css('width', (responses / questions * 100) + '%')
+  }
+
+  function processResponse ($questions, questions) {
+    var quizData = getQuizData ()
+    var currentQuestion = quizData.currentQuestion
+    var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
+    var responses = quizData.responses
+    responses[currentQuestion] = response
+
+    if ( isEmptyResponse(responses[currentQuestion]) ) {
+      alert('You must give a response')
+    } else {
+      var responseCount = getResponseCount(responses)
+
+      getQuizResponse(currentQuestion, function(correctResponse){
+        if( isResponseCorrect(response, correctResponse) ) {
+          alert('Response is correct!')
+        } else {
+          alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
         }
-        break
-      case 'inputs':
-        responses[currentQuestion] = []
-        $inputs.each(function (i, input) {
-          responses[currentQuestion].push(input.value)
+
+        updateQuizStatus($questions, questions, responseCount)
+        saveQuizData({
+          responses: responses,
+          responseCount: responseCount,
+          currentQuestion: ++currentQuestion
         })
-        break
-      default:
-        responses[currentQuestion] = $inputs.val()
+      })
     }
   }
 
-  function responseCounter(){
-    var responseCount = 0
-
-    responses.forEach((response, i) => {
-      question = questions[i]
-
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-        case 'inputs':
-          if (!!responses[i] && !!responses[i].join('')) {
-            responseCount++
-          }
-          break
-        default:
-          if (!!responses[i]) {
-            responseCount++
-          }
-      }
-    })
-    return responseCount;
+  function isResponseCorrect (userResponse, correctResponse){
+    return serializeResponse(userResponse) == serializeResponse(correctResponse)
   }
 
-  function storeData(responses, responseCount, currentQuestion ){
-    quizData.responses = responses
-    quizData.responseCount = responseCount
-    quizData.currentQuestion = currentQuestion
+  function serializeResponse (response) {
+    if (response.join) {
+      return response.sort().join(', ')
+    } else {
+      return response
+    }
+  }
+
+  function updateQuizStatus($questions, questions, responseCount) {
+    showCurrentQuestion(responseCount)
+    updateProgressBar(questions.length, responseCount)
+
+    if (questions.length === responseCount){
+      showTextEndMessage()
+    }
+  }
+
+  function saveQuizData (changes) {
+    quizData = Object.assign(getQuizData(), changes)
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
-  function checkLastQuestion(responseCount, questionsLength){
-    if (responseCount === questionsLength) {
-      showThanks();
-    }
+  function buildQuiz (title, questions, $element) {
+    var quizData = getQuizData ()
+    var responses = quizData.responses
+    var responseCount = quizData.responseCount
+
+    $questions = createQuestionsForm()
+
+    $(document.body)
+      .append(createProgressElement())
+
+    $element
+      .append(createTitleElement(title))
+      .append($questions)
+      .append(createSubmitButton($questions, questions))
+      .append(createResetButton())
+
+    $questions
+      .append( createQuestionsElements(questions, responses) )
+      .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
+
+    updateQuizStatus($questions, questions, responseCount)
   }
 
-  function bindSubmitButton(){
-    $('#submit-response').bind('click', function () {
 
-      setAnswers()
-      responseCount = responseCounter() //immutability fail :/
-      updateProgressBar(responseCount, questions.length)
-
-      if (!responses[currentQuestion]) {
-        alert('You must give a response')
-      } else {
-        hideCurrentQuestion(currentQuestion)
-        currentQuestion = currentQuestion + 1
-        showNextQuestion(currentQuestion )
-        checkLastQuestion(responseCount, questions.length)
-      }
-      storeData(responses, responseCount, currentQuestion )
-    })
-  }
+  getQuizConfig( function(data){
+    buildQuiz(data.title, data.questions, $(element))
+  })
 }
 
 module.exports = quiz
