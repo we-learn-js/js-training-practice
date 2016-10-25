@@ -1,17 +1,24 @@
 quiz = function (element, options) {
 
   function getJson(url, callback) {
-    $.ajax({ url: url }).done( callback )
+    return new Promise(function(resolve){
+      resolve($.ajax({ url: url }))
+    });
   }
 
   function getQuizConfig (callback) {
     getJson(options.url, callback)
+    .then(function(data){
+        callback(data)
+    });
   }
 
   function getQuizResponse (i, callback) {
-    getJson(options.responsesUrl.replace(':index', i), function (response){
+    getJson(options.responsesUrl.replace(':index', i))
+    .then(
+       function (response){
       callback(response.response)
-    })
+    });
   }
 
   function getStoredQuizData () {
