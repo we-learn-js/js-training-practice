@@ -1,15 +1,19 @@
 quiz = function (element, options) {
 
-  function getJson(url, callback) {
-    $.ajax({ url: url }).done( callback )
+  function getJson(url) {
+    return new Promise(function(resolve, reject)  { 
+      $.ajax({ url: url }).done(resolve)
+    });
+    //$.ajax({ url: url }).done( callback )
   }
 
   function getQuizConfig (callback) {
-    getJson(options.url, callback)
+    getJson(options.url).then(callback)
   }
 
   function getQuizResponse (i, callback) {
-    getJson(options.responsesUrl.replace(':index', i), function (response){
+    getJson(options.responsesUrl.replace(':index', i)).then(
+      function (response){
       callback(response.response)
     })
   }
