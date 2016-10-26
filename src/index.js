@@ -13,15 +13,17 @@ quiz = function (element, options) {
   }
 
   function getStoredQuizData () {
-    storedData = localStorage.getItem('quiz')
+    const storedData = localStorage.getItem('quiz')
     return (storedData) ? JSON.parse(storedData) : {}
   }
 
   function getQuizData () {
-    quizData = getStoredQuizData()
+    let quizData = getStoredQuizData()
+
     quizData.responses = quizData.responses || []
     quizData.currentQuestion = quizData.currentQuestion || 0
     quizData.responseCount = quizData.responseCount || 0
+
     return quizData
   }
 
@@ -118,7 +120,6 @@ quiz = function (element, options) {
 
   function createQuestionsElements(questions, responses) {
     return questions.map( (question, i) => {
-
       return $( getQuestionMarkup(question, responses[i], i) ).css('display', 'none')
     })
   }
@@ -206,11 +207,12 @@ quiz = function (element, options) {
       var responseCount = getResponseCount(responses)
 
       getQuizResponse(currentQuestion)
+        .then(correctResponse => correctResponse.response)
         .then(correctResponse => {
-            if( isResponseCorrect(response, correctResponse.response) ) {
+            if( isResponseCorrect(response, correctResponse) ) {
               alert('Response is correct!')
             } else {
-              alert('Response is not correct! It was: ' + serializeResponse(correctResponse.response) )
+              alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
             }
 
             updateQuizStatus($questions, questions, responseCount)
@@ -245,7 +247,7 @@ quiz = function (element, options) {
   }
 
   function saveQuizData (changes) {
-    quizData = Object.assign(getQuizData(), changes)
+    const quizData = Object.assign(getQuizData(), changes)
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
