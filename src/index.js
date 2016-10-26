@@ -4,18 +4,15 @@ quiz = function (element, options) {
     return new Promise(function(resolve, reject)  { 
       $.ajax({ url: url }).done(resolve)
     });
-    //$.ajax({ url: url }).done( callback )
   }
 
-  function getQuizConfig (callback) {
-    getJson(options.url).then(callback)
+  function getQuizConfig () {
+    return getJson(options.url)
   }
 
-  function getQuizResponse (i, callback) {
-    getJson(options.responsesUrl.replace(':index', i)).then(
-      function (response){
-      callback(response.response)
-    })
+  function getQuizResponse (i) {
+    return getJson(options.responsesUrl.replace(':index', i))
+             .then((response) => response.response)
   }
 
   function getStoredQuizData () {
@@ -211,7 +208,7 @@ quiz = function (element, options) {
     } else {
       var responseCount = getResponseCount(responses)
 
-      getQuizResponse(currentQuestion, function(correctResponse){
+      getQuizResponse(currentQuestion).then(function(correctResponse){
         if( isResponseCorrect(response, correctResponse) ) {
           alert('Response is correct!')
         } else {
@@ -278,9 +275,10 @@ quiz = function (element, options) {
   }
 
 
-  getQuizConfig( function(data){
-    buildQuiz(data.title, data.questions, $(element))
-  })
+  getQuizConfig()
+    .then(function(data){
+      buildQuiz(data.title, data.questions, $(element))
+    })
 }
 
 module.exports = quiz
