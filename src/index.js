@@ -1,29 +1,29 @@
 quiz = function (element, options) {
 
-  function getJson(url, callback) {
-    $.ajax({ url: url }).done( callback )
+  function getJson(url) {
+    return Promise.resolve($.ajax({ url: url }))
   }
 
-  function getQuizConfig (callback) {
-    getJson(options.url, callback)
+  function getQuizConfig () {
+    return getJson(options.url)
   }
 
-  function getQuizResponse (i, callback) {
-    getJson(options.responsesUrl.replace(':index', i), function (response){
-      callback(response.response)
-    })
+  function getQuizResponse (i) {
+    return getJson(options.responsesUrl.replace(':index', i))
   }
 
   function getStoredQuizData () {
-    storedData = localStorage.getItem('quiz')
+    const storedData = localStorage.getItem('quiz')
     return (storedData) ? JSON.parse(storedData) : {}
   }
 
   function getQuizData () {
-    quizData = getStoredQuizData()
+    let quizData = getStoredQuizData()
+
     quizData.responses = quizData.responses || []
     quizData.currentQuestion = quizData.currentQuestion || 0
     quizData.responseCount = quizData.responseCount || 0
+
     return quizData
   }
 
@@ -120,7 +120,6 @@ quiz = function (element, options) {
 
   function createQuestionsElements(questions, responses) {
     return questions.map( (question, i) => {
-
       return $( getQuestionMarkup(question, responses[i], i) ).css('display', 'none')
     })
   }
@@ -207,20 +206,22 @@ quiz = function (element, options) {
     } else {
       var responseCount = getResponseCount(responses)
 
-      getQuizResponse(currentQuestion, function(correctResponse){
-        if( isResponseCorrect(response, correctResponse) ) {
-          alert('Response is correct!')
-        } else {
-          alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
-        }
+      getQuizResponse(currentQuestion)
+        .then(correctResponse => correctResponse.response)
+        .then(correctResponse => {
+            if( isResponseCorrect(response, correctResponse) ) {
+              alert('Response is correct!')
+            } else {
+              alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
+            }
 
-        updateQuizStatus($questions, questions, responseCount)
-        saveQuizData({
-          responses: responses,
-          responseCount: responseCount,
-          currentQuestion: ++currentQuestion
-        })
-      })
+            updateQuizStatus($questions, questions, responseCount)
+            saveQuizData({
+              responses: responses,
+              responseCount: responseCount,
+              currentQuestion: ++currentQuestion
+            })
+          })
     }
   }
 
@@ -246,7 +247,7 @@ quiz = function (element, options) {
   }
 
   function saveQuizData (changes) {
-    quizData = Object.assign(getQuizData(), changes)
+    const quizData = Object.assign(getQuizData(), changes)
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
@@ -274,9 +275,7 @@ quiz = function (element, options) {
   }
 
 
-  getQuizConfig( function(data){
-    buildQuiz(data.title, data.questions, $(element))
-  })
+  getQuizConfig().then(data => {buildQuiz(data.title, data.questions, $(element))})
 }
 
 module.exports = quiz
