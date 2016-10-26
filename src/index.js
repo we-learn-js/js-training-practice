@@ -1,17 +1,15 @@
 quiz = function (element, options) {
 
-  function getJson(url, callback) {
-    $.ajax({ url: url }).done( callback )
+  function getJson (url) {
+    return new Promise( resolve => $.ajax({ url: url }).done(resolve) )
   }
 
-  function getQuizConfig (callback) {
-    getJson(options.url, callback)
+  function getQuizConfig () {
+    return getJson(options.url)
   }
 
-  function getQuizResponse (i, callback) {
-    getJson(options.responsesUrl.replace(':index', i), function (response){
-      callback(response.response)
-    })
+  function getQuizResponse (i) {
+    return getJson(options.responsesUrl.replace(':index', i))
   }
 
   function getStoredQuizData () {
@@ -207,20 +205,21 @@ quiz = function (element, options) {
     } else {
       var responseCount = getResponseCount(responses)
 
-      getQuizResponse(currentQuestion, function(correctResponse){
-        if( isResponseCorrect(response, correctResponse) ) {
-          alert('Response is correct!')
-        } else {
-          alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
-        }
+      getQuizResponse(currentQuestion)
+        .then( correctResponse => {
+          if( isResponseCorrect(response, correctResponse) ) {
+            alert('Response is correct!')
+          } else {
+            alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
+          }
 
-        updateQuizStatus($questions, questions, responseCount)
-        saveQuizData({
-          responses: responses,
-          responseCount: responseCount,
-          currentQuestion: ++currentQuestion
+          updateQuizStatus($questions, questions, responseCount)
+          saveQuizData({
+            responses: responses,
+            responseCount: responseCount,
+            currentQuestion: ++currentQuestion
+          })
         })
-      })
     }
   }
 
@@ -274,9 +273,9 @@ quiz = function (element, options) {
   }
 
 
-  getQuizConfig( function(data){
-    buildQuiz(data.title, data.questions, $(element))
-  })
+  getQuizConfig()
+    .then( data => buildQuiz(data.title, data.questions, $(element)) )
+
 }
 
 module.exports = quiz
