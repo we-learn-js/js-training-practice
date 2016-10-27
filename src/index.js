@@ -1,4 +1,4 @@
-quiz = function (element, options) {
+var quiz = function (element, options) {
 
   function getJson(url, callback) {
     $.ajax({ url: url }).done( callback )
@@ -20,7 +20,7 @@ quiz = function (element, options) {
   }
 
   function getQuizData () {
-    quizData = getStoredQuizData()
+    var quizData = getStoredQuizData()
     quizData.responses = quizData.responses || []
     quizData.currentQuestion = quizData.currentQuestion || 0
     quizData.responseCount = quizData.responseCount || 0
@@ -120,7 +120,6 @@ quiz = function (element, options) {
 
   function createQuestionsElements(questions, responses) {
     return questions.map( (question, i) => {
-
       return $( getQuestionMarkup(question, responses[i], i) ).css('display', 'none')
     })
   }
@@ -254,8 +253,7 @@ quiz = function (element, options) {
     var quizData = getQuizData ()
     var responses = quizData.responses
     var responseCount = quizData.responseCount
-
-    $questions = createQuestionsForm()
+    var $questions = createQuestionsForm()
 
     $(document.body)
       .append(createProgressElement())
