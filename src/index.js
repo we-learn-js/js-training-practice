@@ -21,9 +21,15 @@ var quiz = function (element, options) {
 
   function getQuizData () {
     var quizData = getStoredQuizData()
-    quizData.responses = quizData.responses || []
-    quizData.currentQuestion = quizData.currentQuestion || 0
-    quizData.responseCount = quizData.responseCount || 0
+    if(!quizData.responses) {
+      quizData.responses = []
+    }
+    if(!quizData.currentQuestion) {
+      quizData.currentQuestion = 0
+    }
+    if(!quizData.responseCount) {
+      quizData.responseCount = 0
+    }
     return quizData
   }
 
@@ -42,11 +48,20 @@ var quiz = function (element, options) {
   }
 
   function isOptionInResponse (option, response) {
-    return !!response && response.indexOf(option.label) !== -1
+    if (!!response) {
+      if (response.indexOf(option.label) !== -1) {
+        return true
+      }
+    }
+    return false
   }
 
   function getMultipleChoiceField (type, name, idx, label, checked) {
-    checked = checked && 'checked'
+    if (checked) {
+      checked = 'checked'
+    } else {
+      checked = ''
+    }
     return '<div class="field">'
     + '<div class="ui checkbox ' + type + '">'
     + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
@@ -103,8 +118,17 @@ var quiz = function (element, options) {
   }
 
   function getQuestionMarkup (question, response, i) {
-    var code = question.code && '<pre><code>' + question.code + '</code></pre>'
-    question.input = question.input || { type: 'input' }
+
+    if (question.code) {
+      var code = '<pre><code>' + question.code + '</code></pre>'
+    } else {
+      code = question.code
+    }
+
+    if(!question.input) {
+      question.input = { type: 'input' }
+    }
+
     return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
     + '<div class="header">' + question.problem + '</div>'
@@ -164,12 +188,24 @@ var quiz = function (element, options) {
   }
 
   function isEmptyResponse (response) {
-    return !response || (response.join && !response.join('')) || false
+    if(!response) {
+      return true
+    }
+    if(response.join) {
+      if (!response.join('')) {
+        return true
+      }
+    }
+    return false
   }
 
   function getResponseCount (responses) {
     return responses.reduce(function (result, response) {
-      return isEmptyResponse(response) ? result : ++result
+      if (isEmptyResponse(response)) {
+        return result
+      } else {
+        return result + 1
+      }
     }, 0)
   }
 
@@ -218,7 +254,7 @@ var quiz = function (element, options) {
           saveQuizData({
             responses: responses,
             responseCount: responseCount,
-            currentQuestion: ++currentQuestion
+            currentQuestion: currentQuestion + 1
           })
         })
     }
@@ -266,8 +302,9 @@ var quiz = function (element, options) {
       .append(createResetButton())
 
     $questions
-      .append( createQuestionsElements(questions, responses) )
-      .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
+      .append(createQuestionsElements(questions, responses))
+      .find('pre code').each((i, block) => {
+      hljs.highlightBlock(block)})
 
     updateQuizStatus(questions, responseCount)
   }
