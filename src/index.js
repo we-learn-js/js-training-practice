@@ -214,7 +214,7 @@ quiz = function (element, options) {
           alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
         }
 
-        updateQuizStatus($questions, questions, responseCount)
+        updateQuizStatus(questions, responseCount)
         saveQuizData({
           responses: responses,
           responseCount: responseCount,
@@ -236,7 +236,7 @@ quiz = function (element, options) {
     }
   }
 
-  function updateQuizStatus($questions, questions, responseCount) {
+  function updateQuizStatus(questions, responseCount) {
     showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
@@ -246,7 +246,7 @@ quiz = function (element, options) {
   }
 
   function saveQuizData (changes) {
-    quizData = Object.assign(getQuizData(), changes)
+    var quizData = Object.assign(getQuizData(), changes)
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
@@ -270,7 +270,7 @@ quiz = function (element, options) {
       .append( createQuestionsElements(questions, responses) )
       .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
 
-    updateQuizStatus($questions, questions, responseCount)
+    updateQuizStatus(questions, responseCount)
   }
 
 
