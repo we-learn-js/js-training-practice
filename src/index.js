@@ -9,7 +9,7 @@ var quiz = function (element, options) {
     return getJson(options.url)
   }
 
-  function getQuizResponse (i, callback) {
+  function getQuizResponse (i) {
     return getJson(options.responsesUrl.replace(':index', i))
       .then(response => response.response)
   }
