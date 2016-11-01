@@ -264,7 +264,7 @@ var quiz = function (element, options) {
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
-  function buildQuiz (title, questions, $element) {
+  function buildQuiz ({title, questions}, $element) {
     var quizData = getQuizData()
     var responses = quizData.responses
     var responseCount = quizData.responseCount
@@ -289,7 +289,7 @@ var quiz = function (element, options) {
 
   getQuizConfig()
     .then(function (data) {
-      buildQuiz(data.title, data.questions, $(element))
+      buildQuiz(data, $(element))
     })
 }
 
