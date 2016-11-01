@@ -20,17 +20,9 @@ var quiz = function (element, options) {
   }
 
   function getQuizData () {
-    var quizData = getStoredQuizData()
-    if(!quizData.responses) {
-      quizData.responses = []
-    }
-    if(!quizData.currentQuestion) {
-      quizData.currentQuestion = 0
-    }
-    if(!quizData.responseCount) {
-      quizData.responseCount = 0
-    }
-    return quizData
+    var { responses = [], currentQuestion = 0, responseCount = 0 } = getStoredQuizData()
+
+    return { responses, currentQuestion, responseCount }
   }
 
   function createQuestionsForm () {
@@ -216,6 +208,7 @@ var quiz = function (element, options) {
 
   function processResponse ($questions, questions) {
     var quizData = getQuizData()
+    console.log(quizData)
     var currentQuestion = quizData.currentQuestion
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
     var responses = quizData.responses
