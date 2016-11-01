@@ -55,7 +55,7 @@ var quiz = function (element, options) {
 
   function getMultipleChoiceField (type, name, idx, label, checked) {
     checked = checked ? 'checked' : ''
-    
+
     return '<div class="field">'
     + '<div class="ui checkbox ' + type + '">'
     + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
@@ -182,15 +182,9 @@ var quiz = function (element, options) {
   }
 
   function isEmptyResponse (response) {
-    if(!response) {
-      return true
-    }
-    if(response.join) {
-      if (!response.join('')) {
-        return true
-      }
-    }
-    return false
+    return (!response || (response.join && !response.join('')))
+      ? true
+      : false
   }
 
   function getResponseCount (responses) {
