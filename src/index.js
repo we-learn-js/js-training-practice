@@ -256,7 +256,7 @@ var quiz = function (element, options) {
     showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
-    (questions.length === responseCount) && showTextEndMessage()
+    return ((questions.length === responseCount) && showTextEndMessage())
   }
 
   function saveQuizData (changes) {
