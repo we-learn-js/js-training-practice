@@ -247,11 +247,9 @@ var quiz = function (element, options) {
   }
 
   function serializeResponse (response) {
-    if (response.join) {
-      return response.sort().join(', ')
-    } else {
-      return response
-    }
+    return (response.join)
+      ? response.sort().join(', ')
+      : response
   }
 
   function updateQuizStatus (questions, responseCount) {
