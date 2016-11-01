@@ -189,7 +189,7 @@ var quiz = function (element, options) {
 
   function getResponseCount (responses) {
     return responses.reduce(function (result, response) {
-      return (isEmptyResponse(response)) ? result : result + 1
+      return (isEmptyResponse(response)) ? result : ++result
     }, 0)
   }
 
@@ -236,7 +236,7 @@ var quiz = function (element, options) {
           saveQuizData({
             responses: responses,
             responseCount: responseCount,
-            currentQuestion: currentQuestion + 1
+            currentQuestion: ++currentQuestion
           })
         })
     }
