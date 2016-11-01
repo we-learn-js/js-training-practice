@@ -74,12 +74,13 @@ var quiz = function (element, options) {
   }
 
   function getFieldMarkup (question, response, i) {
-    switch (question.input.type) {
+    var type = question.input.type || { type: 'input' }
+
+    switch (type) {
       case 'checkbox':
       case 'radio':
         var input = '<div class="inline fields">'
         question.input.options.forEach(function (option, j) {
-          var type = question.input.type
           var checked = isOptionInResponse(option, response)
           input += getMultipleChoiceField(
             type, getFieldName(i), j, option.label, checked
@@ -107,10 +108,6 @@ var quiz = function (element, options) {
     var code = question.code
       ? '<pre><code>' + question.code + '</code></pre>'
       : question.code
-
-    if(!question.input) {
-      question.input = { type: 'input' }
-    }
 
     return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
