@@ -21,15 +21,11 @@ var quiz = function (element, options) {
 
   function getQuizData () {
     var quizData = getStoredQuizData()
-    if(!quizData.responses) {
-      quizData.responses = []
-    }
-    if(!quizData.currentQuestion) {
-      quizData.currentQuestion = 0
-    }
-    if(!quizData.responseCount) {
-      quizData.responseCount = 0
-    }
+
+    quizData.responses = quizData.responses || [];
+    quizData.currentQuestion = quizData.currentQuestion || 0;
+    quizData.responseCount = quizData.responseCount || 0;
+
     return quizData
   }
 
@@ -48,12 +44,7 @@ var quiz = function (element, options) {
   }
 
   function isOptionInResponse (option, response) {
-    if (!!response) {
-      if (response.indexOf(option.label) !== -1) {
-        return true
-      }
-    }
-    return false
+    return (!!response && response.indexOf(option.label) !== -1) || false
   }
 
   function getMultipleChoiceField (type, name, idx, label, checked) {
@@ -119,15 +110,9 @@ var quiz = function (element, options) {
 
   function getQuestionMarkup (question, response, i) {
 
-    if (question.code) {
-      var code = '<pre><code>' + question.code + '</code></pre>'
-    } else {
-      code = question.code
-    }
+    var code=(question.code)?'<pre><code>' + question.code + '</code></pre>':question.code;
 
-    if(!question.input) {
-      question.input = { type: 'input' }
-    }
+    question.input=question.input || {type:"input"};
 
     return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
