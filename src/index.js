@@ -73,8 +73,12 @@ var quiz = function (element, options) {
     + '</div>'
   }
 
+  function getInputType(question) {
+    return (question.input && question.input.type) || { type: 'input' }
+  }
+
   function getFieldMarkup (question, response, i) {
-    var type = question.input.type || { type: 'input' }
+    var type = getInputType(question)
 
     switch (type) {
       case 'checkbox':
@@ -153,7 +157,7 @@ var quiz = function (element, options) {
 
   function getQuestionResponse (question, i) {
     var $inputs = $('[name^=' + getFieldName(i) + ']')
-    switch (question.input.type) {
+    switch (getInputType(question)) {
       case 'checkbox':
       case 'radio':
         return $inputs.filter('[name=' + $inputs.attr('name') + ']:checked')
