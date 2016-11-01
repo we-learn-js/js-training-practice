@@ -104,12 +104,9 @@ var quiz = function (element, options) {
   }
 
   function getQuestionMarkup (question, response, i) {
-
-    if (question.code) {
-      var code = '<pre><code>' + question.code + '</code></pre>'
-    } else {
-      code = question.code
-    }
+    var code = question.code
+      ? '<pre><code>' + question.code + '</code></pre>'
+      : question.code
 
     if(!question.input) {
       question.input = { type: 'input' }
@@ -208,7 +205,7 @@ var quiz = function (element, options) {
 
   function processResponse ($questions, questions) {
     var quizData = getQuizData()
-    console.log(quizData)
+    
     var currentQuestion = quizData.currentQuestion
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
     var responses = quizData.responses
