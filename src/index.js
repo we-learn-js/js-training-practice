@@ -189,11 +189,7 @@ var quiz = function (element, options) {
 
   function getResponseCount (responses) {
     return responses.reduce(function (result, response) {
-      if (isEmptyResponse(response)) {
-        return result
-      } else {
-        return result + 1
-      }
+      return (isEmptyResponse(response)) ? result : result + 1
     }, 0)
   }
 
