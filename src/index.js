@@ -111,14 +111,14 @@ var quiz = function (element, options) {
   function getQuestionMarkup (question, response, i) {
     var code = question.code
       ? '<pre><code>' + question.code + '</code></pre>'
-      : question.code
+      : ''
 
     return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
     + '<div class="header">' + question.problem + '</div>'
     + '</div>'
     + '<div class="content">'
-    + (code || '')
+    + code
     + '</div>'
     + '<div class="content">'
     + getFieldMarkup(question, response, i)
