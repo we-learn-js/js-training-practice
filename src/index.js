@@ -48,12 +48,9 @@ var quiz = function (element, options) {
   }
 
   function isOptionInResponse (option, response) {
-    if (!!response) {
-      if (response.indexOf(option.label) !== -1) {
-        return true
-      }
-    }
-    return false
+    return (!!response && response.indexOf(option.label) !== -1)
+      ? true
+      : false
   }
 
   function getMultipleChoiceField (type, name, idx, label, checked) {
