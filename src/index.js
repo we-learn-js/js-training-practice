@@ -236,7 +236,7 @@ var quiz = function (element, options) {
   }
 
   function isResponseCorrect (userResponse, correctResponse) {
-    return serializeResponse(userResponse) == serializeResponse(correctResponse)
+    return serializeResponse(userResponse) === serializeResponse(correctResponse)
   }
 
   function serializeResponse (response) {
