@@ -47,12 +47,7 @@ var quiz = function (element, options) {
     return !!response && -1 !== response.indexOf(option.label);
   }
 
-  function getMultipleChoiceField (type, name, idx, label, checked) {
-    if (checked) {
-      checked = 'checked'
-    } else {
-      checked = ''
-    }
+  function getMultipleChoiceField (type, name, idx, label, checked = 'checked') {
     return '<div class="field">'
     + '<div class="ui checkbox ' + type + '">'
     + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
