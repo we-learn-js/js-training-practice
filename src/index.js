@@ -250,9 +250,7 @@ var quiz = function (element, options) {
 
   function buildQuiz (title, questions, $element) {
     var quizData = getQuizData()
-    var responses = quizData.responses
-    var responseCount = quizData.responseCount
-    var $questions = createQuestionsForm()
+    var {responses,responseCount,$questions = createQuestionsForm()}=quizData
 
     $(document.body)
       .append(createProgressElement())
