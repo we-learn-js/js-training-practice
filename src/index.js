@@ -169,24 +169,12 @@ var quiz = function (element, options) {
   }
 
   function isEmptyResponse (response) {
-    if(!response) {
-      return true
-    }
-    if(response.join) {
-      if (!response.join('')) {
-        return true
-      }
-    }
-    return false
+    return !response || (response.join && !response.join(''));
   }
 
   function getResponseCount (responses) {
     return responses.reduce(function (result, response) {
-      if (isEmptyResponse(response)) {
-        return result
-      } else {
-        return result + 1
-      }
+      return isEmptyResponse(response) ? result : result + 1;
     }, 0)
   }
 
@@ -246,11 +234,7 @@ var quiz = function (element, options) {
   }
 
   function serializeResponse (response) {
-    if (response.join) {
-      return response.sort().join(', ')
-    } else {
-      return response
-    }
+    return response.join ? response.sort().join(', ') : response;
   }
 
   function updateQuizStatus (questions, responseCount) {
