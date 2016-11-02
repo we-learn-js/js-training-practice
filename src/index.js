@@ -255,8 +255,7 @@ var quiz = function (element, options) {
 
   function buildQuiz ({title, questions}, $element) {
     var quizData = getQuizData()
-    var responses = quizData.responses
-    var responseCount = quizData.responseCount
+    var { responses, responseCount } = quizData
     var $questions = createQuestionsForm()
 
     $(document.body)
