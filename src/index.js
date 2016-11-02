@@ -204,10 +204,10 @@ var quiz = function (element, options) {
 
   function processResponse ($questions, questions) {
     var quizData = getQuizData()
-    
-    var currentQuestion = quizData.currentQuestion
+
+    var { currentQuestion, responses } = quizData
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
-    var responses = quizData.responses
+
     responses[currentQuestion] = response
 
     if (isEmptyResponse(responses[currentQuestion])) {
