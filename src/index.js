@@ -221,10 +221,9 @@ var quiz = function (element, options) {
       getQuizResponse(currentQuestion)
         .then(function (correctResponse) {
           
-          var message = isResponseCorrect(response, correctResponse)
-            ? 'Response is correct!'
-            : 'Response is not correct! It was: ' + serializeResponse(correctResponse);
-          alert(message);
+          (isResponseCorrect(response, correctResponse))
+            ? alert('Response is correct!')
+            : alert('Response is not correct! It was: ' + serializeResponse(correctResponse));
 
           updateQuizStatus(questions, responseCount)
           saveQuizData({
