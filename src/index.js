@@ -15,22 +15,18 @@ var quiz = function (element, options) {
   }
 
   function getStoredQuizData () {
-    storedData = localStorage.getItem('quiz')
+    let storedData = localStorage.getItem('quiz')
     return (storedData) ? JSON.parse(storedData) : {}
   }
 
   function getQuizData () {
-    var quizData = getStoredQuizData()
-    if(!quizData.responses) {
-      quizData.responses = []
-    }
-    if(!quizData.currentQuestion) {
-      quizData.currentQuestion = 0
-    }
-    if(!quizData.responseCount) {
-      quizData.responseCount = 0
-    }
-    return quizData
+    const {
+      responses = [],
+      currentQuestion = 0,
+      responseCount = 0
+    } = getStoredQuizData();
+
+    return { responses, currentQuestion, responseCount };
   }
 
   function createQuestionsForm () {
@@ -48,23 +44,14 @@ var quiz = function (element, options) {
   }
 
   function isOptionInResponse (option, response) {
-    if (!!response) {
-      if (response.indexOf(option.label) !== -1) {
-        return true
-      }
-    }
-    return false
+    return !!response && -1 !== response.indexOf(option.label);
   }
 
-  function getMultipleChoiceField (type, name, idx, label, checked) {
-    if (checked) {
-      checked = 'checked'
-    } else {
-      checked = ''
-    }
+  function getMultipleChoiceField (type, name, idx, label, isChecked = false) {
+    const checkedValue = isChecked ? 'checked': '';
     return '<div class="field">'
     + '<div class="ui checkbox ' + type + '">'
-    + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
+    + '<input type="' + type + '" ' + checkedValue + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
     + '<label for="' + name + '_' + idx + '">' + label + '</label>'
     + '</div>'
     + '</div>'
@@ -110,7 +97,7 @@ var quiz = function (element, options) {
         input += '</table>'
         break
       default:
-        var value = response ? response : ''
+        var value = response || ''
         var input = getInputField(getFieldName(i), value)
     }
 
@@ -118,23 +105,18 @@ var quiz = function (element, options) {
   }
 
   function getQuestionMarkup (question, response, i) {
+    const code = question.code
+      ? '<pre><code>' + question.code + '</code></pre>'
+      : '';
 
-    if (question.code) {
-      var code = '<pre><code>' + question.code + '</code></pre>'
-    } else {
-      code = question.code
-    }
-
-    if(!question.input) {
-      question.input = { type: 'input' }
-    }
+    question.input = question.input || { type: 'input' };
 
     return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
     + '<div class="header">' + question.problem + '</div>'
     + '</div>'
     + '<div class="content">'
-    + (code || '')
+    + code
     + '</div>'
     + '<div class="content">'
     + getFieldMarkup(question, response, i)
@@ -178,34 +160,22 @@ var quiz = function (element, options) {
       case 'radio':
         return $inputs.filter('[name=' + $inputs.attr('name') + ']:checked')
           .toArray().map(input => input.value)
-        break
+        break;
       case 'inputs':
         return $inputs.toArray().map(input => input.value)
-        break
+        break;
       default:
         return $inputs.val()
     }
   }
 
   function isEmptyResponse (response) {
-    if(!response) {
-      return true
-    }
-    if(response.join) {
-      if (!response.join('')) {
-        return true
-      }
-    }
-    return false
+    return !response || (response.join && !response.join(''));
   }
 
   function getResponseCount (responses) {
     return responses.reduce(function (result, response) {
-      if (isEmptyResponse(response)) {
-        return result
-      } else {
-        return result + 1
-      }
+      return isEmptyResponse(response) ? result : result + 1;
     }, 0)
   }
 
@@ -244,11 +214,11 @@ var quiz = function (element, options) {
 
       getQuizResponse(currentQuestion)
         .then(function (correctResponse) {
-          if (isResponseCorrect(response, correctResponse)) {
-            alert('Response is correct!')
-          } else {
-            alert('Response is not correct! It was: ' + serializeResponse(correctResponse))
-          }
+          alert(
+              isResponseCorrect(response, correctResponse)
+                ? 'Response is correct!'
+                : 'Response is not correct! It was: ' + serializeResponse(correctResponse)
+          );
 
           updateQuizStatus(questions, responseCount)
           saveQuizData({
@@ -265,20 +235,14 @@ var quiz = function (element, options) {
   }
 
   function serializeResponse (response) {
-    if (response.join) {
-      return response.sort().join(', ')
-    } else {
-      return response
-    }
+    return response.join ? response.sort().join(', ') : response;
   }
 
   function updateQuizStatus (questions, responseCount) {
     showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
-    if (questions.length === responseCount) {
-      showTextEndMessage()
-    }
+    questions.length === responseCount && showTextEndMessage();
   }
 
   function saveQuizData (changes) {
