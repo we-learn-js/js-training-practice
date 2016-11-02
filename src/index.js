@@ -96,7 +96,7 @@ var quiz = function (element, options) {
         input += '</table>'
         break
       default:
-        var value = response ? response : ''
+        var value = response || ''
         var input = getInputField(getFieldName(i), value)
     }
 
@@ -164,10 +164,10 @@ var quiz = function (element, options) {
       case 'radio':
         return $inputs.filter('[name=' + $inputs.attr('name') + ']:checked')
           .toArray().map(input => input.value)
-        break
+        break;
       case 'inputs':
         return $inputs.toArray().map(input => input.value)
-        break
+        break;
       default:
         return $inputs.val()
     }
