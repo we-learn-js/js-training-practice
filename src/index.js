@@ -15,22 +15,18 @@ var quiz = function (element, options) {
   }
 
   function getStoredQuizData () {
-    storedData = localStorage.getItem('quiz')
+    let storedData = localStorage.getItem('quiz')
     return (storedData) ? JSON.parse(storedData) : {}
   }
 
   function getQuizData () {
-    var quizData = getStoredQuizData()
-    if(!quizData.responses) {
-      quizData.responses = []
-    }
-    if(!quizData.currentQuestion) {
-      quizData.currentQuestion = 0
-    }
-    if(!quizData.responseCount) {
-      quizData.responseCount = 0
-    }
-    return quizData
+    const {
+      responses = [],
+      currentQuestion = 0,
+      responseCount = 0
+    } = getStoredQuizData();
+
+    return { responses, currentQuestion, responseCount };
   }
 
   function createQuestionsForm () {
