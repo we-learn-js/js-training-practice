@@ -21,15 +21,12 @@ var quiz = function (element, options) {
 
   function getQuizData () {
     var quizData = getStoredQuizData()
-    if(!quizData.responses) {
-      quizData.responses = []
-    }
-    if(!quizData.currentQuestion) {
-      quizData.currentQuestion = 0
-    }
-    if(!quizData.responseCount) {
-      quizData.responseCount = 0
-    }
+    console.log(getStoredQuizData())
+
+    quizData.responses = quizData.responses || []
+    quizData.currentQuestion = quizData.currentQuestion || 0
+    quizData.responseCount = quizData.responseCount || 0
+
     return quizData
   }
 
@@ -48,20 +45,12 @@ var quiz = function (element, options) {
   }
 
   function isOptionInResponse (option, response) {
-    if (!!response) {
-      if (response.indexOf(option.label) !== -1) {
-        return true
-      }
-    }
-    return false
+    return !!response && response.indexOf(option.label) !== -1 ? true : false
   }
 
   function getMultipleChoiceField (type, name, idx, label, checked) {
-    if (checked) {
-      checked = 'checked'
-    } else {
-      checked = ''
-    }
+    checked ? 'checked' : ''
+
     return '<div class="field">'
     + '<div class="ui checkbox ' + type + '">'
     + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
@@ -119,15 +108,9 @@ var quiz = function (element, options) {
 
   function getQuestionMarkup (question, response, i) {
 
-    if (question.code) {
-      var code = '<pre><code>' + question.code + '</code></pre>'
-    } else {
-      code = question.code
-    }
+    var code = question.code ? '<pre><code>' + question.code + '</code></pre>' : question.code
 
-    if(!question.input) {
-      question.input = { type: 'input' }
-    }
+    question.input = question.input || { type: 'input' }
 
     return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
@@ -188,24 +171,12 @@ var quiz = function (element, options) {
   }
 
   function isEmptyResponse (response) {
-    if(!response) {
-      return true
-    }
-    if(response.join) {
-      if (!response.join('')) {
-        return true
-      }
-    }
-    return false
+    return !response || (response.join && !response.join('')) ?  true : false
   }
 
   function getResponseCount (responses) {
     return responses.reduce(function (result, response) {
-      if (isEmptyResponse(response)) {
-        return result
-      } else {
-        return result + 1
-      }
+      return isEmptyResponse(response) ?  result : result + 1
     }, 0)
   }
 
@@ -244,11 +215,8 @@ var quiz = function (element, options) {
 
       getQuizResponse(currentQuestion)
         .then(function (correctResponse) {
-          if (isResponseCorrect(response, correctResponse)) {
-            alert('Response is correct!')
-          } else {
-            alert('Response is not correct! It was: ' + serializeResponse(correctResponse))
-          }
+          isResponseCorrect(response, correctResponse) ? alert('Response is correct!') : alert('Response is not correct! It was: ' + serializeResponse(correctResponse))
+
 
           updateQuizStatus(questions, responseCount)
           saveQuizData({
@@ -265,20 +233,17 @@ var quiz = function (element, options) {
   }
 
   function serializeResponse (response) {
-    if (response.join) {
-      return response.sort().join(', ')
-    } else {
-      return response
-    }
+
+    return response.join ? response.sort().join(', ') : response
+
   }
 
   function updateQuizStatus (questions, responseCount) {
     showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
-    if (questions.length === responseCount) {
-      showTextEndMessage()
-    }
+    questions.length === responseCount && showTextEndMessage()
+
   }
 
   function saveQuizData (changes) {
@@ -288,9 +253,7 @@ var quiz = function (element, options) {
 
   function buildQuiz (title, questions, $element) {
     var quizData = getQuizData()
-    var responses = quizData.responses
-    var responseCount = quizData.responseCount
-    var $questions = createQuestionsForm()
+    var [responses, responseCount, $questions ] = [quizData.responses, quizData.responseCount, createQuestionsForm()]
 
     $(document.body)
       .append(createProgressElement())
