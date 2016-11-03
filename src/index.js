@@ -21,15 +21,10 @@ var quiz = function (element, options) {
 
   function getQuizData () {
     var quizData = getStoredQuizData()
-    if(!quizData.responses) {
-      quizData.responses = []
-    }
-    if(!quizData.currentQuestion) {
-      quizData.currentQuestion = 0
-    }
-    if(!quizData.responseCount) {
-      quizData.responseCount = 0
-    }
+
+    quizData.responses = !quizData.responses ? [] : quizData.responses;
+    quizData.currentQuestion = !quizData.currentQuestion ? 0 : quizData.currentQuestion;
+    quizData.responseCount = !quizData.responseCount ? 0 : quizData.responseCount;
     return quizData
   }
 
@@ -48,20 +43,11 @@ var quiz = function (element, options) {
   }
 
   function isOptionInResponse (option, response) {
-    if (!!response) {
-      if (response.indexOf(option.label) !== -1) {
-        return true
-      }
-    }
-    return false
+    return  !!response && (response.indexOf(option.label) !== -1)
   }
 
   function getMultipleChoiceField (type, name, idx, label, checked) {
-    if (checked) {
-      checked = 'checked'
-    } else {
-      checked = ''
-    }
+    checked = checked && 'checked';
     return '<div class="field">'
     + '<div class="ui checkbox ' + type + '">'
     + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
@@ -119,15 +105,8 @@ var quiz = function (element, options) {
 
   function getQuestionMarkup (question, response, i) {
 
-    if (question.code) {
-      var code = '<pre><code>' + question.code + '</code></pre>'
-    } else {
-      code = question.code
-    }
-
-    if(!question.input) {
-      question.input = { type: 'input' }
-    }
+    const code = question.code ? '<pre><code>' + question.code + '</code></pre>' : question.code;
+    question.input = question.input || { type: 'input' };
 
     return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
@@ -188,24 +167,12 @@ var quiz = function (element, options) {
   }
 
   function isEmptyResponse (response) {
-    if(!response) {
-      return true
-    }
-    if(response.join) {
-      if (!response.join('')) {
-        return true
-      }
-    }
-    return false
+    return !response || (response.join && !response.join('')) || false;
   }
 
   function getResponseCount (responses) {
     return responses.reduce(function (result, response) {
-      if (isEmptyResponse(response)) {
-        return result
-      } else {
-        return result + 1
-      }
+      return (isEmptyResponse(response)) ? result : result + 1;
     }, 0)
   }
 
@@ -254,7 +221,7 @@ var quiz = function (element, options) {
           saveQuizData({
             responses: responses,
             responseCount: responseCount,
-            currentQuestion: currentQuestion + 1
+            currentQuestion: ++currentQuestion
           })
         })
     }
@@ -265,11 +232,7 @@ var quiz = function (element, options) {
   }
 
   function serializeResponse (response) {
-    if (response.join) {
-      return response.sort().join(', ')
-    } else {
-      return response
-    }
+    return response.join ? response.sort().join(', ') : response
   }
 
   function updateQuizStatus (questions, responseCount) {
