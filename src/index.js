@@ -20,13 +20,8 @@ var quiz = function (element, options) {
   }
 
   function getQuizData () {
-    var quizData = getStoredQuizData()
-
-    quizData.responses = quizData.responses || [];
-    quizData.currentQuestion = quizData.currentQuestion || 0;
-    quizData.responseCount = quizData.responseCount || 0;
-
-    return quizData
+    var { responses = [], currentQuestion = 0, responseCount = 0 } = getStoredQuizData()  
+    return { responses, currentQuestion, responseCount }
   }
 
   function createQuestionsForm () {
@@ -48,10 +43,6 @@ var quiz = function (element, options) {
   }
 
   function getMultipleChoiceField (type, name, idx, label, checked) {
-    checked = checked
-      ? 'checked'
-      : '';
-
     return '<div class="field">'
     + '<div class="ui checkbox ' + type + '">'
     + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
@@ -207,11 +198,10 @@ var quiz = function (element, options) {
   }
 
   function processResponse ($questions, questions) {
-    var quizData = getQuizData()
-    var currentQuestion = quizData.currentQuestion
-    var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
-    var responses = quizData.responses
-    responses[currentQuestion] = response
+    var quizData = getQuizData();
+    var { currentQuestion, responses } = quizData;
+    var response = getQuestionResponse(questions[currentQuestion], currentQuestion);
+    responses[currentQuestion] = response;
 
     if (isEmptyResponse(responses[currentQuestion])) {
       alert('You must give a response')
@@ -257,10 +247,9 @@ var quiz = function (element, options) {
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
-  function buildQuiz (title, questions, $element) {
-    var quizData = getQuizData()
-    var responses = quizData.responses
-    var responseCount = quizData.responseCount
+  function buildQuiz ({title, questions}, $element) {
+    var quizData = getQuizData();
+    var { responses, responseCount } = quizData
     var $questions = createQuestionsForm()
 
     $(document.body)
