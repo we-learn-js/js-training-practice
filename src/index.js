@@ -20,17 +20,9 @@ var quiz = function (element, options) {
   }
 
   function getQuizData () {
-    var quizData = getStoredQuizData()
-    if(!quizData.responses) {
-      quizData.responses = []
-    }
-    if(!quizData.currentQuestion) {
-      quizData.currentQuestion = 0
-    }
-    if(!quizData.responseCount) {
-      quizData.responseCount = 0
-    }
-    return quizData
+    var { responses = [], currentQuestion = 0, responseCount = 0 } = getStoredQuizData()
+
+    return { responses, currentQuestion, responseCount }
   }
 
   function createQuestionsForm () {
@@ -48,20 +40,12 @@ var quiz = function (element, options) {
   }
 
   function isOptionInResponse (option, response) {
-    if (!!response) {
-      if (response.indexOf(option.label) !== -1) {
-        return true
-      }
-    }
-    return false
+    return (!!response && response.indexOf(option.label) !== -1)
+      ? true
+      : false
   }
 
-  function getMultipleChoiceField (type, name, idx, label, checked) {
-    if (checked) {
-      checked = 'checked'
-    } else {
-      checked = ''
-    }
+  function getMultipleChoiceField (type, name, idx, label, checked = '') {
     return '<div class="field">'
     + '<div class="ui checkbox ' + type + '">'
     + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
@@ -87,13 +71,18 @@ var quiz = function (element, options) {
     + '</div>'
   }
 
+  function getInputType(question) {
+    return (question.input && question.input.type) || { type: 'input' }
+  }
+
   function getFieldMarkup (question, response, i) {
-    switch (question.input.type) {
+    var type = getInputType(question)
+
+    switch (type) {
       case 'checkbox':
       case 'radio':
         var input = '<div class="inline fields">'
         question.input.options.forEach(function (option, j) {
-          var type = question.input.type
           var checked = isOptionInResponse(option, response)
           input += getMultipleChoiceField(
             type, getFieldName(i), j, option.label, checked
@@ -118,23 +107,16 @@ var quiz = function (element, options) {
   }
 
   function getQuestionMarkup (question, response, i) {
-
-    if (question.code) {
-      var code = '<pre><code>' + question.code + '</code></pre>'
-    } else {
-      code = question.code
-    }
-
-    if(!question.input) {
-      question.input = { type: 'input' }
-    }
+    var code = question.code
+      ? '<pre><code>' + question.code + '</code></pre>'
+      : ''
 
     return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
     + '<div class="header">' + question.problem + '</div>'
     + '</div>'
     + '<div class="content">'
-    + (code || '')
+    + code
     + '</div>'
     + '<div class="content">'
     + getFieldMarkup(question, response, i)
@@ -173,7 +155,7 @@ var quiz = function (element, options) {
 
   function getQuestionResponse (question, i) {
     var $inputs = $('[name^=' + getFieldName(i) + ']')
-    switch (question.input.type) {
+    switch (getInputType(question)) {
       case 'checkbox':
       case 'radio':
         return $inputs.filter('[name=' + $inputs.attr('name') + ']:checked')
@@ -188,24 +170,14 @@ var quiz = function (element, options) {
   }
 
   function isEmptyResponse (response) {
-    if(!response) {
-      return true
-    }
-    if(response.join) {
-      if (!response.join('')) {
-        return true
-      }
-    }
-    return false
+    return (!response || (response.join && !response.join('')))
+      ? true
+      : false
   }
 
   function getResponseCount (responses) {
     return responses.reduce(function (result, response) {
-      if (isEmptyResponse(response)) {
-        return result
-      } else {
-        return result + 1
-      }
+      return (isEmptyResponse(response)) ? result : ++result
     }, 0)
   }
 
@@ -232,9 +204,10 @@ var quiz = function (element, options) {
 
   function processResponse ($questions, questions) {
     var quizData = getQuizData()
-    var currentQuestion = quizData.currentQuestion
+
+    var { currentQuestion, responses } = quizData
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
-    var responses = quizData.responses
+
     responses[currentQuestion] = response
 
     if (isEmptyResponse(responses[currentQuestion])) {
@@ -244,41 +217,35 @@ var quiz = function (element, options) {
 
       getQuizResponse(currentQuestion)
         .then(function (correctResponse) {
-          if (isResponseCorrect(response, correctResponse)) {
-            alert('Response is correct!')
-          } else {
-            alert('Response is not correct! It was: ' + serializeResponse(correctResponse))
-          }
+          (isResponseCorrect(response, correctResponse))
+            ? alert('Response is correct!')
+            : alert('Response is not correct! It was: ' + serializeResponse(correctResponse))
 
           updateQuizStatus(questions, responseCount)
           saveQuizData({
             responses: responses,
             responseCount: responseCount,
-            currentQuestion: currentQuestion + 1
+            currentQuestion: ++currentQuestion
           })
         })
     }
   }
 
   function isResponseCorrect (userResponse, correctResponse) {
-    return serializeResponse(userResponse) == serializeResponse(correctResponse)
+    return serializeResponse(userResponse) === serializeResponse(correctResponse)
   }
 
   function serializeResponse (response) {
-    if (response.join) {
-      return response.sort().join(', ')
-    } else {
-      return response
-    }
+    return (response.join)
+      ? response.sort().join(', ')
+      : response
   }
 
   function updateQuizStatus (questions, responseCount) {
     showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
-    if (questions.length === responseCount) {
-      showTextEndMessage()
-    }
+    return ((questions.length === responseCount) && showTextEndMessage())
   }
 
   function saveQuizData (changes) {
@@ -286,10 +253,9 @@ var quiz = function (element, options) {
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
-  function buildQuiz (title, questions, $element) {
+  function buildQuiz ({title, questions}, $element) {
     var quizData = getQuizData()
-    var responses = quizData.responses
-    var responseCount = quizData.responseCount
+    var { responses, responseCount } = quizData
     var $questions = createQuestionsForm()
 
     $(document.body)
@@ -311,7 +277,7 @@ var quiz = function (element, options) {
 
   getQuizConfig()
     .then(function (data) {
-      buildQuiz(data.title, data.questions, $(element))
+      buildQuiz(data, $(element))
     })
 }
 
