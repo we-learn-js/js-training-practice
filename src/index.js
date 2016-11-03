@@ -196,6 +196,7 @@ quiz = function (element, options) {
   }
 
   function processResponse ($questions, questions) {
+	  
     var quizData = getQuizData ()
     var currentQuestion = quizData.currentQuestion
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
@@ -208,11 +209,9 @@ quiz = function (element, options) {
       var responseCount = getResponseCount(responses)
 
       getQuizResponse(currentQuestion, function(correctResponse){
-        if( isResponseCorrect(response, correctResponse) ) {
-          alert('Response is correct!')
-        } else {
-          alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
-        }
+		  
+		  
+		(isResponseCorrect(response, correctResponse)) ? alert('Response is correct!') : alert('Response is not correct! It was: ' + serializeResponse(correctResponse));
 
         updateQuizStatus($questions, questions, responseCount)
         saveQuizData({
@@ -229,20 +228,15 @@ quiz = function (element, options) {
   }
 
   function serializeResponse (response) {
-    if (response.join) {
-      return response.sort().join(', ')
-    } else {
-      return response
-    }
+	return (response.join) ? response.sort().join(', ') : response;
+	  
   }
 
   function updateQuizStatus($questions, questions, responseCount) {
     showCurrentQuestion(responseCount)
-    updateProgressBar(questions.length, responseCount)
+    updateProgressBar(questions.length, responseCount);
 
-    if (questions.length === responseCount){
-      showTextEndMessage()
-    }
+	(questions.length === responseCount) && showTextEndMessage();
   }
 
   function saveQuizData (changes) {
