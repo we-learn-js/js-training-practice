@@ -15,22 +15,13 @@ var quiz = function (element, options) {
   }
 
   function getStoredQuizData () {
-    storedData = localStorage.getItem('quiz')
+    var storedData = localStorage.getItem('quiz')
     return (storedData) ? JSON.parse(storedData) : {}
   }
 
   function getQuizData () {
-    var quizData = getStoredQuizData()
-    if(!quizData.responses) {
-      quizData.responses = []
-    }
-    if(!quizData.currentQuestion) {
-      quizData.currentQuestion = 0
-    }
-    if(!quizData.responseCount) {
-      quizData.responseCount = 0
-    }
-    return quizData
+    var {responses=[], currentQuestion=0, responseCount=0 } = getStoredQuizData()
+    return { responses, currentQuestion, responseCount }
   }
 
   function createQuestionsForm () {
@@ -231,10 +222,8 @@ var quiz = function (element, options) {
   }
 
   function processResponse ($questions, questions) {
-    var quizData = getQuizData()
-    var currentQuestion = quizData.currentQuestion
+    var { currentQuestion, responses } = getQuizData()
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
-    var responses = quizData.responses
     responses[currentQuestion] = response
 
     if (isEmptyResponse(responses[currentQuestion])) {
@@ -287,9 +276,7 @@ var quiz = function (element, options) {
   }
 
   function buildQuiz (title, questions, $element) {
-    var quizData = getQuizData()
-    var responses = quizData.responses
-    var responseCount = quizData.responseCount
+    var { responses, responseCount } = getQuizData()
     var $questions = createQuestionsForm()
 
     $(document.body)
