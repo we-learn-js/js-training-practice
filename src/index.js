@@ -21,7 +21,6 @@ var quiz = function (element, options) {
 
   function getQuizData () {
     var quizData = getStoredQuizData()
-    console.log(getStoredQuizData())
 
     quizData.responses = quizData.responses || []
     quizData.currentQuestion = quizData.currentQuestion || 0
@@ -202,10 +201,10 @@ var quiz = function (element, options) {
   }
 
   function processResponse ($questions, questions) {
-    var quizData = getQuizData()
-    var currentQuestion = quizData.currentQuestion
+
+    var {currentQuestion, responses} = getQuizData()
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
-    var responses = quizData.responses
+
     responses[currentQuestion] = response
 
     if (isEmptyResponse(responses[currentQuestion])) {
