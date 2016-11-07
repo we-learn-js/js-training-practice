@@ -279,4 +279,29 @@ quiz = function (element, options) {
   })
 }
 
+
+function UserQuiz() {
+    this.responses=[];
+    this.currentQuestion=0;
+    this.responseCount=0;
+}
+
+UserQuiz.prototype.init=function(){
+  
+};
+
+UserQuiz.prototype.save=function(){
+  
+};
+
+UserQuiz.prototype.addResponse=function(questionIndex,response){
+  this.currentQuestion=questionIndex;
+  this.responses.push(response);
+  this.responseCount++;
+};
+
+UserQuiz.prototype.isResponseCorrect=function(questionIndex,response){
+  return true;
+};
+
 module.exports = quiz
