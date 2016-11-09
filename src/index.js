@@ -20,7 +20,7 @@ quiz = function (element, options) {
   }
 
   function getQuizData () {
-    quizData = new UserQuiz();
+    quizData = getStoredQuizData()
     quizData.responses = quizData.responses || []
     quizData.currentQuestion = quizData.currentQuestion || 0
     quizData.responseCount = quizData.responseCount || 0
@@ -312,19 +312,17 @@ UserQuiz.prototype.save=function(){
 };
 
 UserQuiz.prototype.addResponse=function(questionIndex,response){
+  this.changes=true;
+  if (this.responses[questionIndex]) {
+    this.responses[questionIndex]=response;
+  }
+  else {
+    this.responses.push(response);
+  }
 };
 
 UserQuiz.prototype.isResponseCorrect=function(questionIndex,response){
-  return this.serializeResponse(userResponse) == this.serializeResponse(correctResponse)
 };
-
-UserQuiz.prototype.serializeResponse=function(response) {
-    if (response.join) {
-      return response.sort().join(', ')
-    } else {
-      return response
-    }
-  }
 
 userQ=new UserQuiz();
 
