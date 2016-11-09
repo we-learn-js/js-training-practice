@@ -6,6 +6,8 @@ var UserQuiz = function(){
   this.responseCount = 0;
 
   this.init = function () {
+    console.log("init func")
+
     var storedData = localStorage.getItem('quiz')
     if (storedData){
       var { responses, currentQuestion, responseCount } = JSON.parse(storedData);
@@ -14,13 +16,20 @@ var UserQuiz = function(){
       this.responseCount = responseCount;
     }
   }
+
+  this.save = function (latestData) {
+    console.log("save func")
+
+    var quizData = Object.assign({}, latestData)
+    var loadedData = localStorage.setItem('quiz', JSON.stringify(quizData));
+  }
 }
 
 
 var quiz = function (element, options) {
 
-  var David = new UserQuiz(getQuizData());
-  David.init()
+  var controlQuiz = new UserQuiz(getQuizData());
+  controlQuiz.init()
 
   function getJson (url) {
     return new Promise(function (resolve, reject) {
@@ -232,7 +241,7 @@ var quiz = function (element, options) {
             :'Response is not correct! It was: ' + serializeResponse(correctResponse)
           )
           updateQuizStatus(questions, responseCount)
-          saveQuizData({
+          controlQuiz.save({
             responses: responses,
             responseCount: responseCount,
             currentQuestion: ++currentQuestion
@@ -256,10 +265,10 @@ var quiz = function (element, options) {
     questions.length === responseCount && showTextEndMessage()
   }
 
-  function saveQuizData (changes) {
-    var quizData = Object.assign(getQuizData(), changes)
-    localStorage.setItem('quiz', JSON.stringify(quizData))
-  }
+  // function saveQuizData (changes) {
+  //   var quizData = Object.assign(getQuizData(), changes)
+  //   localStorage.setItem('quiz', JSON.stringify(quizData))
+  // }
 
   function buildQuiz (title, questions, $element) {
     var { responses, responseCount } = getQuizData()
