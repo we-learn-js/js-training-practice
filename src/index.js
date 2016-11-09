@@ -17,6 +17,10 @@ var userQuiz = function (responses, currentQuestion, responseCount) {
   this.addResponse = function (questionIndex, response) {
     this.responses[questionIndex] = response
   }
+
+  this.isResponseCorrect = function (questionIndex, response) {
+    // coming soon
+  }
 }
 
 var quiz = function (element, options) {
