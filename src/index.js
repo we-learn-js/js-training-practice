@@ -20,11 +20,7 @@ quiz = function (element, options) {
   }
 
   function getQuizData () {
-    quizData = getStoredQuizData()
-    quizData.responses = quizData.responses || []
-    quizData.currentQuestion = quizData.currentQuestion || 0
-    quizData.responseCount = quizData.responseCount || 0
-    return quizData
+    return new UserQuiz();
   }
 
   function createQuestionsForm () {
