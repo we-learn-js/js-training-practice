@@ -23,6 +23,16 @@ var UserQuiz = function(){
     var quizData = Object.assign({}, latestData)
     var loadedData = localStorage.setItem('quiz', JSON.stringify(quizData));
   }
+
+  this.addResponse = function (questionIndexm, response){
+    console.log("add response func")
+    this.responses[questionIndexm] = response
+  }
+
+  this.isResponseCorrect = function (questionIndexm, response){ 
+
+  }
+
 }
 
 
@@ -227,7 +237,9 @@ var quiz = function (element, options) {
   function processResponse ($questions, questions) {
     var { currentQuestion, responses } = getQuizData()
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
+    
     responses[currentQuestion] = response
+    controlQuiz.addResponse(currentQuestion, response)
 
     if (isEmptyResponse(responses[currentQuestion])) {
       alert('You must give a response')
