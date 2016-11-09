@@ -196,7 +196,7 @@ quiz = function (element, options) {
   }
 
   function processResponse ($questions, questions) {
-    var quizData = getQuizData ()
+    var quizData = new UserQuiz();
     var currentQuestion = quizData.currentQuestion
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
     var responses = quizData.responses
@@ -251,7 +251,7 @@ quiz = function (element, options) {
   }
 
   function buildQuiz (title, questions, $element) {
-    var quizData = getQuizData ()
+    var quizData = new UserQuiz();
     var responses = quizData.responses
     var responseCount = quizData.responseCount
 
@@ -306,9 +306,6 @@ UserQuiz.prototype.save=function(){
     }
     localStorage.setItem('quiz',JSON.stringify(changes));
   }
-  else {
-    localStorage.setItem('quiz',JSON.stringify(this.oldResponses));
-  }
 };
 
 UserQuiz.prototype.addResponse=function(questionIndex,response){
@@ -322,6 +319,7 @@ UserQuiz.prototype.addResponse=function(questionIndex,response){
 };
 
 UserQuiz.prototype.isResponseCorrect=function(questionIndex,response){
+
 };
 
 userQ=new UserQuiz();
