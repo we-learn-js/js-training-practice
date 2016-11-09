@@ -1,8 +1,8 @@
 
 var userQuiz = function (responses, currentQuestion, responseCount) {
-  this.responses = responses;
-  this.currentQuestion = currentQuestion;
-  this.responseCount = responseCount;
+  this.responses = responses || [];
+  this.currentQuestion = currentQuestion || 0;
+  this.responseCount = responseCount || 0;
 
   this.init = function (loadData) {
     var storedData = localStorage.getItem('quiz')
@@ -12,6 +12,10 @@ var userQuiz = function (responses, currentQuestion, responseCount) {
   this.save = function (saveData) {
     var quizData = Object.assign({}, saveData)
     localStorage.setItem('quiz', JSON.stringify(quizData))
+  }
+
+  this.addResponse = function (questionIndex, response) {
+    this.responses[questionIndex] = response
   }
 }
 
@@ -211,6 +215,8 @@ var quiz = function (element, options) {
     var { currentQuestion, responses } = getQuizData()
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
     responses[currentQuestion] = response
+
+    userQuizController.addResponse(currentQuestion, response)
 
     if (isEmptyResponse(responses[currentQuestion])) {
       alert('You must give a response')
