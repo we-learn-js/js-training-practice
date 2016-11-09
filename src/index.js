@@ -1,4 +1,27 @@
+
+
+var UserQuiz = function(){
+  this.responses =  [];
+  this.currentQuestion = 0;
+  this.responseCount = 0;
+
+  this.init = function () {
+    var storedData = localStorage.getItem('quiz')
+    if (storedData){
+      var { responses, currentQuestion, responseCount } = JSON.parse(storedData);
+      this.responses =  responses;
+      this.currentQuestion = currentQuestion;
+      this.responseCount = responseCount;
+    }
+  }
+}
+
+
 var quiz = function (element, options) {
+
+  var David = new UserQuiz(getQuizData());
+  David.init()
+
   function getJson (url) {
     return new Promise(function (resolve, reject) {
       $.ajax({ url: url }).done(resolve)
