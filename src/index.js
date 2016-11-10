@@ -1,4 +1,32 @@
+
+var userQuiz = function (responses, currentQuestion, responseCount) {
+  this.responses = responses || [];
+  this.currentQuestion = currentQuestion || 0;
+  this.responseCount = responseCount || 0;
+
+  this.init = function (loadData) {
+    var storedData = localStorage.getItem('quiz')
+    return (storedData) ? JSON.parse(storedData) : {}
+  }
+
+  this.save = function (saveData) {
+    var quizData = Object.assign({}, saveData)
+    localStorage.setItem('quiz', JSON.stringify(quizData))
+  }
+
+  this.addResponse = function (questionIndex, response) {
+    this.responses[questionIndex] = response
+  }
+
+  this.isResponseCorrect = function (questionIndex, response) {
+    // coming soon
+  }
+}
+
 var quiz = function (element, options) {
+  var userQuizController = new userQuiz()
+  userQuizController.init()
+
   function getJson (url) {
     return new Promise(function (resolve, reject) {
       $.ajax({ url: url }).done(resolve)
@@ -14,13 +42,8 @@ var quiz = function (element, options) {
       .then(response => response.response)
   }
 
-  function getStoredQuizData () {
-    var storedData = localStorage.getItem('quiz')
-    return (storedData) ? JSON.parse(storedData) : {}
-  }
-
   function getQuizData () {
-    var {responses=[], currentQuestion=0, responseCount=0 } = getStoredQuizData()
+    var {responses=[], currentQuestion=0, responseCount=0 } = userQuizController.init()
     return { responses, currentQuestion, responseCount }
   }
 
@@ -197,6 +220,8 @@ var quiz = function (element, options) {
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
     responses[currentQuestion] = response
 
+    userQuizController.addResponse(currentQuestion, response)
+
     if (isEmptyResponse(responses[currentQuestion])) {
       alert('You must give a response')
     } else {
@@ -209,7 +234,7 @@ var quiz = function (element, options) {
             :'Response is not correct! It was: ' + serializeResponse(correctResponse)
           )
           updateQuizStatus(questions, responseCount)
-          saveQuizData({
+          userQuizController.save({
             responses: responses,
             responseCount: responseCount,
             currentQuestion: ++currentQuestion
@@ -231,11 +256,6 @@ var quiz = function (element, options) {
     updateProgressBar(questions.length, responseCount)
 
     questions.length === responseCount && showTextEndMessage()
-  }
-
-  function saveQuizData (changes) {
-    var quizData = Object.assign(getQuizData(), changes)
-    localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
   function buildQuiz (title, questions, $element) {
