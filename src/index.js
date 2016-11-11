@@ -247,14 +247,6 @@ var quiz = function (element, options) {
     }
   }
 
-  // function isResponseCorrect (userResponse, correctResponse) {
-  //   return serializeResponse(userResponse) == serializeResponse(correctResponse)
-  // }
-
-  // function serializeResponse (response) {
-  //   return (response.join && response.sort().join(', ')) || response
-  // }
-
   function updateQuizStatus (questions, responseCount) {
     showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
