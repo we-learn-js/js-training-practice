@@ -197,29 +197,28 @@ quiz = function (element, options) {
 
   function processResponse ($questions, questions) {
     var quizData = new UserQuiz();
-    var currentQuestion = quizData.currentQuestion
-    var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
-    var responses = quizData.responses
-    responses[currentQuestion] = response
+    var response = getQuestionResponse(questions[quizData.currentQuestion], quizData.currentQuestion)
+    
+    quizData.responses[quizData.currentQuestion] = response
 
-    if ( isEmptyResponse(responses[currentQuestion]) ) {
+    if ( isEmptyResponse(quizData.responses[quizData.currentQuestion]) ) {
       alert('You must give a response')
     } else {
-      var responseCount = getResponseCount(responses)
 
-      getQuizResponse(currentQuestion, function(correctResponse){
+      getQuizResponse(quizData.currentQuestion, function(correctResponse){
         if( isResponseCorrect(response, correctResponse) ) {
           alert('Response is correct!')
         } else {
           alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
         }
 
-        updateQuizStatus($questions, questions, responseCount)
-        saveQuizData({
-          responses: responses,
-          responseCount: responseCount,
-          currentQuestion: ++currentQuestion
-        })
+        
+        quizData.addResponse(quizData.currentQuestion,response)
+        quizData.responseCount++;
+        quizData.currentQuestion++;
+        quizData.save();
+        updateQuizStatus($questions, questions, quizData.responseCount)
+        
       })
     }
   }
@@ -252,9 +251,8 @@ quiz = function (element, options) {
 
   function buildQuiz (title, questions, $element) {
     var quizData = new UserQuiz();
-    var responses = quizData.responses
-    var responseCount = quizData.responseCount
-
+  
+  
     $questions = createQuestionsForm()
 
     $(document.body)
@@ -267,10 +265,10 @@ quiz = function (element, options) {
       .append(createResetButton())
 
     $questions
-      .append( createQuestionsElements(questions, responses) )
+      .append( createQuestionsElements(questions, quizData.responses) )
       .find('pre code').each((i, block) => { hljs.highlightBlock(block) })
 
-    updateQuizStatus($questions, questions, responseCount)
+    updateQuizStatus($questions, questions, quizData.responseCount)
   }
 
 
@@ -306,6 +304,7 @@ UserQuiz.prototype.save=function(){
     }
     localStorage.setItem('quiz',JSON.stringify(changes));
   }
+  this.changes=false;
 };
 
 UserQuiz.prototype.addResponse=function(questionIndex,response){
@@ -319,9 +318,10 @@ UserQuiz.prototype.addResponse=function(questionIndex,response){
 };
 
 UserQuiz.prototype.isResponseCorrect=function(questionIndex,response){
+  
 
 };
 
-userQ=new UserQuiz();
+
 
 module.exports = quiz
