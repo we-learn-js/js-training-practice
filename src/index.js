@@ -3,46 +3,40 @@ var UserQuiz = function(){
   this.responses =  [];
   this.currentQuestion = 0;
   this.responseCount = 0;
-
-  this.init = function () {
-    //console.log("init func")
-
-    var storedData = localStorage.getItem('quiz')
-    
-    if (storedData){
-      var { responses, currentQuestion, responseCount } = JSON.parse(storedData);
-      this.responses =  responses;
-      this.currentQuestion = currentQuestion;
-      this.responseCount = responseCount;
-    }
-  }
-
-  this.save = function (latestData) {
-    //console.log("save func")
-
-    var quizData = Object.assign({}, latestData)
-    var loadedData = localStorage.setItem('quiz', JSON.stringify(quizData));
-  }
-
-  this.addResponse = function (questionIndex, response){
-    //console.log("add response func")
-    this.responses[questionIndex] = response
-  }
-
-  this.isResponseCorrect = function (questionIndex, response){ 
-    //console.log("is response correct func")
-
-    var respostaUsuari = this.serializeResponse(this.responses[questionIndex])
-    var respostaCorrecta = this.serializeResponse(response)
-
-    return (respostaUsuari == respostaCorrecta)    
-  }
-
-  this.serializeResponse = function (response) {
-    return (response.join && response.sort().join(', ')) || response
-  }
-
 }
+
+UserQuiz.prototype.init = function () {
+  var storedData = localStorage.getItem('quiz')
+  //console.log('el init ')
+  if (storedData){
+    var { responses, currentQuestion, responseCount } = JSON.parse(storedData);
+    this.responses =  responses;
+    this.currentQuestion = currentQuestion;
+    this.responseCount = responseCount;
+  }
+}
+UserQuiz.prototype.save = function (latestData) {
+  console.log("save func")
+  var quizData = Object.assign({}, latestData)
+  var loadedData = localStorage.setItem('quiz', JSON.stringify(quizData));
+}
+UserQuiz.prototype.addResponse = function (questionIndex, response){
+  //console.log("add response func")
+  this.responses[questionIndex] = response
+}
+UserQuiz.prototype.isResponseCorrect = function (questionIndex, response){ 
+  //console.log("is response correct func")
+
+  var respostaUsuari = this.serializeResponse(this.responses[questionIndex])
+  var respostaCorrecta = this.serializeResponse(response)
+
+  return (respostaUsuari == respostaCorrecta)    
+}
+UserQuiz.prototype.serializeResponse = function (response) {
+  return (response.join && response.sort().join(', ')) || response
+}
+
+
 
 
 var quiz = function (element, options) {
