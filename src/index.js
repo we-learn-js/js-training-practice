@@ -1,3 +1,60 @@
+/*
+getQuizData should be deleted
+*/
+function UserQuiz(questions, options) {
+  this.options = options
+  console.log(options)
+  this.questions = questions
+  //console.log(questions)
+  this.responses = []
+  this.currentQuestion = 0
+  this.responseCount = 0
+}
+
+UserQuiz.prototype.init = function () {
+  var storedData = localStorage.getItem('quiz')
+  storedDataParsed = (storedData) ? JSON.parse(storedData) : {}
+  var {responses=[], currentQuestion=0, responseCount=0 } = storedDataParsed
+}
+
+UserQuiz.prototype.save = function () {
+  var quizData = Object.assign({}, {
+            responses: this.responses,
+            responseCount: this.responseCount,
+            currentQuestion: this.currentQuestion
+          })
+
+  localStorage.setItem('quiz', JSON.stringify(quizData))
+}
+
+UserQuiz.prototype.addResponse = function (questionIndex, response) {
+  this.responses[questionIndex] = response
+}
+
+
+UserQuiz.prototype.isResponseCorrect = function (questionIndex, userResponse) {
+  return this.getQuizResponse(currentQuestion)
+        .then(this.isResponseCorrect(response, correctResponse))
+}
+
+UserQuiz.prototype.getQuizResponse = function(i) {
+    return this.getJson(options.responsesUrl.replace(':index', i))
+      .then(response => response.response)
+}
+
+UserQuiz.prototype.getJson = function(url) {
+  return new Promise(function (resolve, reject) {
+    $.ajax({ url: url }).done(resolve)
+  })
+}
+
+/*
+init: function () {},
+  save: function () {},
+  addResponse: function (questionIndex, response) {},
+  isResponseCorrect: function(questionIndex, response) {},
+  
+  */
 var quiz = function (element, options) {
   function getJson (url) {
     return new Promise(function (resolve, reject) {
@@ -258,6 +315,13 @@ var quiz = function (element, options) {
 
     updateQuizStatus(questions, responseCount)
   }
+
+  var userQuiz
+  getQuizConfig()
+    .then(function (data) {
+      userQuiz = new UserQuiz(data.questions, options).init()
+      buildQuiz(data.title, data.questions, $(element))
+    })
 
   getQuizConfig()
     .then(function (data) {
