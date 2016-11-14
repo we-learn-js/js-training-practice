@@ -196,7 +196,7 @@ quiz = function (element, options) {
   }
 
   function processResponse ($questions, questions) {
-    var quizData = new UserQuiz();
+    var quizData = new UserQuiz(questions);
     var response = getQuestionResponse(questions[quizData.currentQuestion], quizData.currentQuestion)
     
     quizData.responses[quizData.currentQuestion] = response
@@ -250,7 +250,7 @@ quiz = function (element, options) {
   }
 
   function buildQuiz (title, questions, $element) {
-    var quizData = new UserQuiz();
+    var quizData = new UserQuiz(questions);
   
   
     $questions = createQuestionsForm()
@@ -278,7 +278,8 @@ quiz = function (element, options) {
 }
 
 
-function UserQuiz() {
+function UserQuiz(questions) {
+    this.questions=questions;
     this.responses=[];
     this.oldResponses={};
     this.currentQuestion=0;
@@ -318,7 +319,7 @@ UserQuiz.prototype.addResponse=function(questionIndex,response){
 };
 
 UserQuiz.prototype.isResponseCorrect=function(questionIndex,response){
-  
+
 
 };
 
