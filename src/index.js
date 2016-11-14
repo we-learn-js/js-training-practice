@@ -278,7 +278,9 @@ quiz = function (element, options) {
 }
 
 
-function UserQuiz(questions) {
+class UserQuiz {
+  
+  constructor(questions){
     this.questions=questions;
     this.responses=[];
     this.oldResponses={};
@@ -286,42 +288,49 @@ function UserQuiz(questions) {
     this.responseCount=0;
     this.changes=false;
     this.init();
+  }
+  
+  init(){
+    var storedData = localStorage.getItem('quiz')
+    this.oldResponses=storedData ? JSON.parse(storedData) : {}
+    this.responses=this.oldResponses.responses ? this.oldResponses.responses : [];
+    this.currentQuestion=this.oldResponses.currentQuestion ? this.oldResponses.currentQuestion : 0
+    this.responseCount=this.oldResponses.responseCount ? this.oldResponses.responseCount : 0
+  }
+  
+  save(){
+    if (this.changes) {
+      var changes = {
+          responses:this.responses,
+          currentQuestion:this.currentQuestion,
+          responseCount:this.responseCount
+      }
+      localStorage.setItem('quiz',JSON.stringify(changes));
+    }
+    this.changes=false;
+  }
+  
+  addResponse(questionIndex,response){
+    this.changes=true;
+    if (this.responses[questionIndex]) {
+      this.responses[questionIndex]=response;
+    }
+    else {
+      this.responses.push(response);
+    }
+  }
+
+  isResponseCorrect(questionIndex,response){
+  
+  
+  }  
 }
 
-UserQuiz.prototype.init=function(){
-  var storedData = localStorage.getItem('quiz')
-  this.oldResponses=storedData ? JSON.parse(storedData) : {}
-  this.responses=this.oldResponses.responses ? this.oldResponses.responses : [];
-  this.currentQuestion=this.oldResponses.currentQuestion ? this.oldResponses.currentQuestion : 0
-  this.responseCount=this.oldResponses.responseCount ? this.oldResponses.responseCount : 0
-};
-
-UserQuiz.prototype.save=function(){
-  if (this.changes) {
-    var changes = {
-        responses:this.responses,
-        currentQuestion:this.currentQuestion,
-        responseCount:this.responseCount
-    }
-    localStorage.setItem('quiz',JSON.stringify(changes));
-  }
-  this.changes=false;
-};
-
-UserQuiz.prototype.addResponse=function(questionIndex,response){
-  this.changes=true;
-  if (this.responses[questionIndex]) {
-    this.responses[questionIndex]=response;
-  }
-  else {
-    this.responses.push(response);
-  }
-};
-
-UserQuiz.prototype.isResponseCorrect=function(questionIndex,response){
 
 
-};
+
+
+
 
 
 
