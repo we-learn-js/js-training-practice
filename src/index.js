@@ -1,8 +1,7 @@
 var quiz = function (element, options) {
 
   class UserQuiz {
-    constructor (questions, options) {
-      this._options = options
+    constructor (questions) {
       this._questions = questions
 
       this._responses = []
