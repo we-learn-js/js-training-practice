@@ -205,7 +205,10 @@ var quiz = function (element, options) {
       })
   }
 
-  function getQuestionResponse (question, i) {
+  function getQuestionResponse () {
+    var question = userQuiz.questions[userQuiz.currentQuestion]
+    var i = userQuiz.currentQuestion
+    
     var $inputs = $('[name^=' + getFieldName(i) + ']')
     switch (question.input.type) {
       case 'checkbox':
@@ -226,7 +229,7 @@ var quiz = function (element, options) {
   }
 
   function getResponseCount (responses) {
-    return responses.reduce(function (result, response) {
+    return userQuiz.responses.reduce(function (result, response) {
       return result + (+!isEmptyResponse(response))
     }, 0)
   }
@@ -253,13 +256,13 @@ var quiz = function (element, options) {
   }
 
   function processResponse ($questions) {
-    var response = getQuestionResponse(userQuiz.questions[userQuiz.currentQuestion], userQuiz.currentQuestion)
+    var response = getQuestionResponse()
     userQuiz.responses[userQuiz.currentQuestion] = response
 
     if (isEmptyResponse(userQuiz.responses[userQuiz.currentQuestion])) {
       alert('You must give a response')
     } else {
-      userQuiz.responseCount = getResponseCount(userQuiz.responses)
+      userQuiz.responseCount = getResponseCount()
 
       userQuiz.getQuizResponse(userQuiz.currentQuestion)
         .then(function (correctResponse) {
