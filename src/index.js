@@ -91,11 +91,6 @@ var quiz = function (element, options) {
     return getJson(options.url)
   }
 
-  function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
-      .then(response => response.response)
-  }
-
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
   }
@@ -273,7 +268,7 @@ var quiz = function (element, options) {
     } else {
       userQuiz.responseCount = getResponseCount(userQuiz.responses)
 
-      getQuizResponse(userQuiz.currentQuestion)
+      userQuiz.getQuizResponse(userQuiz.currentQuestion)
         .then(function (correctResponse) {
           alert(UserQuiz.isResponseCorrect(response, correctResponse)
             ? 'Response is correct!'
@@ -292,11 +287,6 @@ var quiz = function (element, options) {
     updateProgressBar(questions.length, responseCount)
 
     questions.length === responseCount && showTextEndMessage()
-  }
-
-  function saveQuizData (changes) {
-    var quizData = Object.assign(getQuizData(), changes)
-    localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
   function buildQuiz (title, questions, $element) {
