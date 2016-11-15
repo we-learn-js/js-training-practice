@@ -306,7 +306,7 @@ var quiz = function (element, options) {
 
   getQuizConfig()
     .then(function (data) {
-      userQuiz = new UserQuiz(data.questions, options).init()
+      userQuiz = new UserQuiz(data.questions).init()
       buildQuiz(data.title, data.questions, $(element))
     })
 }
