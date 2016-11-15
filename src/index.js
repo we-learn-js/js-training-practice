@@ -37,9 +37,12 @@ var quiz = function (element, options) {
       this._responses[questionIndex] = response
     }
 
-    isResponseCorrect (questionIndex, userResponse) {
-    return this.getQuizResponse(this._currentQuestion)
-          .then(this.isResponseCorrect(response, correctResponse))
+    static isResponseCorrect (userResponse, correctResponse) {
+      return UserQuiz.serializeResponse(userResponse) == UserQuiz.serializeResponse(correctResponse)
+    }
+
+    static serializeResponse (response) {
+      return (response.join && response.sort().join(', ')) || response
     }
 
     getQuizResponse (i) {
@@ -272,9 +275,9 @@ var quiz = function (element, options) {
 
       getQuizResponse(userQuiz.currentQuestion)
         .then(function (correctResponse) {
-          alert( isResponseCorrect(response, correctResponse)
+          alert(UserQuiz.isResponseCorrect(response, correctResponse)
             ? 'Response is correct!'
-            :'Response is not correct! It was: ' + serializeResponse(correctResponse)
+            :'Response is not correct! It was: ' + UserQuiz.serializeResponse(correctResponse)
           )
           updateQuizStatus(questions, userQuiz.responseCount)
           
@@ -282,14 +285,6 @@ var quiz = function (element, options) {
           userQuiz.save()
         })
     }
-  }
-
-  function isResponseCorrect (userResponse, correctResponse) {
-    return serializeResponse(userResponse) == serializeResponse(correctResponse)
-  }
-
-  function serializeResponse (response) {
-    return (response.join && response.sort().join(', ')) || response
   }
 
   function updateQuizStatus (questions, responseCount) {
