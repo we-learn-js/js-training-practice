@@ -176,9 +176,9 @@ var quiz = function (element, options) {
     + '</div>'
   }
 
-  function createQuestionsElements (questions, responses) {
-    return questions.map((question, i) => {
-      return $(getQuestionMarkup(question, responses[i], i)).css('display', 'none')
+  function createQuestionsElements () {
+    return userQuiz.questions.map((question, i) => {
+      return $(getQuestionMarkup(question, userQuiz.responses[i], i)).css('display', 'none')
     })
   }
 
@@ -190,10 +190,10 @@ var quiz = function (element, options) {
     return 'question-' + idx
   }
 
-  function createSubmitButton ($questions, questions) {
+  function createSubmitButton ($questions) {
     return $('<button id="submit-response" class="ui primary button">Submit response</button>')
       .on('click', function () {
-        processResponse($questions, questions)
+        processResponse($questions)
       })
   }
 
@@ -236,9 +236,9 @@ var quiz = function (element, options) {
     $('#' + getFieldId(idx)).css('display', display)
   }
 
-  function showCurrentQuestion (current) {
-    showQuestion(current - 1, false)
-    showQuestion(current, true)
+  function showCurrentQuestion () {
+    showQuestion(userQuiz.responseCount - 1, false)
+    showQuestion(userQuiz.responseCount, true)
   }
 
   function showTextEndMessage () {
@@ -252,8 +252,8 @@ var quiz = function (element, options) {
     $('#progress').css('width', (responses / questions * 100) + '%')
   }
 
-  function processResponse ($questions, questions) {
-    var response = getQuestionResponse(questions[userQuiz.currentQuestion], userQuiz.currentQuestion)
+  function processResponse ($questions) {
+    var response = getQuestionResponse(userQuiz.questions[userQuiz.currentQuestion], userQuiz.currentQuestion)
     userQuiz.responses[userQuiz.currentQuestion] = response
 
     if (isEmptyResponse(userQuiz.responses[userQuiz.currentQuestion])) {
@@ -267,7 +267,7 @@ var quiz = function (element, options) {
             ? 'Response is correct!'
             :'Response is not correct! It was: ' + UserQuiz.serializeResponse(correctResponse)
           )
-          updateQuizStatus(questions, userQuiz.responseCount)
+          updateQuizStatus()
           
           userQuiz.currentQuestion = userQuiz.currentQuestion + 1
           userQuiz.save()
@@ -275,11 +275,11 @@ var quiz = function (element, options) {
     }
   }
 
-  function updateQuizStatus (questions, responseCount) {
-    showCurrentQuestion(responseCount)
-    updateProgressBar(questions.length, responseCount)
+  function updateQuizStatus () {
+    showCurrentQuestion()
+    updateProgressBar(userQuiz.questions.length, userQuiz.responseCount)
 
-    questions.length === responseCount && showTextEndMessage()
+    userQuiz.questions.length === userQuiz.responseCount && showTextEndMessage()
   }
 
   function buildQuiz (title, questions, $element) {
@@ -291,15 +291,15 @@ var quiz = function (element, options) {
     $element
       .append(createTitleElement(title))
       .append($questions)
-      .append(createSubmitButton($questions, userQuiz.questions))
+      .append(createSubmitButton($questions))
       .append(createResetButton())
 
     $questions
-      .append(createQuestionsElements(userQuiz.questions, userQuiz.responses))
+      .append(createQuestionsElements())
       .find('pre code').each((i, block) => {
       hljs.highlightBlock(block)})
 
-    updateQuizStatus(userQuiz.questions, userQuiz.responseCount)
+    updateQuizStatus()
   }
 
   var userQuiz
