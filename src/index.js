@@ -46,11 +46,11 @@ var quiz = function (element, options) {
     }
 
     getQuizResponse (i) {
-      return this.getJson(options.responsesUrl.replace(':index', i))
+      return UserQuiz.getJson(options.responsesUrl.replace(':index', i))
         .then(response => response.response)
     }
 
-    getJson (url) {
+    static getJson (url) {
       return new Promise(function (resolve, reject) {
         $.ajax({ url: url }).done(resolve)
       })
@@ -81,14 +81,8 @@ var quiz = function (element, options) {
     }
   }
 
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({ url: url }).done(resolve)
-    })
-  }
-
   function getQuizConfig () {
-    return getJson(options.url)
+    return UserQuiz.getJson(options.url)
   }
 
   function createQuestionsForm () {
