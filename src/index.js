@@ -16,13 +16,15 @@ UserQuiz.prototype.init = function () {
   }
 }
 UserQuiz.prototype.save = function (latestData) {
-  console.log("save func")
+  //console.log("save func")
   var quizData = Object.assign({}, latestData)
-  var loadedData = localStorage.setItem('quiz', JSON.stringify(quizData));
+  localStorage.setItem('quiz', JSON.stringify(quizData));
 }
 UserQuiz.prototype.addResponse = function (questionIndex, response){
   //console.log("add response func")
   this.responses[questionIndex] = response
+  this.responseCount++
+  this.currentQuestion++
 }
 UserQuiz.prototype.isResponseCorrect = function (questionIndex, response){ 
   //console.log("is response correct func")
