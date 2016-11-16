@@ -1,50 +1,52 @@
 var quiz = function (element, options) {
 
-  const Serializer = function() {
-    this.serialize = function(data) {
+  class Serializer {
+    serialize(data) {
       return (data.join && data.sort().join(', ')) || data;
-    };
-  };
+    }
+  }
 
-  const UserQuiz = function(serializer) {
-    this.serializer = serializer;
-    this.responses = [];
-    this.currentQuestion = 0;
-    this.responseCount = 0;
-  };
+  class UserQuiz {
 
-  UserQuiz.prototype.init = function() {
-    const storedData = localStorage.getItem('quiz');
-
-    if (storedData) {
-      let {responses=[], currentQuestion=0, responseCount=0 } = JSON.parse(storedData);
-      this.responses = responses;
-      this.currentQuestion = currentQuestion;
-      this.responseCount = responseCount;
+    constructor(serializer) {
+      this.serializer = serializer;
+      this.responses = [];
+      this.currentQuestion = 0;
+      this.responseCount = 0;
     }
 
-    return this;
-  };
+    init() {
+      const storedData = localStorage.getItem('quiz');
 
-  UserQuiz.prototype.save = function() {
-    localStorage.setItem('quiz', JSON.stringify({
-      responses: this.responses,
-      currentQuestion: this.currentQuestion,
-      responseCount: this.responseCount
-    }));
-  };
+      if (storedData) {
+        let {responses=[], currentQuestion=0, responseCount=0 } = JSON.parse(storedData);
+        this.responses = responses;
+        this.currentQuestion = currentQuestion;
+        this.responseCount = responseCount;
+      }
 
-  UserQuiz.prototype.addResponse = function(questionIndex, response) {
-    this.responses[questionIndex] = response;
-  };
+      return this;
+    }
 
-  UserQuiz.prototype.isResponseCorrect = function(answeredResponseIndex, correctResponse) {
-    return this.serializer.serialize(this.responses[answeredResponseIndex]) === this.serializer.serialize(correctResponse);
-  };
+    save() {
+      localStorage.setItem('quiz', JSON.stringify({
+        responses: this.responses,
+        currentQuestion: this.currentQuestion,
+        responseCount: this.responseCount
+      }));
+    }
+
+    addResponse(questionIndex, response) {
+      this.responses[questionIndex] = response;
+    }
+
+    isResponseCorrect(answeredResponseIndex, correctResponse) {
+      return this.serializer.serialize(this.responses[answeredResponseIndex]) === this.serializer.serialize(correctResponse);
+    }
+  }
 
   const serializer = new Serializer();
-  const userQuiz = new UserQuiz(serializer);
-  userQuiz.init();
+  const userQuiz = new UserQuiz(serializer).init();
 
 
   function getJson (url) {
