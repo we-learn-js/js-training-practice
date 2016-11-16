@@ -1,4 +1,54 @@
 var quiz = function (element, options) {
+
+  class Serializer {
+    serialize(data) {
+      return (data.join && data.sort().join(', ')) || data;
+    }
+  }
+
+  class UserQuiz {
+
+    constructor(serializer) {
+      this.serializer = serializer;
+      this.responses = [];
+      this.currentQuestion = 0;
+      this.responseCount = 0;
+    }
+
+    init() {
+      const storedData = localStorage.getItem('quiz');
+
+      if (storedData) {
+        let {responses=[], currentQuestion=0, responseCount=0 } = JSON.parse(storedData);
+        this.responses = responses;
+        this.currentQuestion = currentQuestion;
+        this.responseCount = responseCount;
+      }
+
+      return this;
+    }
+
+    save() {
+      localStorage.setItem('quiz', JSON.stringify({
+        responses: this.responses,
+        currentQuestion: this.currentQuestion,
+        responseCount: this.responseCount
+      }));
+    }
+
+    addResponse(questionIndex, response) {
+      this.responses[questionIndex] = response;
+    }
+
+    isResponseCorrect(answeredResponseIndex, correctResponse) {
+      return this.serializer.serialize(this.responses[answeredResponseIndex]) === this.serializer.serialize(correctResponse);
+    }
+  }
+
+  const serializer = new Serializer();
+  const userQuiz = new UserQuiz(serializer).init();
+
+
   function getJson (url) {
     return new Promise(function (resolve, reject) {
       $.ajax({ url: url }).done(resolve)
@@ -193,37 +243,29 @@ var quiz = function (element, options) {
   }
 
   function processResponse ($questions, questions) {
-    var { currentQuestion, responses } = getQuizData()
-    var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
-    responses[currentQuestion] = response
 
-    if (isEmptyResponse(responses[currentQuestion])) {
+    let currentQuestion = userQuiz.currentQuestion;
+    const response = getQuestionResponse(questions[currentQuestion], currentQuestion);
+    userQuiz.addResponse(currentQuestion, response);
+
+    if (isEmptyResponse(userQuiz.responses[userQuiz.currentQuestion])) {
       alert('You must give a response')
     } else {
-      var responseCount = getResponseCount(responses)
+      userQuiz.responseCount = getResponseCount(userQuiz.responses);
 
       getQuizResponse(currentQuestion)
         .then(function (correctResponse) {
-          alert( isResponseCorrect(response, correctResponse)
+          alert( userQuiz.isResponseCorrect(currentQuestion, correctResponse)
             ? 'Response is correct!'
-            :'Response is not correct! It was: ' + serializeResponse(correctResponse)
-          )
-          updateQuizStatus(questions, responseCount)
-          saveQuizData({
-            responses: responses,
-            responseCount: responseCount,
-            currentQuestion: ++currentQuestion
-          })
-        })
+            :'Response is not correct! It was: ' + serializer.serialize(correctResponse)
+          );
+
+          updateQuizStatus(questions, userQuiz.responseCount);
+
+          userQuiz.currentQuestion++;
+          userQuiz.save();
+        });
     }
-  }
-
-  function isResponseCorrect (userResponse, correctResponse) {
-    return serializeResponse(userResponse) == serializeResponse(correctResponse)
-  }
-
-  function serializeResponse (response) {
-    return (response.join && response.sort().join(', ')) || response
   }
 
   function updateQuizStatus (questions, responseCount) {
@@ -231,11 +273,6 @@ var quiz = function (element, options) {
     updateProgressBar(questions.length, responseCount)
 
     questions.length === responseCount && showTextEndMessage()
-  }
-
-  function saveQuizData (changes) {
-    var quizData = Object.assign(getQuizData(), changes)
-    localStorage.setItem('quiz', JSON.stringify(quizData))
   }
 
   function buildQuiz (title, questions, $element) {
