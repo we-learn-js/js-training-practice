@@ -27,13 +27,17 @@ var quiz = function (element, options) {
 
     isResponseCorrect (questionIndex, response) {
       return getQuizResponse(questionIndex)
-        .then(serializeResponse)
+        .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
-            ok: correctResponse == serializeResponse(response),
+            ok: correctResponse == UserQuiz.serializeResponse(response),
             correctResponse: correctResponse
           }
         } )
+    }
+
+    static serializeResponse (response) {
+      return (response.join && response.sort().join(', ')) || response
     }
   }
 
@@ -233,10 +237,6 @@ var quiz = function (element, options) {
           updateQuizStatus(questions, userQuiz.responseCount)
         })
     }
-  }
-
-  function serializeResponse (response) {
-    return (response.join && response.sort().join(', ')) || response
   }
 
   function updateQuizStatus (questions, responseCount) {
