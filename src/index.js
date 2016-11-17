@@ -9,9 +9,7 @@ var quiz = function (element, options) {
       var storedData = localStorage.getItem('quiz') || '{}'
       storedData = JSON.parse(storedData)
       var {responses=[], currentQuestion=0, responseCount=0 } = storedData
-      this.responses = responses
-      this.currentQuestion = currentQuestion
-      this.responseCount = responseCount
+      Object.assign(this, {responses, currentQuestion, responseCount})
       return this
     }
 
