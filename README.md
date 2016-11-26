@@ -39,15 +39,25 @@ Create a constructor named `UserQuiz` that will manage the state of the quiz.
 * **isResponseCorrect(questionIndex, response):** returns if response if correct, like `isResponseCorrect`
 
 ```js
+
 var quiz = function (element, options) {
   var userQuiz
   getQuizConfig()
     .then(function (data) {
-      userQuiz = new UserQuiz(questions).init()
+      userQuiz = new UserQuiz().init()
       buildQuiz(data.title, data.questions, $(element))
-    })
-  /* ... */
+    });
+/* ... */
+
 ```
 
 Make `userQuiz` manage the state of the quiz.
 Unused code should be removed.
+
+### Object-Oriented Programming
+
+Create the following classes and implement them in the program:
+* **UserQuiz:** responsible for the state of the quiz
+* **Question:** handles question info and related operations
+* **QuizNav:** shows/hides questions in the view
+* **QuizApi:** makes requests to the JSON API
