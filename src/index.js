@@ -1,3 +1,18 @@
+
+UserQuiz={
+
+};
+
+Questions={
+  //(desc, options, isCorrect)
+  
+};
+
+QuizNav={};
+
+QuizApi={};
+
+
 quiz = function (element, options) {
 
   function getJson(url, callback) {
