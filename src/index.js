@@ -1,9 +1,35 @@
 var quiz = function (element, options) {
-  var userQuiz
+  var userQuiz,quizApi;
+
+    class QuizApi {
+      constructor(url) {
+        this.url=url
+      }
+
+      getJson () {
+        const {url} = this
+        return new Promise(function (resolve, reject) {
+          $.ajax({ url }).done(resolve)
+        })
+      }
+
+      getQuizResponse (i) {
+        debugger
+        return this.getJson(options.responsesUrl.replace(':index', i))
+          .then(response => response.response)
+      }
+    }
+
+  function getQuizConfig () {
+      quizApi=new QuizApi(options.url)
+      return quizApi.getJson()
+  }
 
   class UserQuiz {
     constructor (questions) {
-      this.questions = questions
+      var q=[];
+      for(var i=0;i<questions.length;i++){q.push(new Question(questions[i].problem,questions[i].input))}
+      this.questions = q
     }
     init () {
       var storedData = localStorage.getItem('quiz') || '{}'
@@ -26,7 +52,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return getQuizResponse(questionIndex)
+      return quizApi.getQuizResponse(questionIndex)
         .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
@@ -41,20 +67,20 @@ var quiz = function (element, options) {
     }
   }
 
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({ url: url }).done(resolve)
-    })
+  class Question {
+    constructor(problem,input) {
+      this.problem=problem
+      this.input=input
+      this.name='estoy aqui'
+    }
   }
 
-  function getQuizConfig () {
-    return getJson(options.url)
-  }
+class QuizNav {
+  constructor() {
 
-  function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
-      .then(response => response.response)
   }
+}
+
 
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
@@ -270,7 +296,7 @@ var quiz = function (element, options) {
   getQuizConfig()
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
-      buildQuiz(data.title, data.questions, $(element))
+      buildQuiz(data.title, userQuiz.questions, $(element))
     })
 }
 
