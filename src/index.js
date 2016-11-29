@@ -58,21 +58,6 @@ var quiz = function (element, options) {
     }
   }
 
-  //function getJson (url) {
-  //  return new Promise(function (resolve, reject) {
-  //    $.ajax({ url: url }).done(resolve)
-  //  })
-  //}
-
-  //function getQuizConfig () {
-  //  return getJson(options.url)
-  //}
-
-  //function getQuizResponse (i) {
-  //  return getJson(options.responsesUrl.replace(':index', i))
-  //    .then(response => response.response)
-  //}
-
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
   }
