@@ -26,7 +26,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return getQuizResponse(questionIndex)
+      return QuizApi.getQuizResponse(questionIndex)
         .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
@@ -41,20 +41,37 @@ var quiz = function (element, options) {
     }
   }
 
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({ url: url }).done(resolve)
-    })
+  class QuizApi {
+    static getQuizConfig() {
+      return this.getJson(options.url)
+    }
+
+    static getJson(url) {
+      return new Promise(function (resolve, reject) {
+        $.ajax({ url: url }).done(resolve)
+      })
+    }
+
+    static getQuizResponse(i) {
+      return this.getJson(options.responsesUrl.replace(':index', i))
+        .then(response => response.response)
+    }
   }
 
-  function getQuizConfig () {
-    return getJson(options.url)
-  }
+  //function getJson (url) {
+  //  return new Promise(function (resolve, reject) {
+  //    $.ajax({ url: url }).done(resolve)
+  //  })
+  //}
 
-  function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
-      .then(response => response.response)
-  }
+  //function getQuizConfig () {
+  //  return getJson(options.url)
+  //}
+
+  //function getQuizResponse (i) {
+  //  return getJson(options.responsesUrl.replace(':index', i))
+  //    .then(response => response.response)
+  //}
 
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
@@ -267,7 +284,7 @@ var quiz = function (element, options) {
     updateQuizStatus(questions, responseCount)
   }
 
-  getQuizConfig()
+  QuizApi.getQuizConfig()
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
       buildQuiz(data.title, data.questions, $(element))
