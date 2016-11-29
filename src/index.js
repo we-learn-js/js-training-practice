@@ -62,6 +62,49 @@ var quiz = function (element, options) {
     }
   }
 
+  class QuizNav {
+    constructor () {
+    }
+
+    static showQuestion (idx, show) {
+      var display = show ? 'block' : 'none'
+      $('#' + getFieldId(idx)).css('display', display)
+    }
+
+    static showCurrentQuestion (current) {
+      this.showQuestion(current - 1, false)
+      this.showQuestion(current, true)
+    }
+
+    static showTextEndMessage () {
+      $('#submit-response').css('display', 'none')
+      $(element)
+        .append('<div>Thank you for your responses.<br /><br /> </div>')
+        .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+    }
+
+    static updateProgressBar (questions, responses) {
+      $('#progress').css('width', (responses / questions * 100) + '%')
+    }
+
+    static updateQuizStatus (questions, responseCount) {
+      this.showCurrentQuestion(responseCount)
+      this.updateProgressBar(questions.length, responseCount)
+
+      questions.length === responseCount && this.showTextEndMessage()
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
 
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
@@ -204,26 +247,17 @@ var quiz = function (element, options) {
     return !response || (response.join && !response.join('')) || false
   }
 
-  function showQuestion (idx, show) {
-    var display = show ? 'block' : 'none'
-    $('#' + getFieldId(idx)).css('display', display)
-  }
 
-  function showCurrentQuestion (current) {
-    showQuestion(current - 1, false)
-    showQuestion(current, true)
-  }
 
-  function showTextEndMessage () {
-    $('#submit-response').css('display', 'none')
-    $(element)
-      .append('<div>Thank you for your responses.<br /><br /> </div>')
-      .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-  }
 
-  function updateProgressBar (questions, responses) {
-    $('#progress').css('width', (responses / questions * 100) + '%')
-  }
+
+
+
+
+
+
+
+
 
   function processResponse ($questions, questions) {
     var { currentQuestion, responses } = userQuiz
@@ -241,16 +275,9 @@ var quiz = function (element, options) {
             : 'Response is not correct! It was: ' + result.correctResponse
           )
           userQuiz.save()
-          updateQuizStatus(questions, userQuiz.responseCount)
+          QuizNav.updateQuizStatus(questions, userQuiz.responseCount)
         })
     }
-  }
-
-  function updateQuizStatus (questions, responseCount) {
-    showCurrentQuestion(responseCount)
-    updateProgressBar(questions.length, responseCount)
-
-    questions.length === responseCount && showTextEndMessage()
   }
 
   function buildQuiz (title, questions, $element) {
@@ -271,7 +298,7 @@ var quiz = function (element, options) {
       .find('pre code').each((i, block) => {
       hljs.highlightBlock(block)})
 
-    updateQuizStatus(questions, responseCount)
+    QuizNav.updateQuizStatus(questions, responseCount)
   }
 
   QuizApi.getQuizConfig()
