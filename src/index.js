@@ -1,20 +1,15 @@
 var quiz = function (element, options) {
-  var userQuiz,quizApi;
+  var userQuiz,quizApi,quizNav;
 
     class QuizApi {
-      constructor(url) {
-
-      }
-
       getJson (url) {
         return new Promise(function (resolve, reject) {
           $.ajax({ url }).done(resolve)
         })
       }
 
-      getQuizResponse (i) {
-        debugger
-        return this.getJson(options.responsesUrl.replace(':index', i))
+      getQuizResponse (url) {
+        return this.getJson(url)
           .then(response => response.response)
       }
     }
@@ -51,7 +46,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return quizApi.getQuizResponse(questionIndex)
+      return quizApi.getQuizResponse(options.responsesUrl.replace(':index', questionIndex))
         .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
@@ -75,11 +70,10 @@ var quiz = function (element, options) {
   }
 
 class QuizNav {
-  constructor() {
-
+  constructor(questions) {
+    this.$questions=questions;
   }
 }
-
 
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
@@ -187,10 +181,10 @@ class QuizNav {
     return 'question-' + idx
   }
 
-  function createSubmitButton ($questions, questions) {
+  function createSubmitButton () {
     return $('<button id="submit-response" class="ui primary button">Submit response</button>')
       .on('click', function () {
-        processResponse($questions, questions)
+        processResponse()
       })
   }
 
@@ -243,8 +237,9 @@ class QuizNav {
     $('#progress').css('width', (responses / questions * 100) + '%')
   }
 
-  function processResponse ($questions, questions) {
-    var { currentQuestion, responses } = userQuiz
+  function processResponse () {
+    debugger
+    var { currentQuestion, responses, questions} = userQuiz
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
 
     userQuiz.addResponse(currentQuestion, response)
@@ -273,21 +268,19 @@ class QuizNav {
 
   function buildQuiz (title, questions, $element) {
     var { responses, responseCount } = userQuiz
-    var $questions = createQuestionsForm()
+    quizNav=new QuizNav(createQuestionsForm())
 
     $(document.body)
       .append(createProgressElement())
 
     $element
       .append(createTitleElement(title))
-      .append($questions)
-      .append(createSubmitButton($questions, questions))
+      .append(quizNav.$questions)
+      .append(createSubmitButton())
       .append(createResetButton())
 
-    $questions
+    quizNav.$questions
       .append(createQuestionsElements(questions, responses))
-      .find('pre code').each((i, block) => {
-      hljs.highlightBlock(block)})
 
     updateQuizStatus(questions, responseCount)
   }
