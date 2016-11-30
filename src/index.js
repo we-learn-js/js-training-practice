@@ -1,9 +1,56 @@
 var quiz = function (element, options) {
   var userQuiz
 
+
+  class Question {
+    constructor(){
+
+    }
+    showTextEndMessage () {
+      $('#submit-response').css('display', 'none')
+      $(element)
+          .append('<div>Thank you for your responses.<br /><br /> </div>')
+          .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+    }
+  }
+
+  class QuizApi {
+    constructor() {
+    }
+
+    getJson(url) {
+      return new Promise(function (resolve, reject) {
+        $.ajax({url: url}).done(resolve)
+      })
+    }
+
+    getQuizResponse (i) {
+      return this.getJson(options.responsesUrl.replace(':index', i))
+              .then(response => response.response)
+    }
+
+    getQuizConfig () {
+      return this.getJson(options.url)
+    }
+  }
+
+  class QuizNav {
+
+    showQuestion (idx, show) {
+      var display = show ? 'block' : 'none'
+      $('#' + getFieldId(idx)).css('display', display)
+    }
+
+    showCurrentQuestion (current) {
+      this.showQuestion(current - 1, false)
+      this.showQuestion(current, true)
+    }
+  }
+
   class UserQuiz {
     constructor (questions) {
       this.questions = questions
+      this._quizApi = new QuizApi()
     }
     init () {
       var storedData = localStorage.getItem('quiz') || '{}'
@@ -26,7 +73,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return getQuizResponse(questionIndex)
+      return this._quizApi.getQuizResponse(questionIndex)
         .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
@@ -39,21 +86,6 @@ var quiz = function (element, options) {
     static serializeResponse (response) {
       return (response.join && response.sort().join(', ')) || response
     }
-  }
-
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({ url: url }).done(resolve)
-    })
-  }
-
-  function getQuizConfig () {
-    return getJson(options.url)
-  }
-
-  function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
-      .then(response => response.response)
   }
 
   function createQuestionsForm () {
@@ -197,22 +229,8 @@ var quiz = function (element, options) {
     return !response || (response.join && !response.join('')) || false
   }
 
-  function showQuestion (idx, show) {
-    var display = show ? 'block' : 'none'
-    $('#' + getFieldId(idx)).css('display', display)
-  }
 
-  function showCurrentQuestion (current) {
-    showQuestion(current - 1, false)
-    showQuestion(current, true)
-  }
 
-  function showTextEndMessage () {
-    $('#submit-response').css('display', 'none')
-    $(element)
-      .append('<div>Thank you for your responses.<br /><br /> </div>')
-      .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-  }
 
   function updateProgressBar (questions, responses) {
     $('#progress').css('width', (responses / questions * 100) + '%')
@@ -240,10 +258,12 @@ var quiz = function (element, options) {
   }
 
   function updateQuizStatus (questions, responseCount) {
-    showCurrentQuestion(responseCount)
+    var quizNav = new QuizNav()
+    var question = new Question()
+    quizNav.showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
-    questions.length === responseCount && showTextEndMessage()
+    questions.length === responseCount && question.showTextEndMessage()
   }
 
   function buildQuiz (title, questions, $element) {
@@ -267,7 +287,8 @@ var quiz = function (element, options) {
     updateQuizStatus(questions, responseCount)
   }
 
-  getQuizConfig()
+  var quizApi = new QuizApi()
+  quizApi.getQuizConfig()
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
       buildQuiz(data.title, data.questions, $(element))
