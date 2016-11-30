@@ -73,6 +73,35 @@ class QuizNav {
   constructor(questions) {
     this.$questions=questions;
   }
+  updateQuizStatus(questions,responseCount){
+    this._showCurrentQuestion(responseCount)
+    this._updateProgressBar(questions.length, responseCount)
+    questions.length === responseCount && this._showTextEndMessage()
+  }
+  _showCurrentQuestion (current) {
+    this._showQuestion(current - 1, false)
+    this._showQuestion(current, true)
+  }
+
+  _showQuestion (idx, show) {
+    var display = show ? 'block' : 'none'
+    $('#' + this.getFieldId(idx)).css('display', display)
+  }
+
+  getFieldId (idx) {
+    return 'question-' + idx
+  }
+
+  _updateProgressBar (questions, responses) {
+    $('#progress').css('width', (responses / questions * 100) + '%')
+  }
+
+  _showTextEndMessage () {
+    $('#submit-response').css('display', 'none')
+    $(element)
+      .append('<div>Thank you for your responses.<br /><br /> </div>')
+      .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+  }
 }
 
   function createQuestionsForm () {
@@ -154,7 +183,7 @@ class QuizNav {
     var code = question.code && '<pre><code>' + question.code + '</code></pre>'
     question.input = question.input || { type: 'input' }
 
-    return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
+    return '<div id="' + quizNav.getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
     + '<div class="header">' + question.problem + '</div>'
     + '</div>'
@@ -175,10 +204,6 @@ class QuizNav {
 
   function getFieldName (idx) {
     return 'question_' + idx
-  }
-
-  function getFieldId (idx) {
-    return 'question-' + idx
   }
 
   function createSubmitButton () {
@@ -216,29 +241,7 @@ class QuizNav {
     return !response || (response.join && !response.join('')) || false
   }
 
-  function showQuestion (idx, show) {
-    var display = show ? 'block' : 'none'
-    $('#' + getFieldId(idx)).css('display', display)
-  }
-
-  function showCurrentQuestion (current) {
-    showQuestion(current - 1, false)
-    showQuestion(current, true)
-  }
-
-  function showTextEndMessage () {
-    $('#submit-response').css('display', 'none')
-    $(element)
-      .append('<div>Thank you for your responses.<br /><br /> </div>')
-      .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-  }
-
-  function updateProgressBar (questions, responses) {
-    $('#progress').css('width', (responses / questions * 100) + '%')
-  }
-
   function processResponse () {
-    debugger
     var { currentQuestion, responses, questions} = userQuiz
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
 
@@ -254,16 +257,9 @@ class QuizNav {
             : 'Response is not correct! It was: ' + result.correctResponse
           )
           userQuiz.save()
-          updateQuizStatus(questions, userQuiz.responseCount)
+          quizNav.updateQuizStatus(questions, userQuiz.responseCount)
         })
     }
-  }
-
-  function updateQuizStatus (questions, responseCount) {
-    showCurrentQuestion(responseCount)
-    updateProgressBar(questions.length, responseCount)
-
-    questions.length === responseCount && showTextEndMessage()
   }
 
   function buildQuiz (title, questions, $element) {
@@ -282,7 +278,7 @@ class QuizNav {
     quizNav.$questions
       .append(createQuestionsElements(questions, responses))
 
-    updateQuizStatus(questions, responseCount)
+    quizNav.updateQuizStatus(questions, responseCount)
   }
 
   getQuizConfig()
