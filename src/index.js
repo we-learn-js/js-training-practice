@@ -1,9 +1,29 @@
 var quiz = function (element, options) {
-  var userQuiz
+  var userQuiz,quizApi,quizNav;
+
+    class QuizApi {
+      getJson (url) {
+        return new Promise(function (resolve, reject) {
+          $.ajax({ url }).done(resolve)
+        })
+      }
+
+      getQuizResponse (url) {
+        return this.getJson(url)
+          .then(response => response.response)
+      }
+    }
+
+  function getQuizConfig () {
+      quizApi=new QuizApi()
+      return quizApi.getJson(options.url)
+  }
 
   class UserQuiz {
     constructor (questions) {
-      this.questions = questions
+      var q=[];
+      for(var i=0;i<questions.length;i++){q.push(new Question(questions[i].problem,questions[i].input))}
+      this.questions = q
     }
     init () {
       var storedData = localStorage.getItem('quiz') || '{}'
@@ -26,7 +46,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return getQuizResponse(questionIndex)
+      return quizApi.getQuizResponse(options.responsesUrl.replace(':index', questionIndex))
         .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
@@ -41,20 +61,48 @@ var quiz = function (element, options) {
     }
   }
 
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({ url: url }).done(resolve)
-    })
+  class Question {
+    constructor(problem,input) {
+      this.problem=problem
+      this.input=input
+      this.name='estoy aqui'
+    }
   }
 
-  function getQuizConfig () {
-    return getJson(options.url)
+class QuizNav {
+  constructor(questions) {
+    this.$questions=questions;
+  }
+  updateQuizStatus(questions,responseCount){
+    this._showCurrentQuestion(responseCount)
+    this._updateProgressBar(questions.length, responseCount)
+    questions.length === responseCount && this._showTextEndMessage()
+  }
+  _showCurrentQuestion (current) {
+    this._showQuestion(current - 1, false)
+    this._showQuestion(current, true)
   }
 
-  function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
-      .then(response => response.response)
+  _showQuestion (idx, show) {
+    var display = show ? 'block' : 'none'
+    $('#' + this.getFieldId(idx)).css('display', display)
   }
+
+  getFieldId (idx) {
+    return 'question-' + idx
+  }
+
+  _updateProgressBar (questions, responses) {
+    $('#progress').css('width', (responses / questions * 100) + '%')
+  }
+
+  _showTextEndMessage () {
+    $('#submit-response').css('display', 'none')
+    $(element)
+      .append('<div>Thank you for your responses.<br /><br /> </div>')
+      .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+  }
+}
 
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
@@ -135,7 +183,7 @@ var quiz = function (element, options) {
     var code = question.code && '<pre><code>' + question.code + '</code></pre>'
     question.input = question.input || { type: 'input' }
 
-    return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
+    return '<div id="' + quizNav.getFieldId(i) + '" class="ui card" style="width: 100%;">'
     + '<div class="content">'
     + '<div class="header">' + question.problem + '</div>'
     + '</div>'
@@ -158,14 +206,10 @@ var quiz = function (element, options) {
     return 'question_' + idx
   }
 
-  function getFieldId (idx) {
-    return 'question-' + idx
-  }
-
-  function createSubmitButton ($questions, questions) {
+  function createSubmitButton () {
     return $('<button id="submit-response" class="ui primary button">Submit response</button>')
       .on('click', function () {
-        processResponse($questions, questions)
+        processResponse()
       })
   }
 
@@ -197,29 +241,8 @@ var quiz = function (element, options) {
     return !response || (response.join && !response.join('')) || false
   }
 
-  function showQuestion (idx, show) {
-    var display = show ? 'block' : 'none'
-    $('#' + getFieldId(idx)).css('display', display)
-  }
-
-  function showCurrentQuestion (current) {
-    showQuestion(current - 1, false)
-    showQuestion(current, true)
-  }
-
-  function showTextEndMessage () {
-    $('#submit-response').css('display', 'none')
-    $(element)
-      .append('<div>Thank you for your responses.<br /><br /> </div>')
-      .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-  }
-
-  function updateProgressBar (questions, responses) {
-    $('#progress').css('width', (responses / questions * 100) + '%')
-  }
-
-  function processResponse ($questions, questions) {
-    var { currentQuestion, responses } = userQuiz
+  function processResponse () {
+    var { currentQuestion, responses, questions} = userQuiz
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
 
     userQuiz.addResponse(currentQuestion, response)
@@ -234,43 +257,34 @@ var quiz = function (element, options) {
             : 'Response is not correct! It was: ' + result.correctResponse
           )
           userQuiz.save()
-          updateQuizStatus(questions, userQuiz.responseCount)
+          quizNav.updateQuizStatus(questions, userQuiz.responseCount)
         })
     }
   }
 
-  function updateQuizStatus (questions, responseCount) {
-    showCurrentQuestion(responseCount)
-    updateProgressBar(questions.length, responseCount)
-
-    questions.length === responseCount && showTextEndMessage()
-  }
-
   function buildQuiz (title, questions, $element) {
     var { responses, responseCount } = userQuiz
-    var $questions = createQuestionsForm()
+    quizNav=new QuizNav(createQuestionsForm())
 
     $(document.body)
       .append(createProgressElement())
 
     $element
       .append(createTitleElement(title))
-      .append($questions)
-      .append(createSubmitButton($questions, questions))
+      .append(quizNav.$questions)
+      .append(createSubmitButton())
       .append(createResetButton())
 
-    $questions
+    quizNav.$questions
       .append(createQuestionsElements(questions, responses))
-      .find('pre code').each((i, block) => {
-      hljs.highlightBlock(block)})
 
-    updateQuizStatus(questions, responseCount)
+    quizNav.updateQuizStatus(questions, responseCount)
   }
 
   getQuizConfig()
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
-      buildQuiz(data.title, data.questions, $(element))
+      buildQuiz(data.title, userQuiz.questions, $(element))
     })
 }
 
