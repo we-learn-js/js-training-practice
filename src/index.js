@@ -3,11 +3,10 @@ var quiz = function (element, options) {
 
     class QuizApi {
       constructor(url) {
-        this.url=url
+
       }
 
-      getJson () {
-        const {url} = this
+      getJson (url) {
         return new Promise(function (resolve, reject) {
           $.ajax({ url }).done(resolve)
         })
@@ -21,8 +20,8 @@ var quiz = function (element, options) {
     }
 
   function getQuizConfig () {
-      quizApi=new QuizApi(options.url)
-      return quizApi.getJson()
+      quizApi=new QuizApi()
+      return quizApi.getJson(options.url)
   }
 
   class UserQuiz {
