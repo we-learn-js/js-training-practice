@@ -5,6 +5,7 @@ class UserQuiz{
     this.responses = this.userResponses.responses || [];
     this.currentQuestion = this.userResponses.currentQuestion || 0;
     this.responseCount = this.userResponses.responseCount;
+    this.quizNav=new QuizNav(this.currentQuestion);
   }
   
   loadResponses(){
