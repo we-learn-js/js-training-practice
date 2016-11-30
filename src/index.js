@@ -46,6 +46,16 @@ class UserQuiz{
     localStorage.setItem('quiz', JSON.stringify(quizData))
   }
   
+  getResponseCount () {
+    return this.responses.reduce( function(result, response ) {
+      return this.isEmptyResponse(response) ? result : ++result
+    }, 0)
+  }
+  
+  isEmptyResponse (response) {
+    return !response || (response.join && !response.join('')) || false
+  }
+
   
 };
 
