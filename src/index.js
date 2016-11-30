@@ -2,6 +2,18 @@ var quiz = function (element, options) {
   var userQuiz
 
 
+  class Question {
+    constructor(){
+
+    }
+    showTextEndMessage () {
+      $('#submit-response').css('display', 'none')
+      $(element)
+          .append('<div>Thank you for your responses.<br /><br /> </div>')
+          .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+    }
+  }
+
   class QuizApi {
     constructor() {
     }
@@ -19,6 +31,19 @@ var quiz = function (element, options) {
 
     getQuizConfig () {
       return this.getJson(options.url)
+    }
+  }
+
+  class QuizNav {
+
+    showQuestion (idx, show) {
+      var display = show ? 'block' : 'none'
+      $('#' + getFieldId(idx)).css('display', display)
+    }
+
+    showCurrentQuestion (current) {
+      this.showQuestion(current - 1, false)
+      this.showQuestion(current, true)
     }
   }
 
@@ -62,22 +87,6 @@ var quiz = function (element, options) {
       return (response.join && response.sort().join(', ')) || response
     }
   }
-
-  //
-  // function getJson (url) {
-  //   return new Promise(function (resolve, reject) {
-  //     $.ajax({ url: url }).done(resolve)
-  //   })
-  // }
-  //
-  // function getQuizConfig () {
-  //   return getJson(options.url)
-  // }
-  //
-  // function getQuizResponse (i) {
-  //   return getJson(options.responsesUrl.replace(':index', i))
-  //     .then(response => response.response)
-  // }
 
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
@@ -220,35 +229,8 @@ var quiz = function (element, options) {
     return !response || (response.join && !response.join('')) || false
   }
 
-  class QuizNav {
 
-    showQuestion (idx, show) {
-      var display = show ? 'block' : 'none'
-      $('#' + getFieldId(idx)).css('display', display)
-    }
 
-    showCurrentQuestion (current) {
-      this.showQuestion(current - 1, false)
-      this.showQuestion(current, true)
-    }
-  }
-
-  // function showQuestion (idx, show) {
-  //   var display = show ? 'block' : 'none'
-  //   $('#' + getFieldId(idx)).css('display', display)
-  // }
-
-  // function showCurrentQuestion (current) {
-  //   showQuestion(current - 1, false)
-  //   showQuestion(current, true)
-  // }
-
-  function showTextEndMessage () {
-    $('#submit-response').css('display', 'none')
-    $(element)
-      .append('<div>Thank you for your responses.<br /><br /> </div>')
-      .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-  }
 
   function updateProgressBar (questions, responses) {
     $('#progress').css('width', (responses / questions * 100) + '%')
@@ -277,10 +259,11 @@ var quiz = function (element, options) {
 
   function updateQuizStatus (questions, responseCount) {
     var quizNav = new QuizNav()
+    var question = new Question()
     quizNav.showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
-    questions.length === responseCount && showTextEndMessage()
+    questions.length === responseCount && question.showTextEndMessage()
   }
 
   function buildQuiz (title, questions, $element) {
