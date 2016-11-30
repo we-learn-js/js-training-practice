@@ -1,9 +1,31 @@
 var quiz = function (element, options) {
   var userQuiz
 
+
+  class QuizApi {
+    constructor() {
+    }
+
+    getJson(url) {
+      return new Promise(function (resolve, reject) {
+        $.ajax({url: url}).done(resolve)
+      })
+    }
+
+    getQuizResponse (i) {
+      return this.getJson(options.responsesUrl.replace(':index', i))
+              .then(response => response.response)
+    }
+
+    getQuizConfig () {
+      return this.getJson(options.url)
+    }
+  }
+
   class UserQuiz {
     constructor (questions) {
       this.questions = questions
+      this._quizApi = new QuizApi()
     }
     init () {
       var storedData = localStorage.getItem('quiz') || '{}'
@@ -26,7 +48,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return getQuizResponse(questionIndex)
+      return this._quizApi.getQuizResponse(questionIndex)
         .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
@@ -41,20 +63,21 @@ var quiz = function (element, options) {
     }
   }
 
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({ url: url }).done(resolve)
-    })
-  }
-
-  function getQuizConfig () {
-    return getJson(options.url)
-  }
-
-  function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
-      .then(response => response.response)
-  }
+  //
+  // function getJson (url) {
+  //   return new Promise(function (resolve, reject) {
+  //     $.ajax({ url: url }).done(resolve)
+  //   })
+  // }
+  //
+  // function getQuizConfig () {
+  //   return getJson(options.url)
+  // }
+  //
+  // function getQuizResponse (i) {
+  //   return getJson(options.responsesUrl.replace(':index', i))
+  //     .then(response => response.response)
+  // }
 
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
@@ -197,15 +220,28 @@ var quiz = function (element, options) {
     return !response || (response.join && !response.join('')) || false
   }
 
-  function showQuestion (idx, show) {
-    var display = show ? 'block' : 'none'
-    $('#' + getFieldId(idx)).css('display', display)
+  class QuizNav {
+
+    showQuestion (idx, show) {
+      var display = show ? 'block' : 'none'
+      $('#' + getFieldId(idx)).css('display', display)
+    }
+
+    showCurrentQuestion (current) {
+      this.showQuestion(current - 1, false)
+      this.showQuestion(current, true)
+    }
   }
 
-  function showCurrentQuestion (current) {
-    showQuestion(current - 1, false)
-    showQuestion(current, true)
-  }
+  // function showQuestion (idx, show) {
+  //   var display = show ? 'block' : 'none'
+  //   $('#' + getFieldId(idx)).css('display', display)
+  // }
+
+  // function showCurrentQuestion (current) {
+  //   showQuestion(current - 1, false)
+  //   showQuestion(current, true)
+  // }
 
   function showTextEndMessage () {
     $('#submit-response').css('display', 'none')
@@ -240,7 +276,8 @@ var quiz = function (element, options) {
   }
 
   function updateQuizStatus (questions, responseCount) {
-    showCurrentQuestion(responseCount)
+    var quizNav = new QuizNav()
+    quizNav.showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
     questions.length === responseCount && showTextEndMessage()
@@ -267,7 +304,8 @@ var quiz = function (element, options) {
     updateQuizStatus(questions, responseCount)
   }
 
-  getQuizConfig()
+  var quizApi = new QuizApi()
+  quizApi.getQuizConfig()
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
       buildQuiz(data.title, data.questions, $(element))
