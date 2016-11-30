@@ -1,3 +1,93 @@
+
+class UserQuiz{
+  constructor() {
+    this.userResponses=loadResponses();
+    this.responses = this.userResponses.responses || [];
+    this.currentQuestion = this.userResponses.currentQuestion || 0;
+    this.responseCount = this.userResponses.responseCount;
+    this.quizNav=new QuizNav(this.currentQuestion);
+  }
+  
+  loadResponses(){
+    storedData = localStorage.getItem('quiz')
+    return (storedData) ? JSON.parse(storedData) : {}
+  }
+  
+  processResponse ($questions, questions) {
+    var currentQuestion = this.currentQuestion
+    var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
+    var responses = this.responses
+    responses[currentQuestion] = response
+
+    if ( isEmptyResponse(responses[currentQuestion]) ) {
+      alert('You must give a response')
+    } else {
+      var responseCount = getResponseCount(responses)
+
+      getQuizResponse(currentQuestion, function(correctResponse){
+        if( isResponseCorrect(response, correctResponse) ) {
+          alert('Response is correct!')
+        } else {
+          alert('Response is not correct! It was: ' + serializeResponse(correctResponse) )
+        }
+
+        updateQuizStatus($questions, questions, responseCount)
+        this.saveQuizData()
+      })
+    }
+  }
+  
+  saveQuizData() {
+    changes={
+          responses: this.responses,
+          responseCount: this.responseCount,
+          currentQuestion: ++this.currentQuestion
+        };
+    quizData = Object.assign(getQuizData(), changes)
+    localStorage.setItem('quiz', JSON.stringify(quizData))
+  }
+  
+  getResponseCount () {
+    return this.responses.reduce( function(result, response ) {
+      return this.isEmptyResponse(response) ? result : ++result
+    }, 0)
+  }
+  
+  isEmptyResponse (response) {
+    return !response || (response.join && !response.join('')) || false
+  }
+
+  
+};
+
+class Questions {
+  //(desc, options, isCorrect)
+  constructor() {
+    this.questions=this.getQuestions();
+  }
+  
+  getQuestions(){
+    questions=[];
+    //Load questions of AJAX
+    return questions;
+  }
+  
+  displayQuestion(){
+    //
+  }
+}
+
+class QuizNav{
+  constructor(currentQuestion=0) {
+    this.currentQuestion=currentQuestion;
+  }
+}
+
+class QuizApi{
+  
+}
+
+
 quiz = function (element, options) {
 
   function getJson(url, callback) {
