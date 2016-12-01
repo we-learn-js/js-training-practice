@@ -26,7 +26,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return QuizApi.getQuizResponse(questionIndex)
+      return getQuizResponse(questionIndex)
         .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
@@ -42,37 +42,35 @@ var quiz = function (element, options) {
   }
 
   class QuizApi {
-    static _getJson (url) {
+    getJson (url) {
       return new Promise(function (resolve, reject) {
         $.ajax({ url: url }).done(resolve)
       })
     }
-    static getQuizConfig () {
-      return this._getJson(options.url)
-    }
-    static getQuizResponse (i) {
-      return this._getJson(options.responsesUrl.replace(':index', i))
-        .then(response => response.response)
-    }
   }
 
   class QuizNav {
-    static showQuestion (idx, show) {
-      var display = show ? 'block' : 'none'
-      $('#' + Question.getFieldId(idx)).css('display', display)
+    constructor () {
+      this._question = new Question()
     }
-    static showCurrentQuestion (current) {
-      this.showQuestion(current - 1, false)
-      this.showQuestion(current, true)
+
+    _showQuestion (idx, show) {
+      var display = show ? 'block' : 'none'
+      $('#' + this._question.getFieldId(idx)).css('display', display)
+    }
+
+    showCurrentQuestion (current) {
+      this._showQuestion(current - 1, false)
+      this._showQuestion(current, true)
     }
   }
 
   class Question {
-    static getQuestionMarkup (question, response, i) {
+    _getQuestionMarkup (question, response, i) {
       var code = question.code && '<pre><code>' + question.code + '</code></pre>'
       question.input = question.input || { type: 'input' }
 
-      return '<div id="' + Question.getFieldId(i) + '" class="ui card" style="width: 100%;">'
+      return '<div id="' + this.getFieldId(i) + '" class="ui card" style="width: 100%;">'
       + '<div class="content">'
       + '<div class="header">' + question.problem + '</div>'
       + '</div>'
@@ -85,19 +83,29 @@ var quiz = function (element, options) {
       + '</div>'
     }
 
-    static createQuestionsElements (questions, responses) {
+    createQuestionsElements (questions, responses) {
       return questions.map((question, i) => {
-        return $(this.getQuestionMarkup(question, responses[i], i)).css('display', 'none')
+        return $(this._getQuestionMarkup(question, responses[i], i)).css('display', 'none')
       })
     }
 
-    static getFieldName (idx) {
+    getFieldName (idx) {
       return 'question_' + idx
     }
 
-    static getFieldId (idx) {
+    getFieldId (idx) {
       return 'question-' + idx
     }
+  }
+
+  const quizApi = new QuizApi()
+
+  function getQuizResponse (i) {
+    return quizApi.getJson(options.responsesUrl.replace(':index', i))
+      .then(response => response.response)
+  }
+  function getQuizConfig () {
+    return quizApi.getJson(options.url)
   }
 
   function createQuestionsForm () {
@@ -154,7 +162,7 @@ var quiz = function (element, options) {
           var type = question.input.type
           var checked = isOptionInResponse(option, response)
           input += getMultipleChoiceField(
-            type, Question.getFieldName(i), j, option.label, checked
+            type, new Question().getFieldName(i), j, option.label, checked
           )
         })
         input += '</div>'
@@ -163,13 +171,13 @@ var quiz = function (element, options) {
         var input = '<table>'
         question.input.options.forEach(function (option, j) {
           var value = response ? response[j] : ''
-          input += getMultipleInputsField(Question.getFieldName(i), j, option.label, value)
+          input += getMultipleInputsField(new Question().getFieldName(i), j, option.label, value)
         })
         input += '</table>'
         break
       default:
         var value = response ? response : ''
-        var input = getInputField(Question.getFieldName(i), value)
+        var input = getInputField(new Question().getFieldName(i), value)
     }
 
     return input
@@ -191,7 +199,7 @@ var quiz = function (element, options) {
   }
 
   function getQuestionResponse (question, i) {
-    var $inputs = $('[name^=' + Question.getFieldName(i) + ']')
+    var $inputs = $('[name^=' + new Question().getFieldName(i) + ']')
     switch (question.input.type) {
       case 'checkbox':
       case 'radio':
@@ -243,7 +251,7 @@ var quiz = function (element, options) {
   }
 
   function updateQuizStatus (questions, responseCount) {
-    QuizNav.showCurrentQuestion(responseCount)
+    new QuizNav().showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
     questions.length === responseCount && showTextEndMessage()
@@ -263,14 +271,14 @@ var quiz = function (element, options) {
       .append(createResetButton())
 
     $questions
-      .append(Question.createQuestionsElements(questions, responses))
+      .append(new Question().createQuestionsElements(questions, responses))
       .find('pre code').each((i, block) => {
       hljs.highlightBlock(block)})
 
     updateQuizStatus(questions, responseCount)
   }
 
-  QuizApi.getQuizConfig()
+  getQuizConfig()
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
       buildQuiz(data.title, data.questions, $(element))
