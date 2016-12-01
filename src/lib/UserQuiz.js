@@ -1,9 +1,18 @@
 import QuizApi from './QuizApi'
+import Question from './Question'
+
+function createQuestions (questions) {
+  return questions.map( function(question, i){
+    return new Question(i, question)
+  })
+}
 
 export default class UserQuiz {
+
   constructor (questions) {
-    this.questions = questions
+    this.__questions__ = createQuestions(questions)
   }
+
   init () {
     var storedData = localStorage.getItem('quiz') || '{}'
     storedData = JSON.parse(storedData)
@@ -24,18 +33,8 @@ export default class UserQuiz {
     this.currentQuestion++
   }
 
-  isResponseCorrect (questionIndex, response) {
-    return QuizApi.getResponse(questionIndex)
-      .then(UserQuiz.serializeResponse)
-      .then(function(correctResponse) {
-        return {
-          ok: correctResponse == UserQuiz.serializeResponse(response),
-          correctResponse: correctResponse
-        }
-      } )
+  getQuestion(questionIndex) {
+    return this.__questions__[questionIndex]
   }
 
-  static serializeResponse (response) {
-    return (response.join && response.sort().join(', ')) || response
-  }
 }

@@ -1,6 +1,8 @@
 import QuizApi from './lib/QuizApi'
 import UserQuiz from './lib/UserQuiz'
+import Question from './lib/Question'
 
+console.clear()
 var quiz = function (element, options) {
   var userQuiz
 
@@ -144,10 +146,6 @@ var quiz = function (element, options) {
     }
   }
 
-  function isEmptyResponse (response) {
-    return !response || (response.join && !response.join('')) || false
-  }
-
   function showQuestion (idx, show) {
     var display = show ? 'block' : 'none'
     $('#' + getFieldId(idx)).css('display', display)
@@ -173,12 +171,11 @@ var quiz = function (element, options) {
     var { currentQuestion, responses } = userQuiz
     var response = getQuestionResponse(questions[currentQuestion], currentQuestion)
 
-    userQuiz.addResponse(currentQuestion, response)
-
-    if (isEmptyResponse(responses[currentQuestion])) {
+    if (Question.isEmptyResponse(response)) {
       alert('You must give a response')
     } else {
-      userQuiz.isResponseCorrect(currentQuestion, response)
+      userQuiz.addResponse(currentQuestion, response)
+      userQuiz.getQuestion(currentQuestion).isResponseCorrect(response)
         .then(function (result) {
           alert( result.ok
             ? 'Response is correct!'
