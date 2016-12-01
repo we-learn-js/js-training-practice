@@ -26,7 +26,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return getQuizResponse(questionIndex)
+      return QuizApi.getQuizResponse(questionIndex)
         .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
@@ -41,19 +41,63 @@ var quiz = function (element, options) {
     }
   }
 
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({ url: url }).done(resolve)
-    })
+  class QuizApi {
+    static _getJson (url) {
+      return new Promise(function (resolve, reject) {
+        $.ajax({ url: url }).done(resolve)
+      })
+    }
+    static getQuizConfig () {
+      return this._getJson(options.url)
+    }
+    static getQuizResponse (i) {
+      return this._getJson(options.responsesUrl.replace(':index', i))
+        .then(response => response.response)
+    }
   }
 
-  function getQuizConfig () {
-    return getJson(options.url)
+  class QuizNav {
+    static showQuestion (idx, show) {
+      var display = show ? 'block' : 'none'
+      $('#' + Question.getFieldId(idx)).css('display', display)
+    }
+    static showCurrentQuestion (current) {
+      this.showQuestion(current - 1, false)
+      this.showQuestion(current, true)
+    }
   }
 
-  function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
-      .then(response => response.response)
+  class Question {
+    static getQuestionMarkup (question, response, i) {
+      var code = question.code && '<pre><code>' + question.code + '</code></pre>'
+      question.input = question.input || { type: 'input' }
+
+      return '<div id="' + Question.getFieldId(i) + '" class="ui card" style="width: 100%;">'
+      + '<div class="content">'
+      + '<div class="header">' + question.problem + '</div>'
+      + '</div>'
+      + '<div class="content">'
+      + (code || '')
+      + '</div>'
+      + '<div class="content">'
+      + getFieldMarkup(question, response, i)
+      + '</div>'
+      + '</div>'
+    }
+
+    static createQuestionsElements (questions, responses) {
+      return questions.map((question, i) => {
+        return $(this.getQuestionMarkup(question, responses[i], i)).css('display', 'none')
+      })
+    }
+
+    static getFieldName (idx) {
+      return 'question_' + idx
+    }
+
+    static getFieldId (idx) {
+      return 'question-' + idx
+    }
   }
 
   function createQuestionsForm () {
@@ -110,7 +154,7 @@ var quiz = function (element, options) {
           var type = question.input.type
           var checked = isOptionInResponse(option, response)
           input += getMultipleChoiceField(
-            type, getFieldName(i), j, option.label, checked
+            type, Question.getFieldName(i), j, option.label, checked
           )
         })
         input += '</div>'
@@ -119,47 +163,16 @@ var quiz = function (element, options) {
         var input = '<table>'
         question.input.options.forEach(function (option, j) {
           var value = response ? response[j] : ''
-          input += getMultipleInputsField(getFieldName(i), j, option.label, value)
+          input += getMultipleInputsField(Question.getFieldName(i), j, option.label, value)
         })
         input += '</table>'
         break
       default:
         var value = response ? response : ''
-        var input = getInputField(getFieldName(i), value)
+        var input = getInputField(Question.getFieldName(i), value)
     }
 
     return input
-  }
-
-  function getQuestionMarkup (question, response, i) {
-    var code = question.code && '<pre><code>' + question.code + '</code></pre>'
-    question.input = question.input || { type: 'input' }
-
-    return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
-    + '<div class="content">'
-    + '<div class="header">' + question.problem + '</div>'
-    + '</div>'
-    + '<div class="content">'
-    + (code || '')
-    + '</div>'
-    + '<div class="content">'
-    + getFieldMarkup(question, response, i)
-    + '</div>'
-    + '</div>'
-  }
-
-  function createQuestionsElements (questions, responses) {
-    return questions.map((question, i) => {
-      return $(getQuestionMarkup(question, responses[i], i)).css('display', 'none')
-    })
-  }
-
-  function getFieldName (idx) {
-    return 'question_' + idx
-  }
-
-  function getFieldId (idx) {
-    return 'question-' + idx
   }
 
   function createSubmitButton ($questions, questions) {
@@ -178,7 +191,7 @@ var quiz = function (element, options) {
   }
 
   function getQuestionResponse (question, i) {
-    var $inputs = $('[name^=' + getFieldName(i) + ']')
+    var $inputs = $('[name^=' + Question.getFieldName(i) + ']')
     switch (question.input.type) {
       case 'checkbox':
       case 'radio':
@@ -195,16 +208,6 @@ var quiz = function (element, options) {
 
   function isEmptyResponse (response) {
     return !response || (response.join && !response.join('')) || false
-  }
-
-  function showQuestion (idx, show) {
-    var display = show ? 'block' : 'none'
-    $('#' + getFieldId(idx)).css('display', display)
-  }
-
-  function showCurrentQuestion (current) {
-    showQuestion(current - 1, false)
-    showQuestion(current, true)
   }
 
   function showTextEndMessage () {
@@ -240,7 +243,7 @@ var quiz = function (element, options) {
   }
 
   function updateQuizStatus (questions, responseCount) {
-    showCurrentQuestion(responseCount)
+    QuizNav.showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
     questions.length === responseCount && showTextEndMessage()
@@ -260,14 +263,14 @@ var quiz = function (element, options) {
       .append(createResetButton())
 
     $questions
-      .append(createQuestionsElements(questions, responses))
+      .append(Question.createQuestionsElements(questions, responses))
       .find('pre code').each((i, block) => {
       hljs.highlightBlock(block)})
 
     updateQuizStatus(questions, responseCount)
   }
 
-  getQuizConfig()
+  QuizApi.getQuizConfig()
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
       buildQuiz(data.title, data.questions, $(element))
