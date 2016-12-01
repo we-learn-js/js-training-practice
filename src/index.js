@@ -1,5 +1,27 @@
 var quiz = function (element, options) {
   var userQuiz
+  var quizApi
+
+  class QuizApi {
+    constructor (options) {
+      this._options = options
+    }
+
+    getQuizConfig () {
+      return this._getJson(this._options.url)
+    }
+
+    getQuizResponse (i) {
+      return this._getJson(this._options.responsesUrl.replace(':index', i))
+        .then(response => response.response)
+    }
+
+    _getJson (url) {
+      return new Promise(function (resolve, reject) {
+        $.ajax({url: url}).done(resolve)
+      })
+    }
+  }
 
   class UserQuiz {
     constructor (questions) {
@@ -27,7 +49,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return getQuizResponse(questionIndex)
+      return quizApi.getQuizResponse(questionIndex)
         .then(UserQuiz.serializeResponse)
         .then(function (correctResponse) {
           return {
@@ -40,21 +62,6 @@ var quiz = function (element, options) {
     static serializeResponse (response) {
       return (response.join && response.sort().join(', ')) || response
     }
-  }
-
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({url: url}).done(resolve)
-    })
-  }
-
-  function getQuizConfig () {
-    return getJson(options.url)
-  }
-
-  function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
-      .then(response => response.response)
   }
 
   function createQuestionsForm () {
@@ -269,7 +276,8 @@ var quiz = function (element, options) {
     updateQuizStatus(questions, responseCount)
   }
 
-  getQuizConfig()
+  quizApi = new QuizApi(options)
+  quizApi.getQuizConfig()
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
       buildQuiz(data.title, data.questions, $(element))
