@@ -1,47 +1,11 @@
 import QuizApi from './lib/QuizApi'
+import UserQuiz from './lib/UserQuiz'
 
 var quiz = function (element, options) {
   var userQuiz
 
-  class UserQuiz {
-    constructor (questions) {
-      this.questions = questions
-    }
-    init () {
-      var storedData = localStorage.getItem('quiz') || '{}'
-      storedData = JSON.parse(storedData)
-      var {responses=[], currentQuestion=0, responseCount=0 } = storedData
-      Object.assign(this, {responses, currentQuestion, responseCount})
-      return this
-    }
-
-    save () {
-      var { responses, currentQuestion, responseCount } = this
-      var data = { responses, currentQuestion, responseCount }
-      localStorage.setItem('quiz', JSON.stringify(data))
-    }
-
-    addResponse (questionIndex, response) {
-      this.responses[questionIndex] = response
-      this.responseCount++
-      this.currentQuestion++
-    }
-
-    isResponseCorrect (questionIndex, response) {
-      return QuizApi.getResponse(options.responsesUrl, questionIndex)
-        .then(UserQuiz.serializeResponse)
-        .then(function(correctResponse) {
-          return {
-            ok: correctResponse == UserQuiz.serializeResponse(response),
-            correctResponse: correctResponse
-          }
-        } )
-    }
-
-    static serializeResponse (response) {
-      return (response.join && response.sort().join(', ')) || response
-    }
-  }
+  QuizApi.setConfigUrl(options.url)
+  QuizApi.setResponseUrl(options.responsesUrl)
 
   function createQuestionsForm () {
     return $('<form class="ui form"></form>')
@@ -254,7 +218,7 @@ var quiz = function (element, options) {
     updateQuizStatus(questions, responseCount)
   }
 
-  QuizApi.getConfig(options.url)
+  QuizApi.getConfig()
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
       buildQuiz(data.title, data.questions, $(element))

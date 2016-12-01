@@ -1,10 +1,18 @@
 export default class QuizApi {
-  static getConfig (url) {
-    return getJson(url)
+
+  static setConfigUrl (url) {
+    this.__configUrl__ = url
+  }
+  static setResponseUrl (url) {
+    this.__responseUrl__ = url
   }
 
-  static getResponse (url, i) {
-    return getJson(url.replace(':index', i))
+  static getConfig () {
+    return getJson(this.__configUrl__)
+  }
+
+  static getResponse (i) {
+    return getJson(this.__responseUrl__.replace(':index', i))
       .then(response => response.response)
   }
 }
