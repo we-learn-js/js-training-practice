@@ -41,19 +41,71 @@ var quiz = function (element, options) {
     }
   }
 
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({ url: url }).done(resolve)
-    })
+  class QuizApi {
+    getJson (url) {
+      return new Promise(function (resolve, reject) {
+        $.ajax({ url: url }).done(resolve)
+      })
+    }
   }
 
-  function getQuizConfig () {
-    return getJson(options.url)
+  class QuizNav {
+    constructor () {
+      this._question = new Question()
+    }
+
+    _showQuestion (idx, show) {
+      var display = show ? 'block' : 'none'
+      $('#' + this._question.getFieldId(idx)).css('display', display)
+    }
+
+    showCurrentQuestion (current) {
+      this._showQuestion(current - 1, false)
+      this._showQuestion(current, true)
+    }
   }
+
+  class Question {
+    _getQuestionMarkup (question, response, i) {
+      var code = question.code && '<pre><code>' + question.code + '</code></pre>'
+      question.input = question.input || { type: 'input' }
+
+      return '<div id="' + this.getFieldId(i) + '" class="ui card" style="width: 100%;">'
+      + '<div class="content">'
+      + '<div class="header">' + question.problem + '</div>'
+      + '</div>'
+      + '<div class="content">'
+      + (code || '')
+      + '</div>'
+      + '<div class="content">'
+      + getFieldMarkup(question, response, i)
+      + '</div>'
+      + '</div>'
+    }
+
+    createQuestionsElements (questions, responses) {
+      return questions.map((question, i) => {
+        return $(this._getQuestionMarkup(question, responses[i], i)).css('display', 'none')
+      })
+    }
+
+    getFieldName (idx) {
+      return 'question_' + idx
+    }
+
+    getFieldId (idx) {
+      return 'question-' + idx
+    }
+  }
+
+  const quizApi = new QuizApi()
 
   function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
+    return quizApi.getJson(options.responsesUrl.replace(':index', i))
       .then(response => response.response)
+  }
+  function getQuizConfig () {
+    return quizApi.getJson(options.url)
   }
 
   function createQuestionsForm () {
@@ -110,7 +162,7 @@ var quiz = function (element, options) {
           var type = question.input.type
           var checked = isOptionInResponse(option, response)
           input += getMultipleChoiceField(
-            type, getFieldName(i), j, option.label, checked
+            type, new Question().getFieldName(i), j, option.label, checked
           )
         })
         input += '</div>'
@@ -119,47 +171,16 @@ var quiz = function (element, options) {
         var input = '<table>'
         question.input.options.forEach(function (option, j) {
           var value = response ? response[j] : ''
-          input += getMultipleInputsField(getFieldName(i), j, option.label, value)
+          input += getMultipleInputsField(new Question().getFieldName(i), j, option.label, value)
         })
         input += '</table>'
         break
       default:
         var value = response ? response : ''
-        var input = getInputField(getFieldName(i), value)
+        var input = getInputField(new Question().getFieldName(i), value)
     }
 
     return input
-  }
-
-  function getQuestionMarkup (question, response, i) {
-    var code = question.code && '<pre><code>' + question.code + '</code></pre>'
-    question.input = question.input || { type: 'input' }
-
-    return '<div id="' + getFieldId(i) + '" class="ui card" style="width: 100%;">'
-    + '<div class="content">'
-    + '<div class="header">' + question.problem + '</div>'
-    + '</div>'
-    + '<div class="content">'
-    + (code || '')
-    + '</div>'
-    + '<div class="content">'
-    + getFieldMarkup(question, response, i)
-    + '</div>'
-    + '</div>'
-  }
-
-  function createQuestionsElements (questions, responses) {
-    return questions.map((question, i) => {
-      return $(getQuestionMarkup(question, responses[i], i)).css('display', 'none')
-    })
-  }
-
-  function getFieldName (idx) {
-    return 'question_' + idx
-  }
-
-  function getFieldId (idx) {
-    return 'question-' + idx
   }
 
   function createSubmitButton ($questions, questions) {
@@ -178,7 +199,7 @@ var quiz = function (element, options) {
   }
 
   function getQuestionResponse (question, i) {
-    var $inputs = $('[name^=' + getFieldName(i) + ']')
+    var $inputs = $('[name^=' + new Question().getFieldName(i) + ']')
     switch (question.input.type) {
       case 'checkbox':
       case 'radio':
@@ -195,16 +216,6 @@ var quiz = function (element, options) {
 
   function isEmptyResponse (response) {
     return !response || (response.join && !response.join('')) || false
-  }
-
-  function showQuestion (idx, show) {
-    var display = show ? 'block' : 'none'
-    $('#' + getFieldId(idx)).css('display', display)
-  }
-
-  function showCurrentQuestion (current) {
-    showQuestion(current - 1, false)
-    showQuestion(current, true)
   }
 
   function showTextEndMessage () {
@@ -240,7 +251,7 @@ var quiz = function (element, options) {
   }
 
   function updateQuizStatus (questions, responseCount) {
-    showCurrentQuestion(responseCount)
+    new QuizNav().showCurrentQuestion(responseCount)
     updateProgressBar(questions.length, responseCount)
 
     questions.length === responseCount && showTextEndMessage()
@@ -260,7 +271,7 @@ var quiz = function (element, options) {
       .append(createResetButton())
 
     $questions
-      .append(createQuestionsElements(questions, responses))
+      .append(new Question().createQuestionsElements(questions, responses))
       .find('pre code').each((i, block) => {
       hljs.highlightBlock(block)})
 
