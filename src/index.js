@@ -1,3 +1,5 @@
+import QuizApi from './lib/QuizApi'
+
 var quiz = function (element, options) {
   var userQuiz
 
@@ -26,7 +28,7 @@ var quiz = function (element, options) {
     }
 
     isResponseCorrect (questionIndex, response) {
-      return getQuizResponse(questionIndex)
+      return QuizApi.getResponse(options.responsesUrl, questionIndex)
         .then(UserQuiz.serializeResponse)
         .then(function(correctResponse) {
           return {
@@ -39,21 +41,6 @@ var quiz = function (element, options) {
     static serializeResponse (response) {
       return (response.join && response.sort().join(', ')) || response
     }
-  }
-
-  function getJson (url) {
-    return new Promise(function (resolve, reject) {
-      $.ajax({ url: url }).done(resolve)
-    })
-  }
-
-  function getQuizConfig () {
-    return getJson(options.url)
-  }
-
-  function getQuizResponse (i) {
-    return getJson(options.responsesUrl.replace(':index', i))
-      .then(response => response.response)
   }
 
   function createQuestionsForm () {
@@ -267,7 +254,7 @@ var quiz = function (element, options) {
     updateQuizStatus(questions, responseCount)
   }
 
-  getQuizConfig()
+  QuizApi.getConfig(options.url)
     .then(function (data) {
       userQuiz = new UserQuiz(data.questions).init()
       buildQuiz(data.title, data.questions, $(element))
