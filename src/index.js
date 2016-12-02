@@ -16,8 +16,6 @@ var quiz = function (element, options) {
   class UserQuiz {
     constructor (questions) {
 		
-		console.log(questions);
-		
 		var ArrQuestions=[];
 		for(var i=0;i<questions.length;i++){
 			ArrQuestions.push(new question(questions[i].input, questions[i].problem))
