@@ -1,9 +1,30 @@
+
 var quiz = function (element, options) {
   var userQuiz
 
+  
+  
+  class question {
+    constructor(input, problem) {
+		this.input=input;
+		this.problem=problem;
+	}
+  }
+
+ 
+   
   class UserQuiz {
     constructor (questions) {
-      this.questions = questions
+		
+		console.log(questions);
+		
+		var ArrQuestions=[];
+		for(var i=0;i<questions.length;i++){
+			ArrQuestions.push(new question(questions[i].input, questions[i].problem))
+		}
+		
+		this.questions = ArrQuestions;
+	
     }
     init () {
       var storedData = localStorage.getItem('quiz') || '{}'
@@ -40,13 +61,13 @@ var quiz = function (element, options) {
       return (response.join && response.sort().join(', ')) || response
     }
   }
-
+  
   function getJson (url) {
     return new Promise(function (resolve, reject) {
       $.ajax({ url: url }).done(resolve)
     })
   }
-
+  
   function getQuizConfig () {
     return getJson(options.url)
   }
