@@ -1,6 +1,28 @@
 var quiz = function (element, options) {
   var userQuiz
 
+  class Question {
+
+    constructor ({description, responseOptions} = {}) {
+        this.description = description
+        this.responseOptions = responseOptions
+    }
+    isResponseCorrect () {
+    }
+  }
+  class RadioQuestion extends Question {
+
+  }
+  class InputQuestion extends Question {
+
+  }
+
+  class QuizAPI {
+
+  }
+  class QuizNav {
+
+  }
   class UserQuiz {
     constructor (questions) {
       this.questions = questions
