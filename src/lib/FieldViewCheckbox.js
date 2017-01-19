@@ -1,0 +1,1 @@
+class FieldViewCheckbox extends FieldView  {}

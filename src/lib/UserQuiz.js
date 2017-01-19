@@ -1,4 +1,29 @@
-import QuizApi from './QuizApi'
+/**
+ * Observer Pattern: Observable
+ *
+ * Responsible for quiz status
+ */
+class UserQuiz extends EventEmitter {
+
+    /**
+     * Add response and dispatch related events
+     * @param {[type]} response [description]
+     */
+    addResponse (response) {
+        if(question.isResponseEmpty()) {
+            this.emit('emptyResponse', responseCount)
+            return
+        } else {
+            this.emit('response', responseCount)
+        }
+
+        if(lastQuestion) {
+            this.emit('end', responseCount)
+        }
+    }
+}
+
+/*import QuizApi from './QuizApi'
 import Question from './Question'
 
 function createQuestions (questions) {
@@ -38,3 +63,4 @@ export default class UserQuiz {
   }
 
 }
+*/

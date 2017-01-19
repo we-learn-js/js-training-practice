@@ -1,0 +1,1 @@
+class FieldViewRadio extends FieldView  {}
