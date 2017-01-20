@@ -1,29 +1,6 @@
-/**
- * Observer Pattern: Observable
- *
- * Responsible for quiz status
- */
-// class UserQuiz extends EventEmitter {
-//
-//   /**
-//    * Add response and dispatch related events
-//    * @param {[type]} response [description]
-//    */
-//   addResponse (response) {
-//     if(question.isResponseEmpty()) {
-//       this.emit('emptyResponse', responseCount)
-//       return
-//     } else {
-//       this.emit('response', responseCount)
-//     }
-//
-//     if(lastQuestion) {
-//       this.emit('end', responseCount)
-//     }
-//   }
-// }
 import QuizApi from './QuizApi'
 import Question from './Question'
+import Observer from './Observer'
 
 function createQuestions (questions) {
   return questions.map( function(question, i){
@@ -31,7 +8,7 @@ function createQuestions (questions) {
   })
 }
 
-export default class UserQuiz {
+export default class UserQuiz extends Observer {
 
   constructor (questions) {
     this.__questions__ = createQuestions(questions)
@@ -55,6 +32,19 @@ export default class UserQuiz {
     this.responses[questionIndex] = response
     this.responseCount++
     this.currentQuestion++
+
+    const question = this.__questions__[questionIndex]
+
+    if(question.isResponseEmpty()) {
+      this.notify({'emptyResponse', this.responseCount})
+      return
+    } else {
+      this.notify({'response', this.responseCount})
+    }
+
+    if(questionIndex === this.__questions__.length - 1) {
+      this.notify({'end', this.responseCount})
+    }
   }
 
   getQuestion(questionIndex) {
