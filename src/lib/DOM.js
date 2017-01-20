@@ -9,6 +9,7 @@ class DOM {
    * @return {HTMLElement}
    */
   createDomElement(HTMLString) {
+    return document.createElement(HTMLString)
   }
 
   /**
@@ -17,7 +18,11 @@ class DOM {
    * @param  {HTMLElement} child Child element to add
    * @return {HTMLElement} Parent Element
    */
-  append(parent, ...children) {}
+  append(parent, ...children) {
+    children.forEach(child => {
+      parent.appendChild(child)
+    })
+  }
 
   /**
    * Set property of element style
@@ -26,7 +31,9 @@ class DOM {
    * @param  {Mixed} value
    * @return {element}
    */
-  css(element, property, value) {}
+  css(element, property, value) {
+    element.attributes[property] = value
+  }
 
   /**
    * Add event listener to click event on an element
@@ -34,16 +41,9 @@ class DOM {
    * @param  {Function} callback
    * @return {Function} Function to call to remove the event listener (Observer pattern)
    */
-  click(element, callback) {}
+  click(element, callback) {
+    element.addEventListener('click', callback, true);
+  }
 }
 
-/**
- * Singleton pattern
- */
-class IdFactory(){
-  /**
-   * Get unique id. Used for Html elements identification.
-   * @return {String}
-   */
-  getId() {}
-}
+export default DOM;
