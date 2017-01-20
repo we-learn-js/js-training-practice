@@ -1,3 +1,5 @@
+import DOM from './DOM'
+
 /* MVC Pattern */
 
 /**
@@ -8,7 +10,9 @@ class QuestionView {
   /**
    * @param  {Question} question
    */
-  constructor(question) {}
+  constructor(question) {
+    this._question = question
+  }
 
   /**
    * Hide question in DOM
