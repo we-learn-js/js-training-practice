@@ -34,7 +34,7 @@ var quiz = function (element, options) {
 
     var div1=dom.css(dom.createDomElement('div'),'class','field')
     var div1_1=dom.css(dom.createDomElement('div'),'class','ui checkbox ' + type )
-    var input=dom.css(dom.css(dom.css(dom.createDomElement('input',name + '_' + idx,label),'type',type),'checked',checked),'name',name)
+    var input=dom.css(dom.css(dom.css(dom.css(dom.createDomElement('input',name + '_' + idx,label),'type',type),'checked',checked),'name',name),'value',label)
     var label=dom.css(dom.createDomElement('label',undefined,label),'for',name + '_' + idx)
     dom.append(div1_1,input,label)
     return dom.append(div1,div1_1)
