@@ -2,6 +2,7 @@ import QuizApi from './lib/QuizApi'
 import UserQuiz from './lib/UserQuiz'
 import QuizNav from './lib/QuizNav'
 import Question from './lib/Question'
+import DOM from './lib/DOM'
 
 var quiz = function (element, options) {
   var userQuiz, quizNav
@@ -10,17 +11,17 @@ var quiz = function (element, options) {
   QuizApi.setResponseUrl(options.responsesUrl)
 
   function createQuestionsForm () {
-    return $('<form class="ui form"></form>')
+    return DOM.createDomElement('<form class="ui form"></form>')
   }
 
   function createProgressElement () {
-    return $('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+    return DOM.createDomElement('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
       + '<div id="quiz-progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
       + '</div>')
   }
 
   function createTitleElement (title) {
-    return $('<h1 class="ui header">' + title + '</h1>')
+    return DOM.createDomElement('<h1 class="ui header">' + title + '</h1>')
   }
 
   function isOptionInResponse (option, response) {
@@ -103,7 +104,9 @@ var quiz = function (element, options) {
 
   function createQuestionsElements (questions, responses) {
     return questions.map((question, i) => {
-      return $(getQuestionMarkup(question, responses[i], i)).css('display', 'none')
+      var questionElement = DOM.createDomElement(getQuestionMarkup(question, responses[i], i))
+      DOM.css(questionElement, 'display', 'none')
+      return questionElement
     })
   }
 
@@ -116,22 +119,24 @@ var quiz = function (element, options) {
   }
 
   function createSubmitButton ($questions, questions) {
-    return $('<button id="quiz-submit" class="ui primary button">Submit response</button>')
-      .on('click', function () {
-        processResponse($questions, questions)
-      })
+    var submitBtn = DOM.createDomElement('<button id="quiz-submit" class="ui primary button">Submit response</button>')
+    DOM.click(submitBtn, function () {
+      processResponse($questions, questions)
+    })
+    return submitBtn
   }
 
   function createResetButton () {
-    return $('<button class="ui button negative">Reset</button>')
-      .on('click', function () {
-        localStorage.removeItem('quiz')
-        location.reload()
-      })
+    var resetBtn = DOM.createDomElement('<button class="ui button negative">Reset</button>')
+    DOM.click(resetBtn, function () {
+      localStorage.removeItem('quiz')
+      location.reload()
+    })
+    return resetBtn
   }
 
   function getQuestionResponse (question, i) {
-    var $inputs = $('[name^=' + getFieldName(i) + ']')
+    var $inputs = DOM.createDomElement('[name^=' + getFieldName(i) + ']')
     switch (question.input.type) {
       case 'checkbox':
       case 'radio':
@@ -147,7 +152,8 @@ var quiz = function (element, options) {
   }
 
   function updateProgressBar (questions, responses) {
-    $('#progress').css('width', (responses / questions * 100) + '%')
+    var progressElement = DOM.createDomElement('#progress')
+    DOM.css(progressElement, { width: (responses / questions * 100) + '%' } )
   }
 
   function processResponse ($questions, questions) {
@@ -174,20 +180,12 @@ var quiz = function (element, options) {
     var { responses, responseCount } = userQuiz
     var $questions = createQuestionsForm()
 
-    $(document.body)
-      .append(createProgressElement())
-
-    $element
-      .append(createTitleElement(title))
-      .append($questions)
-      .append(createSubmitButton($questions, questions))
-      .append(createResetButton())
-
-    $questions
-      .append(createQuestionsElements(questions, responses))
-      .find('pre code').each((i, block) => {
-      hljs.highlightBlock(block)})
-
+    DOM
+      .append(document.body, createProgressElement())
+      .append($element, createTitleElement(title), $questions,
+        createSubmitButton($questions, questions), createResetButton()
+      )
+      .append($questions, ...createQuestionsElements(questions, responses))
   }
 
   QuizApi.getConfig()
