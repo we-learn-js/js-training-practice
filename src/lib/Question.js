@@ -1,8 +1,14 @@
+/**
+ * Strategy Pattern
+ * Responsible for question info and validation
+ */
+
 import QuizApi from './QuizApi'
 
 export default class Question {
 
   static serializeResponse (response) {
+    debugger;
     return (response.join && response.sort().join(', ')) || response
   }
 

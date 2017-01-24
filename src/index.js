@@ -2,25 +2,27 @@ import QuizApi from './lib/QuizApi'
 import UserQuiz from './lib/UserQuiz'
 import QuizNav from './lib/QuizNav'
 import Question from './lib/Question'
+import Dom from './lib/Dom'
 
 var quiz = function (element, options) {
-  var userQuiz, quizNav
+  var userQuiz, quizNav,dom=new Dom()
+
 
   QuizApi.setConfigUrl(options.url)
   QuizApi.setResponseUrl(options.responsesUrl)
 
   function createQuestionsForm () {
-    return $('<form class="ui form"></form>')
+    return  $(dom.css(dom.createDomElement('form'),'class','ui form'));
   }
 
   function createProgressElement () {
-    return $('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
-      + '<div id="quiz-progress" style="background: #1678c2; width: 1%;">&nbsp;</div>'
-      + '</div>')
+    var div1=dom.css(dom.createDomElement('div','quiz-progress'),'style',"background: #1678c2; width: 1%;");
+    var div2=dom.css(dom.createDomElement('div'),'style','position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ')
+    return  dom.append(div2,div1);
   }
 
   function createTitleElement (title) {
-    return $('<h1 class="ui header">' + title + '</h1>')
+    return $(dom.css(dom.createDomElement('h1',undefined,title),'class','ui header'))
   }
 
   function isOptionInResponse (option, response) {
@@ -29,52 +31,57 @@ var quiz = function (element, options) {
 
   function getMultipleChoiceField (type, name, idx, label, checked = '') {
     checked = checked && 'checked'
+
+    var div1=dom.css(dom.createDomElement('div'),'class','field')
+    var div1_1=dom.css(dom.createDomElement('div'),'class','ui checkbox ' + type )
+    var input=dom.css(dom.css(dom.createDomElement('input',name + '_' + idx,label),'type',type),'checked',checked)
+    var label=dom.css(dom.createDomElement('label',undefined,label),'for',name + '_' + idx)
+    dom.append(div1_1,input,label)
+    return dom.append(div1,div1_1)
+    /*
     return '<div class="field">'
     + '<div class="ui checkbox ' + type + '">'
     + '<input type="' + type + '" ' + checked + ' name="' + name + '" id="' + name + '_' + idx + '" value="' + label + '">'
     + '<label for="' + name + '_' + idx + '">' + label + '</label>'
     + '</div>'
-    + '</div>'
+    + '</div>'*/
   }
 
   function getMultipleInputsField (name, idx, label, value) {
-    return '<tr>'
-    + '<td><label for="' + name + '_' + idx + '">' + label + '</label></td>'
-    + '<td width="15px"></td>'
-    + '<td><div class="ui input">'
-    + '<input type="text" placeholder="Response..." name="' + name + '" id="' + name + '_' + idx + '" value="' + value + '" />'
-    + '</div></td>'
-    + '</tr>'
-    + '<tr><td colspan="3">&nbsp;</tr></tr>'
+    var label=dom.css(dom.createDomElement('label'),'for',name + '_' + idx)
+    var td1=dom.append(dom.createDomElement('td'),label)
+    var td2=dom.css(dom.createDomElement('td'),'width','15px')
+    var input=dom.css(dom.css(dom.createDomElement('input',name + '_' + idx,value),'placeholder','Response...'),'name',name)
+    var div=dom.append(dom.css(dom.createDomElement('div'),'class','ui input'),input)
+    var td3=dom.createDomElement('td')
+    dom.append(td3,div)
+    return dom.append(dom.createDomElement('tr'),td1,td2,td3)
   }
 
   function getInputField (name, value) {
-    return '<div class="ui input fluid">'
-    + '<input type="text" placeholder="Response..." name="' + name + '" value="' + value + '" />'
-    + '</div>'
+    var input=dom.css(dom.css(dom.createDomElement('input',undefined,value),'placeholder','Response...'),'name',name)
+    return dom.append(dom.css(dom.createDomElement('div'),'class','ui input fluid'),input)
+
   }
 
   function getFieldMarkup (question, response, i) {
     switch (question.input.type) {
       case 'checkbox':
       case 'radio':
-        var input = '<div class="inline fields">'
+        var input =dom.css(dom.createDomElement('div'), 'class','inline fields')
         question.input.options.forEach(function (option, j) {
           var type = question.input.type
           var checked = isOptionInResponse(option, response)
-          input += getMultipleChoiceField(
-            type, getFieldName(i), j, option.label, checked
-          )
+          dom.append(input,getMultipleChoiceField(type, getFieldName(i), j, option.label, checked))
         })
-        input += '</div>'
+
         break
       case 'inputs':
-        var input = '<table>'
+        var input = dom.createDomElement('table')
         question.input.options.forEach(function (option, j) {
           var value = response ? response[j] : ''
-          input += getMultipleInputsField(getFieldName(i), j, option.label, value)
+          dom.append(input, getMultipleInputsField(getFieldName(i), j, option.label, value))
         })
-        input += '</table>'
         break
       default:
         var value = response ? response : ''
@@ -88,17 +95,14 @@ var quiz = function (element, options) {
     var code = question.code && '<pre><code>' + question.code + '</code></pre>'
     question.input = question.input || { type: 'input' }
 
-    return '<div id="' + getFieldId(i) + '" class="ui card quiz-question" style="width: 100%;">'
-    + '<div class="content">'
-    + '<div class="header">' + question.problem + '</div>'
-    + '</div>'
-    + '<div class="content">'
-    + (code || '')
-    + '</div>'
-    + '<div class="content">'
-    + getFieldMarkup(question, response, i)
-    + '</div>'
-    + '</div>'
+    var div1=dom.css(dom.css(dom.createDomElement('div',getFieldId(i)),'class','ui card quiz-question'),'style','width:100%;')
+    var div1_1=dom.css(dom.createDomElement('div'),'class','content')
+    var div1_1_1=dom.css(dom.createDomElement('div',undefined,question.problem),'class','header')
+    div1_1=dom.append(div1_1,div1_1_1)
+    var div1_2=dom.css(dom.createDomElement('div',undefined,(code||'')),'class','content')
+    var div1_3=dom.append(dom.css(dom.createDomElement('div'),'class','content'),getFieldMarkup(question, response, i))
+    return dom.append(div1,div1_1,div1_2,div1_3)
+
   }
 
   function createQuestionsElements (questions, responses) {
