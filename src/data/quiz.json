@@ -2,6 +2,7 @@
   "title": "The Quiz",
   "questions": [
     {
+      "id": "0",
       "problem": "How long did it take Ross to ask Rachel out?",
       "input": {
         "type": "radio",
@@ -13,6 +14,7 @@
       }
     },
     {
+      "id": "1",
       "problem": "What are Rachel's sister's names?",
       "input": {
         "type": "checkbox",
@@ -26,6 +28,7 @@
       }
     },
     {
+      "id": "2",
       "problem": "What colour dress was Monica wearing when her and Chandler finally got engaged?",
       "input": {
         "type": "radio",
@@ -38,9 +41,11 @@
       }
     },
     {
+      "id": "3",
       "problem": "Where are Monica and Ross originally from in New York?"
     },
     {
+      "id": "4",
       "problem": "\"Smelly __1__, what are they __2__ you. Smelly __1__, it's __3__. \"",
       "input": {
         "type": "inputs",
@@ -52,6 +57,7 @@
       }
     },
     {
+      "id": "5",
       "problem": "What colour is the shirt that Ross left Mona's apartment?"
     }
   ]

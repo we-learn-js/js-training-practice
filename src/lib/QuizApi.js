@@ -2,9 +2,12 @@ export default class QuizApi {
 
   static setConfigUrl (url) {
     this.__configUrl__ = url
+    return this
   }
+  
   static setResponseUrl (url) {
     this.__responseUrl__ = url
+    return this
   }
 
   static getConfig () {

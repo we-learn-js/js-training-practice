@@ -1,6 +1,15 @@
 import QuizApi from './QuizApi'
 
-export default class Question {
+/**
+ * Default field type
+ * @type {String}
+ */
+const DEFAULT_TYPE = 'input'
+
+/**
+ * Responsible for question info and validation
+ */
+class Question {
 
   static serializeResponse (response) {
     return (response.join && response.sort().join(', ')) || response
@@ -10,20 +19,49 @@ export default class Question {
     return !response || (response.join && !response.join('')) || false
   }
 
-  constructor (id, {problem, input} = {}) {
-    this.__id__ = id
-    this.__problem__ = problem
-    this.__type__ = input && input.type
+  /**
+   * @param  {Object} props Properties of the question
+   * @param  {String} props.id Id of the question
+   * @param  {String} props.problem Statement of the question
+   * @param  {String} props.input.type Type of field
+   * @param  {Object[]} props.input.options Options of the field
+   */
+  constructor (props) {
+
   }
 
+  /**
+   * Get type of field
+   * @return {String}
+   */
+  getType () {
+
+  }
+
+  /**
+   * Get options of field
+   * @return {Object[]}
+   */
+  getOptions () {
+
+  }
+
+  /**
+   * Get statement of the question
+   * @return {String}
+   */
+  getStatement () {
+
+  }
+
+  /**
+   * Validate is response is correct for the question
+   * @param  {String|Array} response
+   * @return {Promise} {ok, correctResponse }
+   */
   isResponseCorrect (response) {
-    return QuizApi.getResponse(this.__id__)
-      .then(Question.serializeResponse)
-      .then(function(correctResponse) {
-        return {
-          ok: correctResponse == Question.serializeResponse(response),
-          correctResponse: correctResponse
-        }
-      } )
+
   }
 }
+
+export default Question
