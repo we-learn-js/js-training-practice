@@ -19,9 +19,7 @@ class DOM {
    * @return {HTMLElement} Parent Element
    */
   static append(parent, ...children) {
-    console.log(children)
     $(parent).append(children)
-
     return this
   }
 
