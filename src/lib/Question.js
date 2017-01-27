@@ -5,10 +5,9 @@
 
 import QuizApi from './QuizApi'
 
-export default class Question {
+export default class Question extends QuestionValidationStrategy {
 
   static serializeResponse (response) {
-    debugger;
     return (response.join && response.sort().join(', ')) || response
   }
 
@@ -32,4 +31,39 @@ export default class Question {
         }
       } )
   }
+}
+
+class QuestionValidationStrategy {
+  selectValidator (validator) {
+    this._validator = validator;
+  }
+  validate() {
+    this._validator.validate(this.getValue());
+  }
+}
+
+class Input extends QuestionValidationStrategy {
+  setElement(DOMElement) {}
+  getValue () {}
+  setValue () {}
+  /* ... */
+}
+class InputText extends Input {
+  constructor () {
+    super()
+    this.selectValidator(inputValidator)
+  }
+}
+class ChechBox extends Input {
+  constructor () {
+    super()
+    this.selectValidator(checboxValidator)
+  }
+}
+
+var inputValidator=function(){
+
+}
+var checboxValidator=function() {
+
 }
