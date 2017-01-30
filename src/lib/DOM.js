@@ -9,7 +9,7 @@ class DOM {
    * @return {HTMLElement}
    */
   static createDomElement(HTMLString) {
-
+    return $(HTMLString).get(0)
   }
 
   /**
@@ -19,7 +19,8 @@ class DOM {
    * @return {DOM} this
    */
   static append(parent, ...children) {
-
+    $(parent).append(children)
+    return this
   }
 
   /**
@@ -30,6 +31,8 @@ class DOM {
    * @return {DOM} this
    */
   static css(element, property, value) {
+    $(element).css(property, value)
+    return this
   }
 
   /**
@@ -39,7 +42,8 @@ class DOM {
    * @return {DOM} this
    */
   static click(element, callback) {
-
+    element.addEventListener('click', callback)
+    return this
   }
 }
 
