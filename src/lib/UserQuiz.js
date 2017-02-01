@@ -78,6 +78,6 @@ export default class UserQuiz extends EventEmitter {
  * @return {Question}
    */
   getQuestion (questionIndex) {
-
+    return this._questions[questionIndex]
   }
 }
