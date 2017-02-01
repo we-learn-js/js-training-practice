@@ -20,7 +20,9 @@ class QuizView extends EventEmitter {
    */
   constructor (title, questions) {
     super()
-
+    this._title = title
+    this._questionViews = questions.map(question => new QuestionView(question))
+    this._endingMessageElement = DOM.createDomElement('<div><div>Thank you for your responses.<br /><br /> </div><button class="ui primary button" onclick="window.print()" >Print responses</button></div>')
   }
 
   /**
@@ -28,7 +30,7 @@ class QuizView extends EventEmitter {
    * @param  {Number} index
    */
   showQuestion (index) {
-
+    this._questionViews[index].show()
   }
 
   /**
@@ -37,7 +39,7 @@ class QuizView extends EventEmitter {
    * @return {String|Array}
    */
   getResponse (index) {
-
+    this._questionViews[index].getResponse()
   }
 
   /**
@@ -54,7 +56,14 @@ class QuizView extends EventEmitter {
    * @param {Number} percentage
    */
   setProgress (percentage) {
+    this._progress.setValue(percentage * 100)
 
+    if(percentage === 1) {
+      DOM.css(this._endingMessageElement, 'display', '')
+    }
+    else {
+      DOM.css(this._endingMessageElement, 'display', 'none')
+    }
   }
 }
 
