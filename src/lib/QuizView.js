@@ -58,12 +58,9 @@ class QuizView extends EventEmitter {
   setProgress (percentage) {
     this._progress.setValue(percentage * 100)
 
-    if(percentage === 1) {
-      DOM.css(this._endingMessageElement, 'display', '')
-    }
-    else {
-      DOM.css(this._endingMessageElement, 'display', 'none')
-    }
+    const displayValue = percentage === 1 ? '' : 'none'
+
+    DOM.css(this._endingMessageElement, 'display', displayValue)
   }
 }
 
