@@ -20,7 +20,28 @@ class QuizView extends EventEmitter {
    */
   constructor (title, questions) {
     super()
+    this._questions = questions.map(q => new QuestionView(q))
+    this._element = DOM.createDomElement('<form class="ui form"></form>')
+    this._progress = new ProgressView()
+    this._submitBtn = DOM.createDomElement('<button id="quiz-submit" class="ui primary button">Submit response</button>')
+    this._resetBtn = DOM.createDomElement('<button class="ui button negative">Reset</button>')
+    this._message = DOM.createDomElement('<div>Thank you for your responses.<br /><br /> </div>')
 
+    DOM.append(this._element, createTitleElement(title))
+    DOM.append(document.body, this._progress.getElement())
+    this._questions.forEach((q) => {
+      DOM.append(this._element, q.getElement())
+    })
+
+    DOM.click(this._resetBtn, (event) => {
+      event.preventDefault()
+      this.emit(this.RESET_EVENT)
+    })
+    DOM.click(this._submitBtn, (event) => {
+      event.preventDefault()
+      this.emit(this.SUBMIT_EVENT)
+    })
+    DOM.append(this._element, this._message, this._submitBtn, this._resetBtn)
   }
 
   /**
@@ -28,7 +49,13 @@ class QuizView extends EventEmitter {
    * @param  {Number} index
    */
   showQuestion (index) {
-
+    this._questions.forEach(function (question, i) {
+      if (i === index) {
+        question.show()
+      } else {
+        question.hide()
+      }
+    })
   }
 
   /**
@@ -37,7 +64,7 @@ class QuizView extends EventEmitter {
    * @return {String|Array}
    */
   getResponse (index) {
-
+    return this._questions[index].getResponse()
   }
 
   /**
@@ -54,7 +81,14 @@ class QuizView extends EventEmitter {
    * @param {Number} percentage
    */
   setProgress (percentage) {
-
+    this._progress.setValue(percentage * 100)
+    if (percentage < 1) {
+      DOM.css(this._submitBtn, 'display', '')
+      DOM.css(this._message, 'display', 'none')
+    } else {
+      DOM.css(this._message, 'display', '')
+      DOM.css(this._submitBtn, 'display', 'none')
+    }
   }
 }
 

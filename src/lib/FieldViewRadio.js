@@ -13,7 +13,21 @@ class FieldViewRadio extends FieldView {
    * @return {String} Html string
    */
   _createMarkup () {
+    this.optionsIds = []
+    var markup = '<div class="inline fields">'
+    this._options.forEach((option, i) => {
+      var optionId = this._id + '_' + i
+      markup += '<div class="field">'
+        + '<div class="ui checkbox ' + this.INPUT_TYPE + '">'
+        + '<input type="' + this.INPUT_TYPE + '"  name="' + this._id + '" id="' + optionId + '" value="' + option.label + '">'
+        + '<label for="' + optionId + '">' + option.label + '</label>'
+        + '</div>'
+        + '</div>'
+      this.optionsIds.push(optionId)
+    })
+    markup += '</div>'
 
+    return markup
   }
 
   /**
@@ -21,7 +35,14 @@ class FieldViewRadio extends FieldView {
    * @return {Array} Value(s) of the field
    */
   getValue () {
-
+    var result = []
+    this.optionsIds.map(function (optionId) {
+      var elem = document.getElementById(optionId)
+      elem.checked && result.push(elem.value)
+    })
+    if (result.length === 0)
+      return null
+    return result
   }
 }
 

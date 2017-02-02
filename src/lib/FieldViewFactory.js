@@ -21,7 +21,23 @@ class FieldViewFactory {
    * @return {FieldViewAbstract}
    */
   static createField (question) {
-    
+    var field
+    var options = question.getOptions()
+    switch (question.getType()) {
+      case TYPES.RADIO:
+        field = new FieldViewRadio(options)
+        break
+      case TYPES.CHECKBOX:
+        field = new FieldViewCheckbox(options)
+        break
+      case TYPES.INPUT:
+        field = new FieldViewText(options)
+        break
+      case TYPES.INPUTS:
+        field = new FieldViewTexts(options)
+        break
+    }
+    return field
   }
 }
 

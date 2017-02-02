@@ -15,7 +15,7 @@ export default class UserQuiz extends EventEmitter {
    */
   constructor (questions) {
     super()
-
+    this.__questions__ = question
   }
 
   /**
@@ -23,7 +23,11 @@ export default class UserQuiz extends EventEmitter {
    * @return {UserQuiz} this
    */
   init () {
-
+    var storedData = localStorage.getItem('quiz') || '{}'
+    storedData = JSON.parse(storedData)
+    var { responses=[], currentQuestion=0, responseCount=0 } = storedData
+    Object.assign(this, {responses, currentQuestion, responseCount})
+    return this
   }
 
   /**
@@ -33,14 +37,19 @@ export default class UserQuiz extends EventEmitter {
    * @param {String|Array} response
    */
   addResponse (questionIndex, response) {
-
+    this.responses[questionIndex] = response
+    this.responseCount++
+    this.currentQuestion++
+    this.emit(this.PROGRESS_EVENT, this.getProgress())
   }
 
   /**
    * Stored quiz state
    */
   save () {
-
+    var { responses, currentQuestion, responseCount } = this
+    var data = { responses, currentQuestion, responseCount}
+    localStorage.setItem('quiz', JSON.stringify(data))
   }
 
   /**
@@ -48,7 +57,9 @@ export default class UserQuiz extends EventEmitter {
    * Emits a progress event
    */
   reset () {
-
+    localStorage.removeItem('quiz')
+    this.init()
+    this.emit(this.PROGRESS_EVENT, this.getProgress())
   }
 
   /**
@@ -56,7 +67,7 @@ export default class UserQuiz extends EventEmitter {
    * @return {Number} Between 0 and 1
    */
   getProgress () {
-
+    return this.responseCount / this.__questions__.length
   }
 
   /**
@@ -65,6 +76,6 @@ export default class UserQuiz extends EventEmitter {
  * @return {Question}
    */
   getQuestion (questionIndex) {
-
+    return this.__questions__[questionIndex]
   }
 }
