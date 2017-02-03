@@ -12,7 +12,7 @@ class FieldViewTexts extends FieldView {
    * @return {String} Html string
    */
   _createMarkup () {
-
+      return '<input type="text" id="'+this._id+'">'
   }
 
   /**

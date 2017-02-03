@@ -21,7 +21,8 @@ class FieldViewAbstract {
    * @param  {String} options[].label Label of the option
    */
   constructor (options) {
-
+    this._id=IdFactory.getId();
+    this._options=options;
   }
 
   /**

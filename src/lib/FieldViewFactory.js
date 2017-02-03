@@ -21,7 +21,15 @@ class FieldViewFactory {
    * @return {FieldViewAbstract}
    */
   static createField (question) {
-    
+    switch(question.type){
+      case TYPES.RADIO:
+        return new FieldViewRadio();break;
+      case TYPES.CHECKBOX:
+        return new FieldViewCheckbox();break;
+      case TYPES.INPUT:
+        return new FieldViewText();break;
+    }
+
   }
 }
 

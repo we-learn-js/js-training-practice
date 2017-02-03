@@ -12,11 +12,11 @@ class FieldViewText extends FieldView {
    * @return {String} Html string
    */
   _createMarkup () {
-
+      return '<input type="text" id="'+ this._id +'">'
   }
 
   getValue () {
-
+    return $(document.getElementById(this._id)).val();
   }
 }
 

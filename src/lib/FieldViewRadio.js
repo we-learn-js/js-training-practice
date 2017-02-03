@@ -13,7 +13,7 @@ class FieldViewRadio extends FieldView {
    * @return {String} Html string
    */
   _createMarkup () {
-
+      return "<input type='"+INPUT_TYPE+"' id='" + this._id + "'>"
   }
 
   /**
@@ -21,7 +21,7 @@ class FieldViewRadio extends FieldView {
    * @return {Array} Value(s) of the field
    */
   getValue () {
-
+    return  $(document.getElementById(this._id)).val()
   }
 }
 
