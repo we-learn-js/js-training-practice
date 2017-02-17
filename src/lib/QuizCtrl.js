@@ -10,7 +10,8 @@ class QuizCtrl {
    * @param  {QuizView} view Quiz View
    */
   constructor (quiz, view) {
-
+    this._quizModel = quiz;
+    this._quizView = view;
   }
 
   /**
@@ -27,7 +28,9 @@ class QuizCtrl {
    * @param  {String|Array} userResponse
    */
   submitResponse (userResponse) {
-
+    !!userResponse
+      ? this.setResponse(userResponse)
+      : alert('You must give a response')
   }
 
   /**
