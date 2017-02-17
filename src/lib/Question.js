@@ -27,7 +27,10 @@ class Question {
    * @param  {Object[]} props.input.options Options of the field
    */
   constructor (props) {
-
+    this._id = props.id
+    this._statement = props.problem
+    this._type = (props.input && props.input.type) || DEFAULT_TYPE
+    this._options = (props.input && props.input.options) || []
   }
 
   /**
@@ -35,7 +38,7 @@ class Question {
    * @return {String}
    */
   getType () {
-
+    return this._type
   }
 
   /**
@@ -43,7 +46,7 @@ class Question {
    * @return {Object[]}
    */
   getOptions () {
-
+    return this._options
   }
 
   /**
@@ -51,7 +54,7 @@ class Question {
    * @return {String}
    */
   getStatement () {
-
+    return this._statement
   }
 
   /**
@@ -60,7 +63,14 @@ class Question {
    * @return {Promise} {ok, correctResponse }
    */
   isResponseCorrect (response) {
-
+    return QuizApi.getResponse(this._id)
+      .then(Question.serializeResponse)
+      .then(function (correctResponse) {
+        return {
+          ok: correctResponse == Question.serializeResponse(response),
+          correctResponse: correctResponse
+        }
+      })
   }
 }
 

@@ -13,7 +13,9 @@ class FieldViewAbstract {
    * @return {String} Html string
    */
   _createMarkup () {
-
+    return '<div class="ui input fluid">'
+    + '<input type="hidden" name="' + this._id + '" value="" />'
+    + '</div>'
   }
 
   /**
@@ -21,7 +23,9 @@ class FieldViewAbstract {
    * @param  {String} options[].label Label of the option
    */
   constructor (options) {
-
+    this._id = IdFactory.getId()
+    this._options = options
+    this._element = DOM.createDomElement(this._createMarkup())
   }
 
   /**

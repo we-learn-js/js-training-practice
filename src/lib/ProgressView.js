@@ -6,7 +6,9 @@ import DOM from './DOM'
 class ProgressView {
 
   constructor () {
-
+    this._element = DOM.createDomElement('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">'
+      + '<div id="progress-view" style="background: #1678c2; width: 1%;">&nbsp;</div>'
+      + '</div>')
   }
 
   /**
@@ -14,7 +16,8 @@ class ProgressView {
    * @param {Number} value Percentage of progress
    */
   setValue (value) {
-
+    var progressElement = document.getElementById('progress-view')
+    DOM.css(progressElement, 'width', value + '%')
   }
 
   /**
