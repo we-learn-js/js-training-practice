@@ -19,7 +19,8 @@ class QuizView extends EventEmitter {
    * @param  {Question[]} questions[]
    */
   constructor (title, questions) {
-    super()
+    super();
+    this.__questions__ = questions;
 
   }
 
