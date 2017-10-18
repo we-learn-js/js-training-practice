@@ -6,7 +6,7 @@
 **Launch the project on dev mode**
 
  ```
-$ npm run start-dev
+$ npm run dev
 ```
 
 **Open the project in in Chrome**
