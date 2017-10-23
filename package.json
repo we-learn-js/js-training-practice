@@ -4,21 +4,28 @@
   "description": "JS Training practice project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dist": "webpack --config webpack.config.js",
-    "dev": "webpack-dev-server --devtool eval --progress --colors --open"
+    "dev": "webpack-dev-server --devtool eval --progress --colors --open",
+    "build": "webpack --config webpack.config.js",
+    "test": "node test/nightwatch/execute",
+    "test:dev": "nodemon -w src -w test --exec 'npm test' --quiet",
+    "reset": "rm -Rf node_modules && npm i"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/soyundev/js-training-practice.git"
+    "url": "git+https://github.com/davidbarna/js-training-practice.git"
   },
   "author": "David Almeida <davidbarna@gmail.com>",
   "bugs": {
-    "url": "https://github.com/soyundev/js-training-practice/issues"
+    "url": "https://github.com/davidbarna/js-training-practice/issues"
   },
-  "homepage": "https://github.com/soyundev/js-training-practice#readme",
+  "homepage": "https://github.com/davidbarna/js-training-practice#readme",
   "devDependencies": {
+    "@s-ui/helpers": "1",
+    "chromedriver": "2.33.1",
     "copy-webpack-plugin": "3.0.1",
+    "nightwatch": "0.9.16",
+    "nodemon": "1.12.1",
+    "selenium-server-standalone-jar": "3.5.3",
     "webpack": "1.13.2",
     "webpack-dev-server": "1.15.2"
   }
