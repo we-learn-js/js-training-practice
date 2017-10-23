@@ -8,7 +8,8 @@
     "build": "webpack --config webpack.config.js",
     "test": "node test/nightwatch/execute",
     "test:dev": "nodemon -w src -w test --exec 'npm test' --quiet",
-    "reset": "rm -Rf node_modules && npm i"
+    "reset": "rm -Rf node_modules && npm i",
+    "prepush": "npm test"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
     "@s-ui/helpers": "1",
     "chromedriver": "2.33.1",
     "copy-webpack-plugin": "3.0.1",
+    "husky": "0.14.3",
     "nightwatch": "0.9.16",
     "nodemon": "1.12.1",
     "selenium-server-standalone-jar": "3.5.3",
