@@ -1,14 +1,18 @@
 {
   "title": "The Friends Quiz",
-  "questions": [
-    {
+  "questions": [{
       "problem": "How long did it take Ross to ask Rachel out?",
       "input": {
         "type": "radio",
-        "options": [
-          { "label": "10 years" },
-          { "label": "2 years" },
-          { "label": "9 years" }
+        "options": [{
+            "label": "10 years"
+          },
+          {
+            "label": "2 years"
+          },
+          {
+            "label": "9 years"
+          }
         ]
       }
     },
@@ -16,12 +20,21 @@
       "problem": "What are Rachel's sister's names?",
       "input": {
         "type": "checkbox",
-        "options": [
-          { "label": "Jane" },
-          { "label": "Abby" },
-          { "label": "Amy" },
-          { "label": "Jill" },
-          { "label": "Annie" }
+        "options": [{
+            "label": "Jane"
+          },
+          {
+            "label": "Abby"
+          },
+          {
+            "label": "Amy"
+          },
+          {
+            "label": "Jill"
+          },
+          {
+            "label": "Annie"
+          }
         ]
       }
     },
@@ -29,11 +42,18 @@
       "problem": "What colour dress was Monica wearing when her and Chandler finally got engaged?",
       "input": {
         "type": "radio",
-        "options": [
-          { "label": "Red" },
-          { "label": "Blue" },
-          { "label": "Black" },
-          { "label": "Pink" }
+        "options": [{
+            "label": "Red"
+          },
+          {
+            "label": "Blue"
+          },
+          {
+            "label": "Black"
+          },
+          {
+            "label": "Pink"
+          }
         ]
       }
     },
@@ -44,10 +64,15 @@
       "problem": "\"Smelly __1__, what are they __2__ you. Smelly __1__, it's __3__. \"",
       "input": {
         "type": "inputs",
-        "options": [
-          { "label": "__1__" },
-          { "label": "__2__" },
-          { "label": "__3__" }
+        "options": [{
+            "label": "__1__"
+          },
+          {
+            "label": "__2__"
+          },
+          {
+            "label": "__3__"
+          }
         ]
       }
     },
