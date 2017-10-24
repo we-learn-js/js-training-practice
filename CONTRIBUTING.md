@@ -16,7 +16,7 @@ Find below the default versions this repo was built with:
 
 ```sh
 $ cd path/to/your/projects
-$ git clone git@github.com:davidbarna/js-training-practice.git
+$ git clone git@github.com:we-learn-js/js-training-practice.git
 $ cd js-training-practice
 $ npm install
 ```

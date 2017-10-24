@@ -3,7 +3,7 @@
 
 ## What is it ?
 
-The quiz is a simple quiz built on client from a [json file](https://github.com/davidbarna/js-training-practice/blob/master/src/data/quiz.json).
+The quiz is a simple quiz built on client from a [json file](https://github.com/we-learn-js/js-training-practice/blob/master/src/data/quiz.json).
 
 The has a simple schema:
 
@@ -19,7 +19,7 @@ The has a simple schema:
 
 ## Why?
 
-It's a project to practice acquired knowledge in [JS Training Course](https://github.com/davidbarna/js-training) refactoring this code.
+It's a project to practice acquired knowledge in [JS Training Course](https://github.com/we-learn-js/js-training) refactoring this code.
 
 **This code is damned bad**, but it was meant to be. This way, you can refactor progressively fixing the main mistakes of the code.
 

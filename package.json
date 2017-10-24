@@ -13,13 +13,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davidbarna/js-training-practice.git"
+    "url": "git+https://github.com/we-learn-js/js-training-practice.git"
   },
   "author": "David Almeida <davidbarna@gmail.com>",
   "bugs": {
-    "url": "https://github.com/davidbarna/js-training-practice/issues"
+    "url": "https://github.com/we-learn-js/js-training-practice/issues"
   },
-  "homepage": "https://github.com/davidbarna/js-training-practice#readme",
+  "homepage": "https://github.com/we-learn-js/js-training-practice#readme",
   "devDependencies": {
     "@s-ui/helpers": "1",
     "chromedriver": "2.33.1",
