@@ -19,9 +19,9 @@ The has a simple schema:
 
 ## Why?
 
-It's a project to practice acquired knowledge refactoring this code.
+It's a project to practice acquired knowledge in [JS Training Course](https://github.com/davidbarna/js-training) refactoring this code.
 
-This code is damned bad, but it was meant to be. This way, you can refactor progressively fixing the main mistakes of the code.
+**This code is damned bad**, but it was meant to be. This way, you can refactor progressively fixing the main mistakes of the code.
 
 ## How?
 
