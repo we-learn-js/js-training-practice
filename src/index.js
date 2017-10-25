@@ -46,7 +46,7 @@ $.ajax({
         for (j = 0; j < question.input.options.length; j++) {
           const option = question.input.options[j]
           const type = question.input.type
-          const checked = responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked' : ''
+          const checked = responses[i] ? 'checked' : ''
 
           input += '<div class="field">' +
             '<div class="ui checkbox ' + type + '">' +
