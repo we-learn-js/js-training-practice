@@ -11,6 +11,7 @@ The following is a set of guidelines to submit your changes to the repo.
 Find below the default versions this repo was built with:
 * Node: `v8.6.0`
 * NPM: `v3.10.10`
+* Chrome: `v62`
 
 ### Install the project
 
