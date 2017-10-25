@@ -40,6 +40,8 @@ Executes end-to-end tests on the app to check your change haven't broken anythin
 > :warning: **Caution!** :warning:
 >
 > Tests are run with selenium and require to have Java JDK installed: http://www.oracle.com/technetwork/java/javase/downloads/index.html.
+>
+> The tests were run successfully with Chrome v62
 
 ### `npm run test:dev`
 
