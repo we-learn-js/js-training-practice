@@ -7,17 +7,16 @@ options = {
 $.ajax({
   url: options.url
 }).done(function(data) {
-  questions = data.questions
+  let responseCount = 0
+  let currentQuestion = 0
+  let responses = []
+  const {questions} = data
 
   // Load data from past reponses
   try {
     quizData = JSON.parse(localStorage.getItem('quiz'))
-    responses = quizData.responses || []
-    currentQuestion = quizData.currentQuestion || -1
-    responseCount = quizData.responseCount || -1
+    let {responses = [], currentQuestion = -1, responseCount = -1} = quizData
   } catch (e) {}
-
-  responses = quizData == null ? [] : quizData.responses
     
   // Append the progress bar to DOM
   $('body')
@@ -31,15 +30,9 @@ $.ajax({
     .append('<form id="quiz-form" class="ui form"></form>')
 
   // For each question of the json,
-  for (let i = 0; i < data.questions.length; i++) {
-    question = data.questions[i]
-
-    if (question.input === undefined) {
-      question.input = {
-        type: 'input'
-      }
-    }
-
+  for (let i = 0; i < questions.length; i++) {
+    const question = questions[i]
+    question.input = question.input || {type: 'input'}
     // Construct the input depending on question type
     switch (question.input.type) {
 
@@ -48,14 +41,9 @@ $.ajax({
       case 'radio':
         let input = '<div class="inline fields">'
         for (j = 0; j < question.input.options.length; j++) {
-          let option = question.input.options[j]
-          let type = question.input.type
-
-          if (responses[i] && responses[i].indexOf(option.label) !== -1) {
-            let checked = 'checked'
-          } else {
-            let checked = ''
-          }
+          const option = question.input.options[j]
+          const type = question.input.type
+          const checked = responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked' : ''
 
           input += '<div class="field">' +
             '<div class="ui checkbox ' + type + '">' +
@@ -71,10 +59,10 @@ $.ajax({
       case 'inputs':
         let input = '<table>'
         for (let j = 0; j < question.input.options.length; j++) {
-          let option = question.input.options[j]
-          let type = 'checkbox'
+          const option = question.input.options[j]
+          const type = 'checkbox'
 
-          let value = responses[i] ? responses[i][j] : ''
+          const value = responses[i] ? responses[i][j] : ''
 
           input += '<tr>' +
             '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
@@ -90,7 +78,7 @@ $.ajax({
 
         // Default: simple input
       default:
-        let value = responses[i] || ''
+        const value = responses[i] || ''
         let input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
