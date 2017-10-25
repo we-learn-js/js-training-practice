@@ -7,16 +7,19 @@ options = {
 $.ajax({
   url: options.url
 }).done(function(data) {
-  let responseCount = 0
-  let currentQuestion = 0
-  let responses = []
+  var responseCount = 0
+  var currentQuestion = 0
+  var responses = []
   const {questions} = data
+  console.log(data)
 
   // Load data from past reponses
   try {
     quizData = JSON.parse(localStorage.getItem('quiz'))
-    let {responses = [], currentQuestion = -1, responseCount = -1} = quizData
+    var {responses = [], currentQuestion = -1, responseCount = -1} = quizData
   } catch (e) {}
+
+  quizData = quizData || {responses}
     
   // Append the progress bar to DOM
   $('body')
@@ -39,7 +42,7 @@ $.ajax({
       // Multiple options
       case 'checkbox':
       case 'radio':
-        let input = '<div class="inline fields">'
+        var input = '<div class="inline fields">'
         for (j = 0; j < question.input.options.length; j++) {
           const option = question.input.options[j]
           const type = question.input.type
@@ -57,7 +60,7 @@ $.ajax({
 
         // Set of inputs (composed response)
       case 'inputs':
-        let input = '<table>'
+        input = '<table>'
         for (let j = 0; j < question.input.options.length; j++) {
           const option = question.input.options[j]
           const type = 'checkbox'
@@ -79,7 +82,7 @@ $.ajax({
         // Default: simple input
       default:
         const value = responses[i] || ''
-        let input = '<div class="ui input fluid">' +
+        input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
     }
@@ -128,8 +131,8 @@ $.ajax({
 
   // Actions on every response submission
   $('#submit-response').on('click', function() {
-    var $inputs = $('[name^=question_' + currentQuestion + ']')
-    var question = questions[currentQuestion]
+    const $inputs = $('[name^=question_' + currentQuestion + ']')
+    let question = questions[currentQuestion]
 
     // Behavior for each question type to add response to array of responses
     switch (question.input.type) {
@@ -159,7 +162,7 @@ $.ajax({
         case 'checkbox':
         case 'radio':
         case 'inputs':
-          responses[i] && responses[i].join('') && responseCount++
+          responses[i] && responseCount++
           break
         default:
           responses[i] && responseCount++
@@ -203,9 +206,6 @@ $.ajax({
     }
 
     // Save current state of the quiz
-    quizData.responses = responses
-    quizData.responseCount = responseCount
-    quizData.currentQuestion = currentQuestion
-    localStorage.setItem('quiz', JSON.stringify(quizData))
+    localStorage.setItem('quiz', JSON.stringify({responses, responseCount, currentQuestion}))
   })
 })
