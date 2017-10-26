@@ -11,7 +11,6 @@ $.ajax({
   var responses = []
   const {questions} = data
 
-  debugger
   // Load data from past reponses
   try {
     quizData = JSON.parse(localStorage.getItem('quiz'))
