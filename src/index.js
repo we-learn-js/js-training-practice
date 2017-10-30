@@ -117,7 +117,7 @@
     }
 
     // Add a reset button that will redirect to quiz start
-    $resetButton = $('<button class="ui button negative">Reset</button>')
+    const $resetButton = $('<button class="ui button negative">Reset</button>')
     $resetButton.on('click', function() {
       localStorage.removeItem('quiz')
       location.reload();
@@ -178,7 +178,7 @@
       // Check if question had a valid answer
       let isQuestionAnswered = !!response
       if (response && response.length) {
-        for (j = 0; j < response.length; j++) {
+        for (let j = 0; j < response.length; j++) {
           if (!response[j]) {
             isQuestionAnswered = false
           }
@@ -208,10 +208,7 @@
 
 
       // Save current state of the quiz
-      quizData.responses = responses
-      quizData.responseCount = responseCount
-      quizData.currentQuestion = currentQuestion
-      localStorage.setItem('quiz', JSON.stringify(quizData))
+      localStorage.setItem('quiz', JSON.stringify({responses, responseCount, currentQuestion}))
     })
   })
 })($, JSON, localStorage)
