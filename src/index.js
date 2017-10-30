@@ -1,5 +1,3 @@
-responseCount = 0
-currentQuestion = 0
 options = {
   url: 'data/quiz.json?' + Date.now()
 }
@@ -7,22 +5,14 @@ options = {
 $.ajax({
   url: options.url
 }).done(function(data) {
-  questions = data.questions
+  var {questions} = data
+  var quizData
 
   // Load data from past reponses
   try {
-    quizData = JSON.parse(localStorage.getItem('quiz'))
-    responses = quizData.responses || []
-    currentQuestion = quizData.currentQuestion || -1
-    responseCount = quizData.responseCount || -1
+    quizData = JSON.parse(localStorage.getItem('quiz')) || {}
   } catch (e) {}
-
-  if (quizData == null) {
-    quizData = {
-      responses: []
-    }
-    responses = quizData.responses
-  }
+  var {responses=[], currentQuestion=0, responseCount=0} = quizData
 
 
   // Append the progress bar to DOM
