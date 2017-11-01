@@ -1,5 +1,3 @@
-responseCount = 0
-currentQuestion = 0
 options = {
   url: 'data/quiz.json?' + Date.now()
 }
@@ -7,23 +5,23 @@ options = {
 $.ajax({
   url: options.url
 }).done(function(data) {
-  questions = data.questions
+  let questions = data.questions
+  var responses = []
+  var responseCount = 0
+  var currentQuestion = 0
+
 
   // Load data from past reponses
   try {
     quizData = JSON.parse(localStorage.getItem('quiz'))
-    responses = quizData.responses || []
-    currentQuestion = quizData.currentQuestion || -1
-    responseCount = quizData.responseCount || -1
+    var {responses = [], currentQuestion = -1, responseCount = -1} = quizData
   } catch (e) {}
 
-  if (quizData == null) {
-    quizData = {
-      responses: []
-    }
-    responses = quizData.responses
+  if (!quizData) {
+       quizData = {
+         responses: []
+       }
   }
-
 
   // Append the progress bar to DOM
   $('body')
@@ -40,7 +38,7 @@ $.ajax({
   for (var i = 0; i < data.questions.length; i++) {
     question = data.questions[i]
 
-    if (question.input === undefined) {
+    if (!question.input) {
       question.input = {
         type: 'input'
       }
@@ -56,12 +54,7 @@ $.ajax({
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
           var type = question.input.type
-
-          if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-            var checked = 'checked'
-          } else {
-            var checked = ''
-          }
+          var checked = (responses[i] && responses[i].indexOf(option.label) != -1) ? 'checked' : ''
 
           input += '<div class="field">' +
             '<div class="ui checkbox ' + type + '">' +
@@ -79,12 +72,8 @@ $.ajax({
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
           var type = 'checkbox'
+          var value = responses[i] ? responses[i][j] : ''
 
-          if (!!responses[i]) {
-            var value = responses[i][j]
-          } else {
-            var value = ''
-          }
 
           input += '<tr>' +
             '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
@@ -100,11 +89,7 @@ $.ajax({
 
         // Default: simple input
       default:
-        if (!!responses[i]) {
-          var value = responses[i]
-        } else {
-          var value = ''
-        }
+        var value = responses[i] ? responses[i] : ''
         var input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
@@ -138,7 +123,7 @@ $.ajax({
     .append('<button id="submit-response" class="ui primary button">Submit response</button>')
 
   // Is case all questions have been responded
-  if (responseCount === questions.length) {
+  if (responseCount == questions.length) {
     $('#submit-response').css('display', 'none')
     $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
     $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
@@ -158,19 +143,19 @@ $.ajax({
     var question = questions[currentQuestion]
 
     // Behavior for each question type to add response to array of responses
-    switch (question.input.type) {
+      responses[currentQuestion] = []
+      switch (question.input.type) {
       case 'checkbox':
       case 'radio':
-        responses[currentQuestion] = []
+
         $('[name=' + $inputs.attr('name') + ']:checked').each(function(i, input) {
           responses[currentQuestion].push(input.value)
         })
-        if (responses[currentQuestion].length === 0) {
+        if (responses[currentQuestion].length == 0) {
           responses[currentQuestion] = null
         }
         break
       case 'inputs':
-        responses[currentQuestion] = []
         $inputs.each(function(i, input) {
           responses[currentQuestion].push(input.value)
         })
@@ -187,12 +172,12 @@ $.ajax({
         case 'checkbox':
         case 'radio':
         case 'inputs':
-          if (!!responses[i] && !!responses[i].join('')) {
+          if (responses[i] && responses[i].join('')) {
             responseCount++
           }
           break
         default:
-          if (!!responses[i]) {
+          if (responses[i]) {
             responseCount++
           }
       }
@@ -207,7 +192,7 @@ $.ajax({
     if (!responses[currentQuestion]) {
       isQuestionAnswered = false
     }
-    if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
+    if (responses[currentQuestion] && responses[currentQuestion].length) {
       for (j = 0; j < responses[currentQuestion].length; j++) {
         if (!responses[currentQuestion][j]) {
           isQuestionAnswered = false
@@ -223,13 +208,13 @@ $.ajax({
       // Display next question
       $('#quiz-form')
         .find('#question-' + currentQuestion).css('display', 'none')
-      currentQuestion = currentQuestion + 1
+      currentQuestion++
 
       $('#quiz-form')
         .find('#question-' + currentQuestion).css('display', 'block')
 
       // If it was the las question, display final message
-      if (responseCount === questions.length) {
+      if (responseCount == questions.length) {
         $('#submit-response').css('display', 'none')
         $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
         $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
