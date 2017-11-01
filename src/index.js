@@ -11,7 +11,6 @@ $.ajax({
   var currentQuestion = 0
   var responses = []
   const {questions} = data
-  console.log(data)
 
   // Load data from past reponses
   try {
