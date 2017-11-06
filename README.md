@@ -1,6 +1,5 @@
 # JS Training: The Quiz Project
 
-
 ## What is it ?
 
 The quiz is a simple quiz built on client from a [json file](https://github.com/we-learn-js/js-training-practice/blob/master/src/data/quiz.json).
@@ -21,7 +20,7 @@ The has a simple schema:
 
 It's a project to practice acquired knowledge in [JS Training Course](https://github.com/we-learn-js/js-training) refactoring this code.
 
-**This code is damned bad**, but it was meant to be. This way, you can refactor progressively fixing the main mistakes of the code.
+**This code is not meant to be well done, but meant to be refactored**. This way, you can refactor progressively fixing the main mistakes of the code.
 
 ## How?
 
@@ -52,8 +51,21 @@ Executes end-to-end tests on watch mode. Tests will be reexecuted every time.
 Safely reinstalls the project.
 
 
-**Once you're done, create a pull request**
+## Refactor phases
 
-Assign [davidbarna](https://github.com/davidbarna)
+### 1. Operators And Closures
 
-on push tests will be automatically executed
+[![branch-icon] refactor/operators-closures](https://github.com/we-learn-js/js-training-practice/tree/refactor/operators-closures)
+
+* Change scopes of variables from global scope to local scope.
+* Declare variables with `let`, `const` or `var`.
+* Use destructuring when possible.
+* Use operator expressions for conditionals and value assignment.
+
+### 2. Strings
+
+[![branch-icon] refactor/strings](https://github.com/we-learn-js/js-training-practice/tree/refactor/strings)
+
+* Convert strings to template strings.
+
+[branch-icon]: ./.github/images/git-branch.png
