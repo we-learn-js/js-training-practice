@@ -31,14 +31,14 @@ Every week, a new branch will be created as destination branch for your changes.
 
 ```sh
 $ git checkout -b {destination-branch}
-$ git checkout -b 1-operators-oop
+$ git checkout -b refactor/functions
 ```
 
 ### Create a branch
 
 ```sh
 $ git checkout -b {destination-branch}-{gh-username}
-$ git checkout -b 1-operators-oop-davidbarna
+$ git checkout -b refactor/functions-davidbarna
 ```
 
 ### Make your changes

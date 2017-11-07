@@ -68,4 +68,16 @@ Safely reinstalls the project.
 
 * Convert strings to template strings.
 
+### 3. Functions
+
+[![branch-icon] refactor/functions](https://github.com/we-learn-js/js-training-practice/tree/refactor/functions)
+
+* Split all logic in functions as pure as possible.
+* Use new arrow functions syntax when possible.
+* Respect functional principles:
+  * Immutability
+  * Absence of side effects
+  * Function don't depend on state
+  * Functions with 1 input/ 1 output.
+
 [branch-icon]: ./.github/images/git-branch.png
