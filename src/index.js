@@ -4,7 +4,7 @@
   }
 
   const DataLayer = function(JSON, localStorage) {
-    LOCAL_STORAGE_ITEM = 'quiz'
+    const LOCAL_STORAGE_ITEM = 'quiz'
     return {
       load: () => {
         try {
