@@ -3,173 +3,27 @@
     url: `data/quiz.json?${Date.now()}`
   }
 
-  $.ajax({ url }).done(function(data) {
-    let {questions} = data
-    let quizData
-
-    // Load data from past reponses
-    try {
-      quizData = JSON.parse(localStorage.getItem('quiz')) || {}
-    } catch (e) {}
-    let {responses=[], currentQuestion=0, responseCount=0} = quizData
-
-
-    // Append the progress bar to DOM
-    $('body')
-      .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
-        <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
-        </div>`)
-
-    // Append title and form to quiz
-    $('#quiz')
-      .append(`<h1 class="ui header">${data.title}</h1>`)
-      .append('<form id="quiz-form" class="ui form"></form>')
-
-    // For each question of the json,
-    for (let i = 0; i < questions.length; i++) {
-      questions[i].input = questions[i].input || { type:'input' }
-      let {problem, input, input: {type, options}} = questions[i]
-      let inputHtml
-
-
-      // Construct the input depending on question type
-      switch (type) {
-
-        // Multiple options
-        case 'checkbox':
-        case 'radio':
-          inputHtml = '<div class="inline fields">'
-          for (j = 0; j < options.length; j++) {
-            const {[j]:option} = options
-            const checked = !!responses[i] && responses[i].includes(option.label) ? 'checked' : ''
-
-            inputHtml += `<div class="field">
-              <div class="ui checkbox ${type}">
-              <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}" value="${option.label}">
-              <label for="question_${i}_${j}">${option.label}</label>
-              </div>
-              </div>`
-          }
-          inputHtml += '</div>'
-          break
-
-          // Set of inputs (composed response)
-        case 'inputs':
-          inputHtml = '<table>'
-          for (let j = 0; j < options.length; j++) {
-            const {[j]:option} = options
-            const value = responses[i] && responses[i][j] || ''
-
-            inputHtml += `<tr>
-              <td><label for="question_${i}_${j}">${option.label}</label></td>
-              <td width="15px"></td>
-              <td><div class="ui input">
-              <input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" />
-              </div></td>
-              </tr>
-              <tr><td colspan="3">&nbsp;</tr></tr>`
-          }
-          inputHtml += '</table>'
-          break
-
-          // Default: simple input
-        default:
-          const value = responses[i] || ''
-          inputHtml = `<div class="ui input fluid">
-            <input type="text" placeholder="Response..." name="question_${i}" value="${value}" />
-            </div>`
-      }
-
-      $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
-          <div class="content"><div class="header">${problem}</div></div>
-          <div class="content">${inputHtml}</div>
-        </div>`
-      ).css('display', 'none')
-
-      $('#quiz-form')
-        .append($question)
-
-      // Show current question
-      $('#quiz-form')
-        .find(`#question-${currentQuestion}`)
-        .css('display', 'block')
-
-      // Update progress bar
-      $('#progress')
-        .css('width', (responseCount / questions.length * 100) + '%')
-    }
-
-    // Add button to submit response
-    $('#quiz')
-      .append('<button id="submit-response" class="ui primary button">Submit response</button>')
-
-    // Is case all questions have been responded
-    if (responseCount === questions.length) {
-      $('#submit-response').css('display', 'none')
-      $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-      $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-    }
-
-    // Add a reset button that will redirect to quiz start
-    const $resetButton = $('<button class="ui button negative">Reset</button>')
-    $resetButton.on('click', function() {
-      localStorage.removeItem('quiz')
-      location.reload();
-    })
-    $('#quiz').append($resetButton)
-
-    // Actions on every response submission
-    $('#submit-response').on('click', function() {
-      const $inputs = $(`[name^=question_${currentQuestion}`)
-      const question = questions[currentQuestion]
-      let response = responses[currentQuestion]
-
-      // Behavior for each question type to add response to array of responses
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-          response = []
-          $(`[name=${$inputs.attr('name')}]:checked`).each(function(i, input) {
-            response.push(input.value)
-          })
-          response = response.length ? response : null
-          break
-        case 'inputs':
-          response = []
-          $inputs.each(function(i, input) {
-            response.push(input.value)
-          })
-          break
-        default:
-          response = $inputs.val()
-      }
-
-
-
-      // Set the current responses counter
-      responses[currentQuestion] = response
-      let responseCount = 0
-      for (let i = 0; i < responses.length; i++) {
-        let question = questions[i]
-        let response = responses[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            responseCount += !!response && !!response.join('')
-            break
-          default:
-            responseCount += !!response
+  const DataLayer = function(JSON, localStorage) {
+    LOCAL_STORAGE_ITEM = 'quiz'
+    return {
+      load: () => {
+        try {
+          return JSON.parse(localStorage.getItem(LOCAL_STORAGE_ITEM)) || {}
+        } catch (e) {
+          return undefined
         }
+      },
+      save: (data) => {
+        localStorage.setItem(LOCAL_STORAGE_ITEM, JSON.stringify(data))
+      },
+      reset: () => {
+        localStorage.removeItem(LOCAL_STORAGE_ITEM)
+        location.reload();
       }
+    }
+  }
 
-      // Update progress bar
-      $('#progress')
-        .css('width', (responseCount / questions.length * 100) + '%')
-
-
-
-      // Check if question had a valid answer
+  const isQuestionAnswered = (response) =>  {
       let isQuestionAnswered = !!response
       if (response && response.length) {
         for (let j = 0; j < response.length; j++) {
@@ -178,30 +32,187 @@
           }
         }
       }
+      return isQuestionAnswered
+  }
 
-      if (!isQuestionAnswered) {
-        // Alert user of missing response
-        alert('You must give a response')
-      } else {
+  const changeQuestionShowState = (questionNumber, state) =>
+    $('#quiz-form')
+      .find(`#question-${questionNumber}`)
+      .css('display', state)
 
-        // Display next question
-        $('#quiz-form')
-          .find(`#question-${currentQuestion}`).css('display', 'none')
+  const QuestionHtmlFactory = (questionNumber, options, responses) => {
+    const DEFAULT_STRATEGY = 'input'
 
+    const createCheckboxOrRadioOption = (questionNumber, optionNumber, type, checked, label) =>
+        `<div class="field">
+          <div class="ui checkbox ${type}">
+            <input type="${type}" ${checked} name="question_${questionNumber}" id="question_${questionNumber}_${optionNumber}" value="${label}">
+            <label for="question_${questionNumber}_${optionNumber}">${label}</label>
+          </div>
+        </div>`
+    const createCheckboxOrRadio = (type) =>
+      (questionNumber, options, responses) => {
+        inputHtml = '<div class="inline fields">'
+        for (optionNumber = 0; optionNumber < options.length; optionNumber++) {
+          const {[optionNumber]:option} = options
+          const checked = !!responses[questionNumber] && responses[questionNumber].includes(option.label) ? 'checked' : ''
+          inputHtml += createCheckboxOrRadioOption(questionNumber, optionNumber, type, checked, option.label)
+        }
+        inputHtml += '</div>'
+        return inputHtml
+      }
 
-        $('#quiz-form')
-          .find(`#question-${++currentQuestion}`).css('display', 'block')
+    const createMultipleInputs = (questionNumber, options, responses) => {
+      inputHtml = '<table>'
+      for (let j = 0; j < options.length; j++) {
+        const {[j]:option} = options
+        const value = responses[questionNumber] && responses[questionNumber][j] || ''
 
-        // If it was the las question, display final message
-        if (responseCount === questions.length) {
+        inputHtml += `<tr>
+          <td><label for="question_${questionNumber}_${j}">${option.label}</label></td>
+          <td width="15px"></td>
+          <td><div class="ui input">
+          <input type="text" placeholder="Response..." name="question_${questionNumber}" id="question_${questionNumber}_${j}" value="${value}" />
+          </div></td>
+          </tr>
+          <tr><td colspan="3">&nbsp;</tr></tr>`
+      }
+      inputHtml += '</table>'
+      return inputHtml
+    }
+
+    const createSingleInput = (questionNumber, options, responses) => {
+      const value = responses[questionNumber] || ''
+      return `<div class="ui input fluid">
+                <input type="text" placeholder="Response..." name="question_${questionNumber}" value="${value}" />
+              </div>`
+    }
+
+    const strategies = {
+      'checkbox': createCheckboxOrRadio('checkbox'),
+      'radio': createCheckboxOrRadio('radio'),
+      'inputs': createMultipleInputs,
+      'input': createSingleInput
+    }
+    return (type) => strategies[Object.keys(strategies).find(x => x === type) || DEFAULT_STRATEGY](questionNumber, options, responses)
+  }
+
+  const UILayer = function() {
+    return {
+      createProgressBar: () =>
+        `<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
+                <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
+            </div>`,
+      createH1: (title) =>
+        `<h1 class="ui header">${title}</h1>`,
+      createForm: (id) =>
+        `<form id="${id}" class="ui form"></form>`,
+      updateProgressBar: ($element, value) =>
+        $element.css('width', value + '%'),
+      createButton: (id, text, classes) =>
+        `<button id="${id}" class="${classes.join(' ')}">${text}</button>`,
+      showQuestion: (questionNumber) =>
+        changeQuestionShowState(questionNumber, 'block'),
+      hideQuestion: (questionNumber) =>
+        changeQuestionShowState(questionNumber, 'none'),
+      createQuestionElement: (questions, i, responses) => {
+        questions[i].input = questions[i].input || { type:'input' }
+        let {problem, input, input: {type, options}} = questions[i]
+        let inputHtml = QuestionHtmlFactory(i, options, responses)(type)
+        return $(`<div id="question-${i}" class="ui card" style="width: 100%;">
+            <div class="content"><div class="header">${problem}</div></div>
+            <div class="content">${inputHtml}</div>
+          </div>`
+        ).css('display', 'none')
+      },
+      finishQuiz: () => {
           $('#submit-response').css('display', 'none')
           $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
           $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+      }
+    }
+  }
+
+  const ResponseService = ($) => {
+    const DEFAULT_STRATEGY = 'input'
+
+    const getResponseCb = ($inputs) => {
+      response = $.map($(`[name=${$inputs.attr('name')}]:checked`), (input) => input.value)
+      return response.length ? response : null
+    }
+    const getResponseMultipleInputs = ($inputs) => $.map($inputs, (input) => input.value)
+    const getResponseSingleInput = ($inputs) => $inputs.val()
+
+    const strategies = {
+      'checkbox': getResponseCb,
+      'radio': getResponseCb,
+      'inputs': getResponseMultipleInputs,
+      'input': getResponseSingleInput
+    }
+    return ($inputs, type) => strategies[Object.keys(strategies).find(x => x === type) || DEFAULT_STRATEGY]($inputs)
+  }
+
+  $.ajax({ url }).done(function(data) {
+    const dataLayer = DataLayer(JSON, localStorage)
+    const uiLayer = UILayer()
+    const responseService = ResponseService($)
+    let {questions} = data
+    let {responses=[], currentQuestion=0, responseCount=0} = dataLayer.load()
+    // Append the progress bar to DOM
+    $('body')
+      .append(uiLayer.createProgressBar())
+
+    $('#quiz')
+      .append(uiLayer.createH1(data.title))
+      .append($(uiLayer.createForm("quiz-form")).append(questions.map((element, index) =>
+        uiLayer.createQuestionElement(questions, index, responses)
+      )))
+
+    // Show current question
+    uiLayer.showQuestion(currentQuestion)
+    // Update progress bar
+    uiLayer.updateProgressBar($('#progress'), (responseCount / questions.length * 100))
+
+    // Add button to submit response
+    $('#quiz')
+      .append(uiLayer.createButton("submit-response", "Submit Response", ["ui", "primary", "button"]))
+
+    // Is case all questions have been responded
+    if (responseCount === questions.length) {
+      uiLayer.finishQuiz();
+    }
+
+    // Add a reset button that will redirect to quiz start
+
+    const $resetButton = $(uiLayer.createButton(null, "Reset", ["ui", "button", "negative"])).on('click', dataLayer.reset)
+    $('#quiz').append($resetButton)
+
+    // Actions on every response submission
+    $('#submit-response').on('click', function() {
+      const $inputs = $(`[name^=question_${currentQuestion}`)
+      const question = questions[currentQuestion]
+      let response = responses[currentQuestion]
+      response = responseService($inputs, question.input.type)
+      responses[currentQuestion] = response
+      let responseCount = responses.map(x => x && x.join('') ? 1 : 0).reduce((cur, acc) => cur + acc)
+      // Update progress bar
+      uiLayer.updateProgressBar($('#progress'), (responseCount / questions.length * 100))
+
+      // Check if question had a valid answer
+      if (!isQuestionAnswered(response)) {
+        // Alert user of missing response
+        alert('You must give a response')
+      } else {
+        // Display next question
+        uiLayer.hideQuestion(currentQuestion)
+        uiLayer.showQuestion(++currentQuestion)
+        // If it was the las question, display final message
+        if (responseCount === questions.length) {
+          uiLayer.finishQuiz();
         }
       }
 
-      // Save current state of the quiz
-      localStorage.setItem('quiz', JSON.stringify({responses, responseCount, currentQuestion}))
+      dataLayer.save({responses, responseCount, currentQuestion})
     })
   })
 })($, JSON, localStorage)
