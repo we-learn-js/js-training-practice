@@ -3,7 +3,7 @@
     url: `data/quiz.json?${Date.now()}`
   }
 
-  const getOptionsMarkup = type => id => options => response => {
+  const getOptionsMarkup = type => options => id =>  response => {
     return '<div class="inline fields">'
       + options
         .map(({label}, j) => {
@@ -11,15 +11,15 @@
           const optionId = `${id}_${j}`
           return `<div class="field">
             <div class="ui checkbox ${type}">
-              <input type="${type}" ${checked} name="${id}" id="optionId" value="${label}">
+              <input type="${type}" ${checked} name="${id}" id="${optionId}" value="${label}">
               <label for="optionId">${label}</label>
             </div>
           </div>`
         }).join('')
       + '</div>'
   }
-  
-  const getInputsOptionsMarkup = id => options => response => {
+
+  const getInputsOptionsMarkup = options => id =>  response => {
     return '<table>'
       + options.map(({label}, j) =>  {
         const optionId = `${id}_${j}`
@@ -34,6 +34,10 @@
         <tr><td colspan="3">&nbsp;</tr></tr>` }).join('')
       + '</table>'
   }
+
+  const getInputMarkup = id =>  (response='') => `<div class="ui input fluid">
+      <input type="text" placeholder="Response..." name="${id}" value="${response}" />
+    </div>`
 
   const getCheckboxesMarkup = getOptionsMarkup('checkbox')
   const getRadiosMarkup = getOptionsMarkup('radio')
@@ -65,30 +69,25 @@
       questions[i].input = questions[i].input || { type:'input' }
       let {problem, input, input: {type, options}} = questions[i]
       let response = responses[i]
+      let name = `question_${i}`
       let inputHtml
-
 
       // Construct the input depending on question type
       switch (type) {
-
         // Multiple options
         case 'checkbox':
-          inputHtml = getCheckboxesMarkup(name)(options)(response)
-        case 'radio':
-          inputHtml = getRadiosMarkup(name)(options)(response)
+          inputHtml = getCheckboxesMarkup(options)(name)(response)
           break
-
+        case 'radio':
+          inputHtml = getRadiosMarkup(options)(name)(response)
+          break
           // Set of inputs (composed response)
         case 'inputs':
-          inputHtml = getInputsOptionsMarkup(name)(options)(response)
+          inputHtml = getInputsOptionsMarkup(options)(name)(response)
           break
-
           // Default: simple input
         default:
-          const value = responses[i] || ''
-          inputHtml = `<div class="ui input fluid">
-            <input type="text" placeholder="Response..." name="question_${i}" value="${value}" />
-            </div>`
+          inputHtml = getInputMarkup(name)(response)
       }
 
       $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
