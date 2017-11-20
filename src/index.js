@@ -3,6 +3,24 @@
     url: `data/quiz.json?${Date.now()}`
   }
 
+  const getOptionsMarkup = type => id => options => response => {
+    return '<div class="inline fields">'
+      + options
+        .map(({label}, j) =>  {
+          const checked = !!response && response.includes(option.label) ? 'checked' : ''
+          const optionId = `${id}_${j}`
+          return `<div class="field">
+            <div class="ui checkbox ${type}">
+              <input type="${type}" ${checked} name="${id}" id="optionId" value="${label}">
+              <label for="optionId">${label}</label>
+            </div>
+          </div>`
+        }).join('')
+      + '</div>'
+  }
+  const getCheckboxesMarkup = getOptionsMarkup('checkbox')
+  const getRadiosMarkup = getOptionsMarkup('radio')
+
   $.ajax({ url }).done(function(data) {
     let {questions} = data
     let quizData
@@ -29,28 +47,17 @@
     for (let i = 0; i < questions.length; i++) {
       questions[i].input = questions[i].input || { type:'input' }
       let {problem, input, input: {type, options}} = questions[i]
+      let response = responses[i]
       let inputHtml
-
 
       // Construct the input depending on question type
       switch (type) {
 
         // Multiple options
         case 'checkbox':
+          inputHtml = getCheckboxesMarkup(name)(options)(response)
         case 'radio':
-          inputHtml = '<div class="inline fields">'
-          for (j = 0; j < options.length; j++) {
-            const {[j]:option} = options
-            const checked = !!responses[i] && responses[i].includes(option.label) ? 'checked' : ''
-
-            inputHtml += `<div class="field">
-              <div class="ui checkbox ${type}">
-              <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}" value="${option.label}">
-              <label for="question_${i}_${j}">${option.label}</label>
-              </div>
-              </div>`
-          }
-          inputHtml += '</div>'
+          inputHtml = getRadiosMarkup(name)(options)(response)
           break
 
           // Set of inputs (composed response)
