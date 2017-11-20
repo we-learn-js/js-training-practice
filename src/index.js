@@ -6,8 +6,8 @@
   const getOptionsMarkup = type => id => options => response => {
     return '<div class="inline fields">'
       + options
-        .map(({label}, j) =>  {
-          const checked = !!response && response.includes(option.label) ? 'checked' : ''
+        .map(({label}, j) => {
+          const checked = !!response && response.includes(label) ? 'checked' : ''
           const optionId = `${id}_${j}`
           return `<div class="field">
             <div class="ui checkbox ${type}">
@@ -18,6 +18,23 @@
         }).join('')
       + '</div>'
   }
+  
+  const getInputsOptionsMarkup = id => options => response => {
+    return '<table>'
+      + options.map(({label}, j) =>  {
+        const optionId = `${id}_${j}`
+        const value = response && response[j] || ''
+        return `<tr>
+          <td><label for="${optionId}">${label}</label></td>
+          <td width="15px"></td>
+          <td><div class="ui input">
+            <input type="text" placeholder="Response..." name="${id}" id="${optionId}" value="${value}" />
+          </div></td>
+          </tr>
+        <tr><td colspan="3">&nbsp;</tr></tr>` }).join('')
+      + '</table>'
+  }
+
   const getCheckboxesMarkup = getOptionsMarkup('checkbox')
   const getRadiosMarkup = getOptionsMarkup('radio')
 
@@ -50,6 +67,7 @@
       let response = responses[i]
       let inputHtml
 
+
       // Construct the input depending on question type
       switch (type) {
 
@@ -62,21 +80,7 @@
 
           // Set of inputs (composed response)
         case 'inputs':
-          inputHtml = '<table>'
-          for (let j = 0; j < options.length; j++) {
-            const {[j]:option} = options
-            const value = responses[i] && responses[i][j] || ''
-
-            inputHtml += `<tr>
-              <td><label for="question_${i}_${j}">${option.label}</label></td>
-              <td width="15px"></td>
-              <td><div class="ui input">
-              <input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" />
-              </div></td>
-              </tr>
-              <tr><td colspan="3">&nbsp;</tr></tr>`
-          }
-          inputHtml += '</table>'
+          inputHtml = getInputsOptionsMarkup(name)(options)(response)
           break
 
           // Default: simple input
