@@ -53,9 +53,9 @@ $.ajax({
       case 'checkbox':
       case 'radio':
         var input = '<div class="inline fields">'
+        var type = question.input.type
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
-          var type = question.input.type
 
           if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
             var checked = 'checked'
