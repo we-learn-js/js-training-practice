@@ -57,7 +57,7 @@ $.ajax({
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
 
-          if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
+          if (responses[i] && responses[i].indexOf(option.label) !== -1) {
             var checked = 'checked'
           } else {
             var checked = ''
@@ -80,7 +80,7 @@ $.ajax({
           var option = question.input.options[j]
           var type = 'checkbox'
 
-          if (!!responses[i]) {
+          if (responses[i]) {
             var value = responses[i][j]
           } else {
             var value = ''
@@ -100,7 +100,7 @@ $.ajax({
 
         // Default: simple input
       default:
-        if (!!responses[i]) {
+        if (responses[i]) {
           var value = responses[i]
         } else {
           var value = ''
@@ -187,12 +187,12 @@ $.ajax({
         case 'checkbox':
         case 'radio':
         case 'inputs':
-          if (!!responses[i] && !!responses[i].join('')) {
+          if (responses[i] && responses[i].join('')) {
             responseCount++
           }
           break
         default:
-          if (!!responses[i]) {
+          if (responses[i]) {
             responseCount++
           }
       }
@@ -207,7 +207,7 @@ $.ajax({
     if (!responses[currentQuestion]) {
       isQuestionAnswered = false
     }
-    if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
+    if (responses[currentQuestion] && responses[currentQuestion].length) {
       for (j = 0; j < responses[currentQuestion].length; j++) {
         if (!responses[currentQuestion][j]) {
           isQuestionAnswered = false
