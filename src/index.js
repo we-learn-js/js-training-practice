@@ -56,12 +56,7 @@ $.ajax({
         var type = question.input.type
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
-
-          if (responses[i] && responses[i].indexOf(option.label) !== -1) {
-            var checked = 'checked'
-          } else {
-            var checked = ''
-          }
+          let checked = responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked' : ''
 
           input += '<div class="field">' +
             '<div class="ui checkbox ' + type + '">' +
@@ -79,12 +74,7 @@ $.ajax({
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
           var type = 'checkbox'
-
-          if (responses[i]) {
-            var value = responses[i][j]
-          } else {
-            var value = ''
-          }
+          let value = responses[i] ? responses[i][j] : ''
 
           input += '<tr>' +
             '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
@@ -100,11 +90,7 @@ $.ajax({
 
         // Default: simple input
       default:
-        if (responses[i]) {
-          var value = responses[i]
-        } else {
-          var value = ''
-        }
+        let value = responses[i] ? responses[i] : ''
         var input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
