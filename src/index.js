@@ -1,5 +1,3 @@
-let responseCount = 0
-let currentQuestion = 0
 let options = {
   url: 'data/quiz.json?' + Date.now()
 }
@@ -7,6 +5,8 @@ let options = {
 $.ajax({
   url: options.url
 }).done(function(data) {
+  let responseCount = 0
+  let currentQuestion = 0
   const questions = data.questions
 
   // Load data from past reponses
