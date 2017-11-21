@@ -1,18 +1,18 @@
-responseCount = 0
-currentQuestion = 0
-options = {
+let responseCount = 0
+let currentQuestion = 0
+let options = {
   url: 'data/quiz.json?' + Date.now()
 }
 
 $.ajax({
   url: options.url
 }).done(function(data) {
-  questions = data.questions
+  const questions = data.questions
 
   // Load data from past reponses
   try {
-    quizData = JSON.parse(localStorage.getItem('quiz'))
-    responses = quizData.responses || []
+    var quizData = JSON.parse(localStorage.getItem('quiz'))
+    var responses = quizData.responses || []
     currentQuestion = quizData.currentQuestion || -1
     responseCount = quizData.responseCount || -1
   } catch (e) {}
