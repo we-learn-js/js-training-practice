@@ -168,7 +168,7 @@ $.ajax({
     // Set the current responses counter
     let responseCount = 0
     for (i = 0; i < responses.length; i++) {
-      question = questions[i]
+      let question = questions[i]
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
