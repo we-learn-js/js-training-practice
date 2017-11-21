@@ -173,14 +173,10 @@ $.ajax({
         case 'checkbox':
         case 'radio':
         case 'inputs':
-          if (responses[i] && responses[i].join('')) {
-            responseCount++
-          }
+          responses[i] && responses[i].join('') && responseCount++
           break
         default:
-          if (responses[i]) {
-            responseCount++
-          }
+          responses[i] && responseCount++
       }
     }
 
