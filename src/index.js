@@ -38,7 +38,7 @@ $.ajax({
 
   // For each question of the json,
   for (var i = 0; i < data.questions.length; i++) {
-    question = data.questions[i]
+    let question = data.questions[i]
 
     if (question.input === undefined) {
       question.input = {
@@ -154,8 +154,8 @@ $.ajax({
 
   // Actions on every response submission
   $('#submit-response').on('click', function() {
-    var $inputs = $('[name^=question_' + currentQuestion + ']')
-    var question = questions[currentQuestion]
+    let $inputs = $('[name^=question_' + currentQuestion + ']')
+    let question = questions[currentQuestion]
 
     // Behavior for each question type to add response to array of responses
     switch (question.input.type) {
