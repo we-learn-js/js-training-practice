@@ -4,7 +4,7 @@
 
 The quiz is a simple quiz built on client from a [json file](https://github.com/we-learn-js/js-training-practice/blob/master/src/data/quiz.json).
 
-The has a simple schema:
+The quiz has a simple schema:
 
 | Property | Definition |
 | -- | -- |
