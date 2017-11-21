@@ -166,7 +166,7 @@ $.ajax({
     }
 
     // Set the current responses counter
-    var responseCount = 0
+    let responseCount = 0
     for (i = 0; i < responses.length; i++) {
       question = questions[i]
       switch (question.input.type) {
@@ -189,7 +189,7 @@ $.ajax({
       .css('width', (responseCount / questions.length * 100) + '%')
 
     // Check if question had a valid answer
-    isQuestionAnswered = true
+    let isQuestionAnswered = true
     if (!responses[currentQuestion]) {
       isQuestionAnswered = false
     }
