@@ -78,12 +78,23 @@
         <div class="content"><div class="header">${problem}</div></div>
         <div class="content">${inputHtml}</div>
       </div>`
-    ).css('display', 'none').get(0)
+    ).get(0)
   }
+  const appendToQuizForm = element => $('#quiz-form').append(element)
 
   const updateProgress = questions => responses =>
     $('#progress')
       .css('width', (responses / questions * 100) + '%')
+
+  const updateQuizViewStatus = current => {
+    $('#quiz-form')
+      .find(`[id^=question_]`)
+      .css('display', 'none')
+    $('#quiz-form')
+      .find(`#question_${current}`)
+      .css('display', 'block')
+  }
+
 
   $.ajax({ url }).done(function(data) {
     let {questions} = data
