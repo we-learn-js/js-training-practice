@@ -12,7 +12,7 @@ $.ajax({
   try {
     quizData = JSON.parse(localStorage.getItem('quiz')) || {}
   } catch (e) {}
-  
+
   let { responses = [], currentQuestion = 0, responseCount = 0 } = quizData
 
   // Append the progress bar to DOM
@@ -121,7 +121,7 @@ $.ajax({
   }
 
   // Add a reset button that will redirect to quiz start
-  $resetButton = $('<button class="ui button negative">Reset</button>')
+  const $resetButton = $('<button class="ui button negative">Reset</button>')
   $resetButton.on('click', function() {
     localStorage.removeItem('quiz')
     location.reload();
