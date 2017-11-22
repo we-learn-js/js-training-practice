@@ -44,22 +44,21 @@
 
   const getQuiz = () => JSON.parse(localStorage.getItem('quiz') || null) || {}
   const setQuiz = data => localStorage.setItem('quiz', JSON.stringify(data))
+  const setupQuizElement = (quizContainer, title) => {
+    $(document.body)
+      .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
+        <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
+        </div>`)
+    $(quizContainer)
+      .append(`<h1 class="ui header">${title}</h1>`)
+      .append('<form id="quiz-form" class="ui form"></form>')
+  }
 
   $.ajax({ url }).done(function(data) {
     let {questions} = data
     let {responses=[], currentQuestion=0, responseCount=0} = getQuiz()
 
-
-    // Append the progress bar to DOM
-    $('body')
-      .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
-        <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
-        </div>`)
-
-    // Append title and form to quiz
-    $('#quiz')
-      .append(`<h1 class="ui header">${data.title}</h1>`)
-      .append('<form id="quiz-form" class="ui form"></form>')
+    setupQuizElement(document.getElementById('quiz'), data.title)
 
     // For each question of the json,
     for (let i = 0; i < questions.length; i++) {
