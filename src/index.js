@@ -53,6 +53,34 @@
       .append(`<h1 class="ui header">${title}</h1>`)
       .append('<form id="quiz-form" class="ui form"></form>')
   }
+  const createQuestionElement = ({problem, input, input: {type, options}}) => name => response => {
+    let inputHtml
+
+    // Construct the input depending on question type
+    switch (type) {
+      // Multiple options
+      case 'checkbox':
+        inputHtml = getCheckboxesMarkup(options)(name)(response)
+        break
+      case 'radio':
+        inputHtml = getRadiosMarkup(options)(name)(response)
+        break
+        // Set of inputs (composed response)
+      case 'inputs':
+        inputHtml = getInputsOptionsMarkup(options)(name)(response)
+        break
+        // Default: simple input
+      default:
+        inputHtml = getInputMarkup(name)(response)
+    }
+
+    return $(`<div id="${name}" class="ui card" style="width: 100%;">
+        <div class="content"><div class="header">${problem}</div></div>
+        <div class="content">${inputHtml}</div>
+      </div>`
+    ).css('display', 'none').get(0)
+  }
+
   const updateProgress = questions => responses =>
     $('#progress')
       .css('width', (responses / questions * 100) + '%')
@@ -67,41 +95,14 @@
     // For each question of the json,
     for (let i = 0; i < questions.length; i++) {
       questions[i].input = questions[i].input || { type:'input' }
-      let {problem, input, input: {type, options}} = questions[i]
-      let response = responses[i]
-      let name = `question_${i}`
-      let inputHtml
-
-      // Construct the input depending on question type
-      switch (type) {
-        // Multiple options
-        case 'checkbox':
-          inputHtml = getCheckboxesMarkup(options)(name)(response)
-          break
-        case 'radio':
-          inputHtml = getRadiosMarkup(options)(name)(response)
-          break
-          // Set of inputs (composed response)
-        case 'inputs':
-          inputHtml = getInputsOptionsMarkup(options)(name)(response)
-          break
-          // Default: simple input
-        default:
-          inputHtml = getInputMarkup(name)(response)
-      }
-
-      $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
-          <div class="content"><div class="header">${problem}</div></div>
-          <div class="content">${inputHtml}</div>
-        </div>`
-      ).css('display', 'none')
+      $question = createQuestionElement(questions[i])(`question_${i}`)(responses[i])
 
       $('#quiz-form')
         .append($question)
 
       // Show current question
       $('#quiz-form')
-        .find(`#question-${currentQuestion}`)
+        .find(`#question_${currentQuestion}`)
         .css('display', 'block')
 
       updateQuizProgress(responseCount)
