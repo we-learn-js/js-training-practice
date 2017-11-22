@@ -37,7 +37,7 @@ $.ajax({
     .append('<form id="quiz-form" class="ui form"></form>')
 
   // For each question of the json,
-  for (var i = 0; i < data.questions.length; i++) {
+  for (let i = 0; i < data.questions.length; i++) {
     let question = data.questions[i]
 
     if (question.input === undefined) {
@@ -54,7 +54,7 @@ $.ajax({
       case 'radio':
         var input = '<div class="inline fields">'
         var type = question.input.type
-        for (j = 0; j < question.input.options.length; j++) {
+        for (let j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
           let checked = responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked' : ''
 
@@ -72,7 +72,7 @@ $.ajax({
       case 'inputs':
         var input = '<table>'
         var type = 'checkbox'
-        for (j = 0; j < question.input.options.length; j++) {
+        for (let j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
           let value = responses[i] ? responses[i][j] : ''
 
@@ -167,7 +167,7 @@ $.ajax({
 
     // Set the current responses counter
     let responseCount = 0
-    for (i = 0; i < responses.length; i++) {
+    for (let i = 0; i < responses.length; i++) {
       let question = questions[i]
       switch (question.input.type) {
         case 'checkbox':
@@ -190,7 +190,7 @@ $.ajax({
       isQuestionAnswered = false
     }
     if (responses[currentQuestion] && responses[currentQuestion].length) {
-      for (j = 0; j < responses[currentQuestion].length; j++) {
+      for (let j = 0; j < responses[currentQuestion].length; j++) {
         if (!responses[currentQuestion][j]) {
           isQuestionAnswered = false
         }
