@@ -94,13 +94,21 @@
     $('#progress')
       .css('width', (responses / questions * 100) + '%')
 
-  const updateQuizViewStatus = current => {
+  const updateQuizViewStatus = questions => current => {
     $('#quiz-form')
       .find(`[id^=question_]`)
       .css('display', 'none')
     $('#quiz-form')
       .find(`#question_${current}`)
       .css('display', 'block')
+
+    // Is case all questions have been responded
+    if (questions <= current ) {
+      $('#submit-response').css('display', 'none')
+      $('#quiz')
+        .append('<div>Thank you for your responses.<br /><br /> </div>')
+        .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+    }
   }
 
   const setupQuestions = questions => responses => {
@@ -177,14 +185,7 @@
       // Alert user of missing response
       alert('You must give a response')
     } else {
-      updateQuizViewStatus(++currentQuestion)
-
-      // If it was the las question, display final message
-      if (responseCount === questions.length) {
-        $('#submit-response').css('display', 'none')
-        $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-        $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-      }
+      updateQuizViewStatus(questions.length)(++currentQuestion)
     }
 
     // Save current state of the quiz
@@ -198,14 +199,7 @@
 
     setupQuizElement(document.getElementById('quiz'), data.title)
     setupQuestions(questions)(responses)
-    updateQuizViewStatus(currentQuestion)
+    updateQuizViewStatus(questions.length)(currentQuestion)
     updateQuizProgress(responseCount)
-
-    // Is case all questions have been responded
-    if (responseCount === questions.length) {
-      $('#submit-response').css('display', 'none')
-      $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-      $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-    }
   })
 })($, JSON, localStorage)
