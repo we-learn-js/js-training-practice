@@ -45,13 +45,21 @@
   const getQuiz = () => JSON.parse(localStorage.getItem('quiz') || null) || {}
   const setQuiz = data => localStorage.setItem('quiz', JSON.stringify(data))
   const setupQuizElement = (quizContainer, title) => {
+    const $resetButton = $('<button class="ui button negative">Reset</button>')
+    const $submitButton = $('<button id="submit-response" class="ui primary button">Submit response</button>')
+    $resetButton.on('click', resetQuiz)
+    $submitButton.on('click', submitResponse)
+
+    $(quizContainer)
+      .append(`<h1 class="ui header">${title}</h1>`)
+      .append('<form id="quiz-form" class="ui form"></form>')
+      .append($submitButton)
+      .append($resetButton)
+
     $(document.body)
       .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
         <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
         </div>`)
-    $(quizContainer)
-      .append(`<h1 class="ui header">${title}</h1>`)
-      .append('<form id="quiz-form" class="ui form"></form>')
   }
   const createQuestionElement = ({problem, input, input: {type, options}}) => name => response => {
     let inputHtml
@@ -95,6 +103,93 @@
       .css('display', 'block')
   }
 
+  const setupQuestions = questions => responses => {
+    const defaultInput = { input: {type:'input'} }
+    questions
+      .map(question => question.input ? question : Object.assign({}, defaultInput, question))
+      .map((question, i) => createQuestionElement(question)(`question_${i}`)(responses[i]))
+      .map(appendToQuizForm)
+  }
+
+  const resetQuiz = () => {
+    localStorage.removeItem('quiz')
+    location.reload();
+  }
+
+  const submitResponse = function() {
+    const $inputs = $(`[name^=question_${currentQuestion}`)
+    const question = questions[currentQuestion]
+    let response = responses[currentQuestion]
+
+
+    // Behavior for each question type to add response to array of responses
+    switch (question.input.type) {
+      case 'checkbox':
+      case 'radio':
+        response = []
+        $(`[name=${$inputs.attr('name')}]:checked`).each(function(i, input) {
+          response.push(input.value)
+        })
+        response = response.length ? response : null
+        break
+      case 'inputs':
+        response = []
+        $inputs.each(function(i, input) {
+          response.push(input.value)
+        })
+        break
+      default:
+        response = $inputs.val()
+    }
+
+
+
+    // Set the current responses counter
+    responses[currentQuestion] = response
+    let responseCount = 0
+    for (let i = 0; i < responses.length; i++) {
+      let question = questions[i]
+      let response = responses[i]
+      switch (question.input.type) {
+        case 'checkbox':
+        case 'radio':
+        case 'inputs':
+          responseCount += !!response && !!response.join('')
+          break
+        default:
+          responseCount += !!response
+      }
+    }
+
+    updateQuizProgress(responseCount)
+
+    // Check if question had a valid answer
+    let isQuestionAnswered = !!response
+    if (response && response.length) {
+      for (let j = 0; j < response.length; j++) {
+        if (!response[j]) {
+          isQuestionAnswered = false
+        }
+      }
+    }
+
+    if (!isQuestionAnswered) {
+      // Alert user of missing response
+      alert('You must give a response')
+    } else {
+      updateQuizViewStatus(++currentQuestion)
+
+      // If it was the las question, display final message
+      if (responseCount === questions.length) {
+        $('#submit-response').css('display', 'none')
+        $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
+        $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+      }
+    }
+
+    // Save current state of the quiz
+    setQuiz({responses, responseCount, currentQuestion})
+  }
 
   $.ajax({ url }).done(function(data) {
     let {questions} = data
@@ -102,26 +197,9 @@
     const updateQuizProgress = updateProgress(questions.length)
 
     setupQuizElement(document.getElementById('quiz'), data.title)
-
-    // For each question of the json,
-    for (let i = 0; i < questions.length; i++) {
-      questions[i].input = questions[i].input || { type:'input' }
-      $question = createQuestionElement(questions[i])(`question_${i}`)(responses[i])
-
-      $('#quiz-form')
-        .append($question)
-
-      // Show current question
-      $('#quiz-form')
-        .find(`#question_${currentQuestion}`)
-        .css('display', 'block')
-
-      updateQuizProgress(responseCount)
-    }
-
-    // Add button to submit response
-    $('#quiz')
-      .append('<button id="submit-response" class="ui primary button">Submit response</button>')
+    setupQuestions(questions)(responses)
+    updateQuizViewStatus(currentQuestion)
+    updateQuizProgress(responseCount)
 
     // Is case all questions have been responded
     if (responseCount === questions.length) {
@@ -129,95 +207,5 @@
       $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
       $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
     }
-
-    // Add a reset button that will redirect to quiz start
-    const $resetButton = $('<button class="ui button negative">Reset</button>')
-    $resetButton.on('click', function() {
-      localStorage.removeItem('quiz')
-      location.reload();
-    })
-    $('#quiz').append($resetButton)
-
-    // Actions on every response submission
-    $('#submit-response').on('click', function() {
-      const $inputs = $(`[name^=question_${currentQuestion}`)
-      const question = questions[currentQuestion]
-      let response = responses[currentQuestion]
-
-      // Behavior for each question type to add response to array of responses
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-          response = []
-          $(`[name=${$inputs.attr('name')}]:checked`).each(function(i, input) {
-            response.push(input.value)
-          })
-          response = response.length ? response : null
-          break
-        case 'inputs':
-          response = []
-          $inputs.each(function(i, input) {
-            response.push(input.value)
-          })
-          break
-        default:
-          response = $inputs.val()
-      }
-
-
-
-      // Set the current responses counter
-      responses[currentQuestion] = response
-      let responseCount = 0
-      for (let i = 0; i < responses.length; i++) {
-        let question = questions[i]
-        let response = responses[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            responseCount += !!response && !!response.join('')
-            break
-          default:
-            responseCount += !!response
-        }
-      }
-
-      updateQuizProgress(responseCount)
-
-      // Check if question had a valid answer
-      let isQuestionAnswered = !!response
-      if (response && response.length) {
-        for (let j = 0; j < response.length; j++) {
-          if (!response[j]) {
-            isQuestionAnswered = false
-          }
-        }
-      }
-
-      if (!isQuestionAnswered) {
-        // Alert user of missing response
-        alert('You must give a response')
-      } else {
-
-        // Display next question
-        $('#quiz-form')
-          .find(`#question-${currentQuestion}`).css('display', 'none')
-
-
-        $('#quiz-form')
-          .find(`#question-${++currentQuestion}`).css('display', 'block')
-
-        // If it was the las question, display final message
-        if (responseCount === questions.length) {
-          $('#submit-response').css('display', 'none')
-          $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-          $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-        }
-      }
-
-      // Save current state of the quiz
-      setQuiz({responses, responseCount, currentQuestion})
-    })
   })
 })($, JSON, localStorage)
