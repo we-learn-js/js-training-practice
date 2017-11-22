@@ -12,7 +12,7 @@
           return `<div class="field">
             <div class="ui checkbox ${type}">
               <input type="${type}" ${checked} name="${id}" id="${optionId}" value="${label}">
-              <label for="optionId">${label}</label>
+              <label for="${optionId}">${label}</label>
             </div>
           </div>`
         }).join('')
@@ -42,15 +42,12 @@
   const getCheckboxesMarkup = getOptionsMarkup('checkbox')
   const getRadiosMarkup = getOptionsMarkup('radio')
 
+  const getQuiz = () => JSON.parse(localStorage.getItem('quiz') || null) || {}
+  const setQuiz = data => localStorage.setItem('quiz', JSON.stringify(data))
+
   $.ajax({ url }).done(function(data) {
     let {questions} = data
-    let quizData
-
-    // Load data from past reponses
-    try {
-      quizData = JSON.parse(localStorage.getItem('quiz')) || {}
-    } catch (e) {}
-    let {responses=[], currentQuestion=0, responseCount=0} = quizData
+    let {responses=[], currentQuestion=0, responseCount=0} = getQuiz()
 
 
     // Append the progress bar to DOM
@@ -211,7 +208,7 @@
       }
 
       // Save current state of the quiz
-      localStorage.setItem('quiz', JSON.stringify({responses, responseCount, currentQuestion}))
+      setQuiz({responses, responseCount, currentQuestion})
     })
   })
 })($, JSON, localStorage)
