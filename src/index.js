@@ -53,6 +53,9 @@
       .append(`<h1 class="ui header">${title}</h1>`)
       .append('<form id="quiz-form" class="ui form"></form>')
   }
+  const updateProgress = questions => responses =>
+    $('#progress')
+      .css('width', (responses / questions * 100) + '%')
 
   $.ajax({ url }).done(function(data) {
     let {questions} = data
@@ -100,9 +103,7 @@
         .find(`#question-${currentQuestion}`)
         .css('display', 'block')
 
-      // Update progress bar
-      $('#progress')
-        .css('width', (responseCount / questions.length * 100) + '%')
+      updateProgress(questions.length)(responseCount)
     }
 
     // Add button to submit response
@@ -169,11 +170,7 @@
         }
       }
 
-      // Update progress bar
-      $('#progress')
-        .css('width', (responseCount / questions.length * 100) + '%')
-
-
+      updateProgress(questions.length)(responseCount)
 
       // Check if question had a valid answer
       let isQuestionAnswered = !!response
