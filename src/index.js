@@ -5,25 +5,15 @@ let options = {
 $.ajax({
   url: options.url
 }).done(function(data) {
-  let responseCount = 0
-  let currentQuestion = 0
   const questions = data.questions
 
+  var quizData
   // Load data from past reponses
   try {
-    var quizData = JSON.parse(localStorage.getItem('quiz'))
-    var responses = quizData.responses || []
-    currentQuestion = quizData.currentQuestion || -1
-    responseCount = quizData.responseCount || -1
+    quizData = JSON.parse(localStorage.getItem('quiz')) || {}
   } catch (e) {}
-
-  if (quizData == null) {
-    quizData = {
-      responses: []
-    }
-    responses = quizData.responses
-  }
-
+  
+  let { responses = [], currentQuestion = 0, responseCount = 0 } = quizData
 
   // Append the progress bar to DOM
   $('body')
