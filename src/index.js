@@ -60,6 +60,7 @@
   $.ajax({ url }).done(function(data) {
     let {questions} = data
     let {responses=[], currentQuestion=0, responseCount=0} = getQuiz()
+    const updateQuizProgress = updateProgress(questions.length)
 
     setupQuizElement(document.getElementById('quiz'), data.title)
 
@@ -103,7 +104,7 @@
         .find(`#question-${currentQuestion}`)
         .css('display', 'block')
 
-      updateProgress(questions.length)(responseCount)
+      updateQuizProgress(responseCount)
     }
 
     // Add button to submit response
@@ -170,7 +171,7 @@
         }
       }
 
-      updateProgress(questions.length)(responseCount)
+      updateQuizProgress(responseCount)
 
       // Check if question had a valid answer
       let isQuestionAnswered = !!response
