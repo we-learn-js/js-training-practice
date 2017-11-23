@@ -56,7 +56,6 @@ $.ajax({
         // Set of inputs (composed response)
       case 'inputs':
         var input = '<table>'
-        var type = 'checkbox'
         for (let j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
           let value = responses[i] ? responses[i][j] : ''
