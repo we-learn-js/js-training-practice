@@ -29,12 +29,7 @@ $.ajax({
   // For each question of the json,
   for (let i = 0; i < data.questions.length; i++) {
     let question = data.questions[i]
-
-    if (question.input === undefined) {
-      question.input = {
-        type: 'input'
-      }
-    }
+    question.input = question.input || { type: 'input' }
 
     // Construct the input depending on question type
     switch (question.input.type) {
