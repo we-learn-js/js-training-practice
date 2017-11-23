@@ -31,7 +31,7 @@ $.ajax({
     let question = data.questions[i]
     question.input = question.input || { type: 'input' }
 
-    let { input: { type, options } } = question
+    let { input: { type, options }, problem } = question
 
     // Construct the input depending on question type
     switch (type) {
@@ -83,7 +83,7 @@ $.ajax({
 
     $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">' +
       '<div class="content">' +
-      '<div class="header">' + question.problem + '</div>' +
+      '<div class="header">' + problem + '</div>' +
       '</div>' +
       '<div class="content">' +
       input +
