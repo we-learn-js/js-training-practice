@@ -31,14 +31,15 @@ $.ajax({
     let question = data.questions[i]
     question.input = question.input || { type: 'input' }
 
+    let { input: { type } } = question
+
     // Construct the input depending on question type
-    switch (question.input.type) {
+    switch (type) {
 
       // Multiple options
       case 'checkbox':
       case 'radio':
         var input = '<div class="inline fields">'
-        var type = question.input.type
         for (let j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
           let checked = responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked' : ''
