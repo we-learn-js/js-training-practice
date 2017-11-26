@@ -74,9 +74,9 @@
           // Default: simple input
         default:
           const value = responses[i] || ''
-          inputHtml = '<div class="ui input fluid">' +
-            '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
-            '</div>'
+          inputHtml = `<div class="ui input fluid">
+            <input type="text" placeholder="Response..." name="question_${i}" value="${value}" />
+            </div>`
       }
 
       $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">' +
