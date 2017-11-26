@@ -31,26 +31,25 @@
       let {problem, input, input: {type, options}} = questions[i]
       let inputHtml
 
-
       // Construct the input depending on question type
       switch (type) {
 
         // Multiple options
         case 'checkbox':
         case 'radio':
-          inputHtml = '<div class="inline fields">'
+          inputHtml = `<div class="inline fields">`
           for (j = 0; j < options.length; j++) {
             const {[j]:option} = options
             const checked = !!responses[i] && responses[i].includes(option.label) ? 'checked' : ''
 
-            inputHtml += '<div class="field">' +
-              '<div class="ui checkbox ' + type + '">' +
-              '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">' +
-              '<label for="question_' + i + '_' + j + '">' + option.label + '</label>' +
-              '</div>' +
-              '</div>'
+            inputHtml += `<div class="field">
+              <div class="ui checkbox ${type}">
+              <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}" value="${option.label}">
+              <label for="question_${i}_${j}">${option.label}</label>
+              </div>
+              </div>`
           }
-          inputHtml += '</div>'
+          inputHtml += `</div>`
           break
 
           // Set of inputs (composed response)
