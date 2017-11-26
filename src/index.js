@@ -123,7 +123,7 @@
 
     // Actions on every response submission
     $('#submit-response').on('click', function() {
-      const $inputs = $('[name^=question_' + currentQuestion + ']')
+      const $inputs = $(`[name^=question_${currentQuestion}]`)
       const question = questions[currentQuestion]
       let response = responses[currentQuestion]
 
@@ -132,7 +132,7 @@
         case 'checkbox':
         case 'radio':
           response = []
-          $('[name=' + $inputs.attr('name') + ']:checked').each(function(i, input) {
+          $(`[name=${$inputs.attr('name')}]:checked`).each(function(i, input) {
             response.push(input.value)
           })
           response = response.length ? response : null
