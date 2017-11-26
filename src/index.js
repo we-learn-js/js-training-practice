@@ -13,7 +13,7 @@ $.ajax({
     quizData = JSON.parse(localStorage.getItem('quiz')) || {}
   } catch (e) {}
 
-  let { responses = [], currentQuestion = 0, responseCount = 0 } = quizData
+  let { responses = [], currentQuestion: currentQuestionIndex = 0, responseCount = 0 } = quizData
 
   // Append the progress bar to DOM
   $('body')
@@ -97,7 +97,7 @@ $.ajax({
 
     // Show current question
     $('#quiz-form')
-      .find('#question-' + currentQuestion)
+      .find('#question-' + currentQuestionIndex)
       .css('display', 'block')
 
     // Update progress bar
@@ -126,29 +126,29 @@ $.ajax({
 
   // Actions on every response submission
   $('#submit-response').on('click', function() {
-    const $inputs = $('[name^=question_' + currentQuestion + ']')
-    const question = questions[currentQuestion]
+    const $inputs = $('[name^=question_' + currentQuestionIndex + ']')
+    const question = questions[currentQuestionIndex]
 
     // Behavior for each question type to add response to array of responses
     switch (question.input.type) {
       case 'checkbox':
       case 'radio':
-        responses[currentQuestion] = []
+        responses[currentQuestionIndex] = []
         $('[name=' + $inputs.attr('name') + ']:checked').each(function(i, input) {
-          responses[currentQuestion].push(input.value)
+          responses[currentQuestionIndex].push(input.value)
         })
-        if (responses[currentQuestion].length === 0) {
-          responses[currentQuestion] = null
+        if (responses[currentQuestionIndex].length === 0) {
+          responses[currentQuestionIndex] = null
         }
         break
       case 'inputs':
-        responses[currentQuestion] = []
+        responses[currentQuestionIndex] = []
         $inputs.each(function(i, input) {
-          responses[currentQuestion].push(input.value)
+          responses[currentQuestionIndex].push(input.value)
         })
         break
       default:
-        responses[currentQuestion] = $inputs.val()
+        responses[currentQuestionIndex] = $inputs.val()
     }
 
     // Set the current responses counter
@@ -172,12 +172,12 @@ $.ajax({
 
     // Check if question had a valid answer
     let isQuestionAnswered = true
-    if (!responses[currentQuestion]) {
+    if (!responses[currentQuestionIndex]) {
       isQuestionAnswered = false
     }
-    if (responses[currentQuestion] && responses[currentQuestion].length) {
-      for (let j = 0; j < responses[currentQuestion].length; j++) {
-        if (!responses[currentQuestion][j]) {
+    if (responses[currentQuestionIndex] && responses[currentQuestionIndex].length) {
+      for (let j = 0; j < responses[currentQuestionIndex].length; j++) {
+        if (!responses[currentQuestionIndex][j]) {
           isQuestionAnswered = false
         }
       }
@@ -190,11 +190,11 @@ $.ajax({
 
       // Display next question
       $('#quiz-form')
-        .find('#question-' + currentQuestion).css('display', 'none')
-      currentQuestion = currentQuestion + 1
+        .find('#question-' + currentQuestionIndex).css('display', 'none')
+      currentQuestionIndex = currentQuestionIndex + 1
 
       $('#quiz-form')
-        .find('#question-' + currentQuestion).css('display', 'block')
+        .find('#question-' + currentQuestionIndex).css('display', 'block')
 
       // If it was the las question, display final message
       if (responseCount === questions.length) {
@@ -207,7 +207,7 @@ $.ajax({
     // Save current state of the quiz
     quizData.responses = responses
     quizData.responseCount = responseCount
-    quizData.currentQuestion = currentQuestion
+    quizData.currentQuestion = currentQuestionIndex
     localStorage.setItem('quiz', JSON.stringify(quizData))
   })
 })
