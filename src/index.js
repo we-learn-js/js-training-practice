@@ -189,11 +189,11 @@
 
         // Display next question
         $('#quiz-form')
-          .find('#question-' + currentQuestion).css('display', 'none')
+          .find(`#question-${currentQuestion}`).css('display', 'none')
 
 
         $('#quiz-form')
-          .find('#question-' + ++currentQuestion).css('display', 'block')
+          .find(`#question-${++currentQuestion}`).css('display', 'block')
 
         // If it was the las question, display final message
         if (responseCount === questions.length) {
