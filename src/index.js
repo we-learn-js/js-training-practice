@@ -79,14 +79,14 @@
             </div>`
       }
 
-      $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">' +
-        '<div class="content">' +
-        '<div class="header">' + problem + '</div>' +
-        '</div>' +
-        '<div class="content">' +
-        inputHtml +
-        '</div>' +
-        '</div>'
+      $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
+        <div class="content">
+        <div class="header">${problem}</div>
+        </div>
+        <div class="content">
+        ${inputHtml}
+        </div>
+        </div>`
       ).css('display', 'none')
 
       $('#quiz-form')
