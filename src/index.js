@@ -104,13 +104,13 @@
 
     // Add button to submit response
     $('#quiz')
-      .append('<button id="submit-response" class="ui primary button">Submit response</button>')
+      .append(`<button id="submit-response" class="ui primary button">Submit response</button>`)
 
     // Is case all questions have been responded
     if (responseCount === questions.length) {
       $('#submit-response').css('display', 'none')
-      $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-      $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+      $('#quiz').append(`<div>Thank you for your responses.<br /><br /> </div>`)
+      $('#quiz').append(`<button class="ui primary button" onclick="window.print()" >Print responses</button>`)
     }
 
     // Add a reset button that will redirect to quiz start
@@ -198,8 +198,8 @@
         // If it was the las question, display final message
         if (responseCount === questions.length) {
           $('#submit-response').css('display', 'none')
-          $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-          $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+          $('#quiz').append(`<div>Thank you for your responses.<br /><br /> </div>`)
+          $('#quiz').append(`<button class="ui primary button" onclick="window.print()" >Print responses</button>`)
         }
       }
 
