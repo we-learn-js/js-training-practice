@@ -33,36 +33,36 @@ $.ajax({
 
     let { input: { type, options }, problem } = question
 
-    let input
+    let questionInputHtml
     // Construct the input depending on question type
     switch (type) {
 
       // Multiple options
       case 'checkbox':
       case 'radio':
-        input = '<div class="inline fields">'
+        questionInputHtml = '<div class="inline fields">'
         for (let j = 0; j < options.length; j++) {
           var option = options[j]
           let checked = responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked' : ''
 
-          input += '<div class="field">' +
+          questionInputHtml += '<div class="field">' +
             '<div class="ui checkbox ' + type + '">' +
             '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">' +
             '<label for="question_' + i + '_' + j + '">' + option.label + '</label>' +
             '</div>' +
             '</div>'
         }
-        input += '</div>'
+        questionInputHtml += '</div>'
         break
 
         // Set of inputs (composed response)
       case 'inputs':
-        input = '<table>'
+        questionInputHtml = '<table>'
         for (let j = 0; j < options.length; j++) {
           var option = options[j]
           let value = responses[i] ? responses[i][j] : ''
 
-          input += '<tr>' +
+          questionInputHtml += '<tr>' +
             '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
             '<td width="15px"></td>' +
             '<td><div class="ui input">' +
@@ -71,13 +71,13 @@ $.ajax({
             '</tr>' +
             '<tr><td colspan="3">&nbsp;</tr></tr>'
         }
-        input += '</table>'
+        questionInputHtml += '</table>'
         break
 
         // Default: simple input
       default:
         let value = responses[i] ? responses[i] : ''
-        input = '<div class="ui input fluid">' +
+        questionInputHtml = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
     }
@@ -87,7 +87,7 @@ $.ajax({
       '<div class="header">' + problem + '</div>' +
       '</div>' +
       '<div class="content">' +
-      input +
+      questionInputHtml +
       '</div>' +
       '</div>'
     ).css('display', 'none')
