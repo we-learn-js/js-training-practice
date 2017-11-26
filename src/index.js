@@ -126,8 +126,8 @@ $.ajax({
 
   // Actions on every response submission
   $('#submit-response').on('click', function() {
-    let $inputs = $('[name^=question_' + currentQuestion + ']')
-    let question = questions[currentQuestion]
+    const $inputs = $('[name^=question_' + currentQuestion + ']')
+    const question = questions[currentQuestion]
 
     // Behavior for each question type to add response to array of responses
     switch (question.input.type) {
