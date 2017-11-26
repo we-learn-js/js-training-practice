@@ -127,10 +127,10 @@ $.ajax({
   // Actions on every response submission
   $('#submit-response').on('click', function() {
     const $inputs = $('[name^=question_' + currentQuestionIndex + ']')
-    const question = questions[currentQuestionIndex]
+    const currentQuestion = questions[currentQuestionIndex]
 
     // Behavior for each question type to add response to array of responses
-    switch (question.input.type) {
+    switch (currentQuestion.input.type) {
       case 'checkbox':
       case 'radio':
         responses[currentQuestionIndex] = []
