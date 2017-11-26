@@ -33,13 +33,14 @@ $.ajax({
 
     let { input: { type, options }, problem } = question
 
+    let input
     // Construct the input depending on question type
     switch (type) {
 
       // Multiple options
       case 'checkbox':
       case 'radio':
-        var input = '<div class="inline fields">'
+        input = '<div class="inline fields">'
         for (let j = 0; j < options.length; j++) {
           var option = options[j]
           let checked = responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked' : ''
@@ -56,7 +57,7 @@ $.ajax({
 
         // Set of inputs (composed response)
       case 'inputs':
-        var input = '<table>'
+        input = '<table>'
         for (let j = 0; j < options.length; j++) {
           var option = options[j]
           let value = responses[i] ? responses[i][j] : ''
@@ -76,7 +77,7 @@ $.ajax({
         // Default: simple input
       default:
         let value = responses[i] ? responses[i] : ''
-        var input = '<div class="ui input fluid">' +
+        input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
     }
