@@ -128,28 +128,31 @@ $.ajax({
   $('#submit-response').on('click', function() {
     const $inputs = $('[name^=question_' + currentQuestionIndex + ']')
     const currentQuestion = questions[currentQuestionIndex]
+    let currentResponse = responses[currentQuestionIndex]
 
     // Behavior for each question type to add response to array of responses
     switch (currentQuestion.input.type) {
       case 'checkbox':
       case 'radio':
-        responses[currentQuestionIndex] = []
+        currentResponse = []
         $('[name=' + $inputs.attr('name') + ']:checked').each(function(i, input) {
-          responses[currentQuestionIndex].push(input.value)
+          currentResponse.push(input.value)
         })
-        if (responses[currentQuestionIndex].length === 0) {
-          responses[currentQuestionIndex] = null
+        if (currentResponse.length === 0) {
+          currentResponse = null
         }
         break
       case 'inputs':
-        responses[currentQuestionIndex] = []
+        currentResponse = []
         $inputs.each(function(i, input) {
-          responses[currentQuestionIndex].push(input.value)
+          currentResponse.push(input.value)
         })
         break
       default:
-        responses[currentQuestionIndex] = $inputs.val()
+        currentResponse = $inputs.val()
     }
+
+    responses[currentQuestionIndex] = currentResponse
 
     // Set the current responses counter
     let responseCount = 0
@@ -172,12 +175,12 @@ $.ajax({
 
     // Check if question had a valid answer
     let isQuestionAnswered = true
-    if (!responses[currentQuestionIndex]) {
+    if (!currentResponse) {
       isQuestionAnswered = false
     }
-    if (responses[currentQuestionIndex] && responses[currentQuestionIndex].length) {
-      for (let j = 0; j < responses[currentQuestionIndex].length; j++) {
-        if (!responses[currentQuestionIndex][j]) {
+    if (currentResponse && currentResponse.length) {
+      for (let j = 0; j < currentResponse.length; j++) {
+        if (!currentResponse[j]) {
           isQuestionAnswered = false
         }
       }
