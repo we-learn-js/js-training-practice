@@ -174,10 +174,8 @@ $.ajax({
       .css('width', (responseCount / questions.length * 100) + '%')
 
     // Check if question had a valid answer
-    let isQuestionAnswered = true
-    if (!currentResponse) {
-      isQuestionAnswered = false
-    }
+    let isQuestionAnswered = !!currentResponse
+
     if (currentResponse && currentResponse.length) {
       for (let j = 0; j < currentResponse.length; j++) {
         if (!currentResponse[j]) {
