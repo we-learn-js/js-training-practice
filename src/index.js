@@ -22,8 +22,8 @@
 
     // Append title and form to quiz
     $('#quiz')
-      .append('<h1 class="ui header">' + data.title + '</h1>')
-      .append('<form id="quiz-form" class="ui form"></form>')
+      .append(`<h1 class="ui header">${data.title}</h1>`)
+      .append(`<form id="quiz-form" class="ui form"></form>`)
 
     // For each question of the json,
     for (let i = 0; i < questions.length; i++) {
