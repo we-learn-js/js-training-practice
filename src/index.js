@@ -16,9 +16,9 @@
 
     // Append the progress bar to DOM
     $('body')
-      .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">' +
-        '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>' +
-        '</div>')
+      .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
+        <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
+        </div>`)
 
     // Append title and form to quiz
     $('#quiz')
