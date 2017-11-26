@@ -1,3 +1,5 @@
+function runApp($, JSON, localStorage) {
+
 let options = {
   url: 'data/quiz.json?' + Date.now()
 }
@@ -212,3 +214,7 @@ $.ajax({
     localStorage.setItem('quiz', JSON.stringify(quizData))
   })
 })
+
+}
+
+runApp($, JSON, localStorage)
