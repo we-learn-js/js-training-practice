@@ -54,21 +54,21 @@
 
           // Set of inputs (composed response)
         case 'inputs':
-          inputHtml = '<table>'
+          inputHtml = `<table>`
           for (j = 0; j < options.length; j++) {
             const {[j]:option} = options
             const value = responses[i] && responses[i][j] || ''
 
-            inputHtml += '<tr>' +
-              '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
-              '<td width="15px"></td>' +
-              '<td><div class="ui input">' +
-              '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />' +
-              '</div></td>' +
-              '</tr>' +
-              '<tr><td colspan="3">&nbsp;</tr></tr>'
+            inputHtml += `<tr>
+              <td><label for="question_${i}_${j}">${option.label}</label></td>
+              <td width="15px"></td>
+              <td><div class="ui input">
+              <input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" />
+              </div></td>
+              </tr>
+              <tr><td colspan="3">&nbsp;</tr></tr>`
           }
-          inputHtml += '</table>'
+          inputHtml += `</table>`
           break
 
           // Default: simple input
