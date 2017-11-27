@@ -5,14 +5,9 @@
 
   $.ajax({ url }).done(function(data) {
     let {questions} = data
-    let quizData
-
-    // Load data from past reponses
-    try {
-      quizData = JSON.parse(localStorage.getItem('quiz')) || {}
-    } catch (e) {}
+    
+    let quizData = loadDataFromPastResponses()
     let {responses=[], currentQuestion=0, responseCount=0} = quizData
-
 
     // Append the progress bar to DOM
     $('body')
@@ -205,3 +200,14 @@
     })
   })
 })($, JSON, localStorage)
+
+function loadDataFromPastResponses() {
+  let quizData
+
+  // Load data from past reponses
+  try {
+    quizData = JSON.parse(localStorage.getItem('quiz')) || {}
+  } catch (e) {}
+
+  return quizData
+}
