@@ -5,15 +5,11 @@
 
   $.ajax({ url }).done(function(data) {
     let {questions} = data
-    
+
     let quizData = loadDataFromPastResponses()
     let {responses=[], currentQuestion=0, responseCount=0} = quizData
 
-    // Append the progress bar to DOM
-    $('body')
-      .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
-        <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
-        </div>`)
+    appendProgressBarToDOM()
 
     // Append title and form to quiz
     $('#quiz')
@@ -210,4 +206,12 @@ function loadDataFromPastResponses() {
   } catch (e) {}
 
   return quizData
+}
+
+function appendProgressBarToDOM() {
+  // Append the progress bar to DOM
+  $('body')
+    .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
+      <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
+      </div>`)
 }
