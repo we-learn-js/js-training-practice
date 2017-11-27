@@ -99,7 +99,7 @@
 
       // Update progress bar
       $('#progress')
-        .css('width', (responseCount / questions.length * 100) + '%')
+        .css('width', `${(responseCount / questions.length * 100)}%`)
     }
 
     // Add button to submit response
@@ -168,7 +168,7 @@
 
       // Update progress bar
       $('#progress')
-        .css('width', (responseCount / questions.length * 100) + '%')
+        .css('width', `${(responseCount / questions.length * 100)}%`)
 
 
 
