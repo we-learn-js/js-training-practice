@@ -11,10 +11,7 @@
 
     appendProgressBarToDOM()
 
-    // Append title and form to quiz
-    $('#quiz')
-      .append(`<h1 class="ui header">${data.title}</h1>`)
-      .append('<form id="quiz-form" class="ui form"></form>')
+    appendTitleAndFormToQuiz(data.title)
 
     // For each question of the json,
     for (let i = 0; i < questions.length; i++) {
@@ -214,4 +211,11 @@ function appendProgressBarToDOM() {
     .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
       <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
       </div>`)
+}
+
+function appendTitleAndFormToQuiz(title) {
+  // Append title and form to quiz
+  $('#quiz')
+    .append(`<h1 class="ui header">${title}</h1>`)
+    .append('<form id="quiz-form" class="ui form"></form>')
 }
