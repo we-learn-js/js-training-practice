@@ -1,6 +1,6 @@
 (function($, JSON, localStorage){
   const {url} = options = {
-    url: 'data/quiz.json?' + Date.now()
+    url: `data/quiz.json?${Date.now()}`
   }
 
   $.ajax({ url }).done(function(data) {
