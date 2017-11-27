@@ -94,7 +94,7 @@
 
       // Show current question
       $('#quiz-form')
-        .find('#question-' + currentQuestion)
+        .find(`#question-${currentQuestion}`)
         .css('display', 'block')
 
       // Update progress bar
