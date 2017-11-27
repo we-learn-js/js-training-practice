@@ -10,63 +10,13 @@
     let {responses=[], currentQuestion=0, responseCount=0} = quizData
 
     appendProgressBarToDOM()
-
     appendTitleAndFormToQuiz(data.title)
 
     // For each question of the json,
     for (let i = 0; i < questions.length; i++) {
       questions[i].input = questions[i].input || { type:'input' }
       let {problem, input, input: {type, options}} = questions[i]
-      let inputHtml
-
-
-      // Construct the input depending on question type
-      switch (type) {
-
-        // Multiple options
-        case 'checkbox':
-        case 'radio':
-          inputHtml = '<div class="inline fields">'
-          for (j = 0; j < options.length; j++) {
-            const {[j]:option} = options
-            const checked = !!responses[i] && responses[i].includes(option.label) ? 'checked' : ''
-
-            inputHtml += `<div class="field">
-              <div class="ui checkbox ${type}">
-              <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}" value="${option.label}">
-              <label for="question_${i}_${j}">${option.label}</label>
-              </div>
-              </div>`
-          }
-          inputHtml += '</div>'
-          break
-
-          // Set of inputs (composed response)
-        case 'inputs':
-          inputHtml = '<table>'
-          for (let j = 0; j < options.length; j++) {
-            const {[j]:option} = options
-            const value = responses[i] && responses[i][j] || ''
-
-            inputHtml += `<tr>
-              <td><label for="question_${i}_${j}">${option.label}</label></td>
-              <td width="15px"></td>
-              <td><div class="ui input">
-              <input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" />
-              </div></td>
-              </tr>
-              <tr><td colspan="3">&nbsp;</tr></tr>`
-          }
-          inputHtml += '</table>'
-          break
-
-          // Default: simple input
-        default:
-          const value = responses[i] || ''
-          inputHtml = `<div class="ui input fluid">
-            <input type="text" placeholder="Response..." name="question_${i}" value="${value}" />
-            </div>`
-      }
+      let inputHtml = constructQuestionInputHtml(i, type, options, responses)
 
       $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
           <div class="content"><div class="header">${problem}</div></div>
@@ -218,4 +168,59 @@ function appendTitleAndFormToQuiz(title) {
   $('#quiz')
     .append(`<h1 class="ui header">${title}</h1>`)
     .append('<form id="quiz-form" class="ui form"></form>')
+}
+
+function constructQuestionInputHtml(questionIndex, type, options, responses) {
+  let inputHtml
+  let i = questionIndex
+
+  // Construct the input depending on question type
+  switch (type) {
+
+    // Multiple options
+    case 'checkbox':
+    case 'radio':
+      inputHtml = '<div class="inline fields">'
+      for (j = 0; j < options.length; j++) {
+        const {[j]:option} = options
+        const checked = !!responses[i] && responses[i].includes(option.label) ? 'checked' : ''
+
+        inputHtml += `<div class="field">
+          <div class="ui checkbox ${type}">
+          <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}" value="${option.label}">
+          <label for="question_${i}_${j}">${option.label}</label>
+          </div>
+          </div>`
+      }
+      inputHtml += '</div>'
+      break
+
+      // Set of inputs (composed response)
+    case 'inputs':
+      inputHtml = '<table>'
+      for (let j = 0; j < options.length; j++) {
+        const {[j]:option} = options
+        const value = responses[i] && responses[i][j] || ''
+
+        inputHtml += `<tr>
+          <td><label for="question_${i}_${j}">${option.label}</label></td>
+          <td width="15px"></td>
+          <td><div class="ui input">
+          <input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" />
+          </div></td>
+          </tr>
+          <tr><td colspan="3">&nbsp;</tr></tr>`
+      }
+      inputHtml += '</table>'
+      break
+
+      // Default: simple input
+    default:
+      const value = responses[i] || ''
+      inputHtml = `<div class="ui input fluid">
+        <input type="text" placeholder="Response..." name="question_${i}" value="${value}" />
+        </div>`
+  }
+
+  return inputHtml
 }
