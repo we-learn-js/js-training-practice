@@ -47,17 +47,18 @@ $.ajax({
     }
 
     // Construct the input depending on question type
-    switch (question.input.type) {
+    let type = question.input.type
+    let input
+    switch (type) {
 
       // Multiple options
       case 'checkbox':
       case 'radio':
-        var input = '<div class="inline fields">'
+        input = '<div class="inline fields">'
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
-          var type = question.input.type
 
-          if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
+          if (responses[i] && responses[i].indexOf(option.label) !== -1) {
             var checked = 'checked'
           } else {
             var checked = ''
@@ -75,17 +76,14 @@ $.ajax({
 
         // Set of inputs (composed response)
       case 'inputs':
-        var input = '<table>'
+        input = '<table>'
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
-          var type = 'checkbox'
-
-          if (!!responses[i]) {
+          if (responses[i]) {
             var value = responses[i][j]
           } else {
             var value = ''
           }
-
           input += '<tr>' +
             '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
             '<td width="15px"></td>' +
@@ -105,7 +103,7 @@ $.ajax({
         } else {
           var value = ''
         }
-        var input = '<div class="ui input fluid">' +
+        input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
     }
@@ -180,40 +178,15 @@ $.ajax({
     }
 
     // Set the current responses counter
-    var responseCount = 0
-    for (i = 0; i < responses.length; i++) {
-      question = questions[i]
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-        case 'inputs':
-          if (!!responses[i] && !!responses[i].join('')) {
-            responseCount++
-          }
-          break
-        default:
-          if (!!responses[i]) {
-            responseCount++
-          }
-      }
-    }
-
+    const responseCount = responses.filter((response) => response).length
+    
     // Update progress bar
     $('#progress')
       .css('width', (responseCount / questions.length * 100) + '%')
 
     // Check if question had a valid answer
-    isQuestionAnswered = true
-    if (!responses[currentQuestion]) {
-      isQuestionAnswered = false
-    }
-    if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-      for (j = 0; j < responses[currentQuestion].length; j++) {
-        if (!responses[currentQuestion][j]) {
-          isQuestionAnswered = false
-        }
-      }
-    }
+    const isQuestionAnswered = responses[currentQuestion] && responses[currentQuestion].filter((question)=>question).length
+    
 
     if (!isQuestionAnswered) {
       // Alert user of missing response
