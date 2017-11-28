@@ -37,9 +37,7 @@
         .css('width', (responseCount / questions.length * 100) + '%')
     }
 
-    // Add button to submit response
-    $('#quiz')
-      .append('<button id="submit-response" class="ui primary button">Submit response</button>')
+    addSubmitQuizResponseButton()
 
     // Is case all questions have been responded
     if (responseCount === questions.length) {
@@ -81,8 +79,6 @@
         default:
           response = $inputs.val()
       }
-
-
 
       // Set the current responses counter
       responses[currentQuestion] = response
@@ -223,4 +219,10 @@ function constructQuestionInputHtml(questionIndex, type, options, responses) {
   }
 
   return inputHtml
+}
+
+function addSubmitQuizResponseButton() {
+  // Add button to submit response
+  $('#quiz')
+    .append('<button id="submit-response" class="ui primary button">Submit response</button>')
 }
