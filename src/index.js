@@ -19,11 +19,10 @@
       let inputHtml = constructQuestionInputHtml(i, type, options, responses)
 
       appendQuizQuestion(i, problem, inputHtml)
-
-      showQuestion(currentQuestion)
-
-      updateProgressBar(responseCount, questions.length)
     }
+
+    showQuestion(currentQuestion)
+    updateProgressBar(responseCount, questions.length)
 
     addSubmitQuizResponseButton()
 
