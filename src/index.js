@@ -32,9 +32,7 @@
         .find(`#question-${currentQuestion}`)
         .css('display', 'block')
 
-      // Update progress bar
-      $('#progress')
-        .css('width', (responseCount / questions.length * 100) + '%')
+      updateProgressBar(responseCount, questions.length)
     }
 
     addSubmitQuizResponseButton()
@@ -97,11 +95,7 @@
         }
       }
 
-      // Update progress bar
-      $('#progress')
-        .css('width', (responseCount / questions.length * 100) + '%')
-
-
+      updateProgressBar(responseCount, questions.length)
 
       // Check if question had a valid answer
       let isQuestionAnswered = !!response
@@ -157,6 +151,12 @@ function appendProgressBarToDOM() {
     .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
       <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
       </div>`)
+}
+
+function updateProgressBar(responseCount, questionsLength) {
+  // Update progress bar
+  $('#progress')
+    .css('width', (responseCount / questionsLength * 100) + '%')
 }
 
 function appendTitleAndFormToQuiz(title) {
