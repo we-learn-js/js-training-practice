@@ -18,7 +18,9 @@
       let {problem, input, input: {type, options}} = questions[i]
       let inputHtml = constructQuestionInputHtml(i, type, options, responses)
 
-      showQuizQuestion(i, problem, inputHtml, currentQuestion)
+      appendQuizQuestion(i, problem, inputHtml)
+
+      showQuestion(currentQuestion)
 
       updateProgressBar(responseCount, questions.length)
     }
@@ -103,7 +105,6 @@
         // Display next question
         $('#quiz-form')
           .find(`#question-${currentQuestion}`).css('display', 'none')
-
 
         $('#quiz-form')
           .find(`#question-${++currentQuestion}`).css('display', 'block')
@@ -215,7 +216,14 @@ function addSubmitQuizResponseButton() {
     .append('<button id="submit-response" class="ui primary button">Submit response</button>')
 }
 
-function showQuizQuestion(questionIndex, problem, inputHtml, currentQuestion) {
+function showQuestion(currentQuestion) {
+  // Show current question
+  $('#quiz-form')
+    .find(`#question-${currentQuestion}`)
+    .css('display', 'block')
+}
+
+function appendQuizQuestion(questionIndex, problem, inputHtml) {
   let i = questionIndex
 
   $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
@@ -226,9 +234,4 @@ function showQuizQuestion(questionIndex, problem, inputHtml, currentQuestion) {
 
   $('#quiz-form')
     .append($question)
-
-  // Show current question
-  $('#quiz-form')
-    .find(`#question-${currentQuestion}`)
-    .css('display', 'block')
 }
