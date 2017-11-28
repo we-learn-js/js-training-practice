@@ -130,71 +130,36 @@
     return name => inputs.filter( input => input.name.includes(name) )
   }
 
-
+  const isValidResponse = response => !!response // has a value
+    && !!Array.from(response).length // not an empty array
+    && !!Array.from(response).reduce((value, item) => value && !!item, true) // no value is empty
 
   const submitResponse = questions => () => {
     let {responses=[], currentQuestion=0} = getQuiz()
-    const {input:{type}={}} = questions[currentQuestion]
     const getFormInputs = getInputsByName(document.getElementById('quiz-form'))
     const inputs = getFormInputs(`question_${currentQuestion}`)
-
-    // Behavior for each question type to add response to array of responses
-    switch (type) {
-      case 'checkbox':
-      case 'radio':
-        response = inputs
-          .filter(({checked}) => checked)
-          .map(({value}) => value)
-        response = response.length ? response : null
-        break
-      case 'inputs':
-        response = inputs
-          .map(({value}) => value)
-        break
-      default:
-        response = inputs
-          .map(({value}) => value)[0]
-    }
+    const response = inputs
+      .filter(({checked, type}) => type === 'text' || checked ) // has checked and it's false
+      .map(({value}) => value) // map to actual values
 
     // Set the current responses counter
-    responses[currentQuestion] = response
-    let responseCount = 0
-    for (let i = 0; i < responses.length; i++) {
-      let question = questions[i]
-      let response = responses[i]
+    responses.push(response)
 
-      switch (question.input && question.input.type) {
-        case 'checkbox':
-        case 'radio':
-        case 'inputs':
-          responseCount += !!response && !!response.join('')
-          break
-        default:
-          responseCount += !!response
-      }
-    }
-
-    updateProgress(questions.length)(responseCount)
+    // Count valid responses
+    const responseCount = responses
+      .reduce( ((value, response) => value + isValidResponse(response)), 0 )
 
     // Check if question had a valid answer
-    let isQuestionAnswered = !!response
-    if (response && response.length) {
-      for (let j = 0; j < response.length; j++) {
-        if (!response[j]) {
-          isQuestionAnswered = false
-        }
-      }
-    }
+    const isQuestionAnswered = isValidResponse(response)
 
     if (!isQuestionAnswered) {
       // Alert user of missing response
       alert('You must give a response')
     } else {
       updateQuizViewStatus(questions.length)(++currentQuestion)
+      updateProgress(questions.length)(responseCount)
+      setQuiz({responses, responseCount, currentQuestion})
     }
-
-    // Save current state of the quiz
-    setQuiz({responses, responseCount, currentQuestion})
   }
 
   $.ajax({ url }).done(function(data) {
