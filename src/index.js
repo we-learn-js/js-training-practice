@@ -90,6 +90,7 @@
     ).get(0)
   }
   const appendToQuizForm = element => $('#quiz-form').append(element)
+  const removeFromQuizForm = element => $(element).remove()
 
   const updateProgress = questions => responses => {
     const responseCount = countValidResponses(responses)
@@ -97,15 +98,18 @@
       .css('width', (responseCount / questions.length * 100) + '%')
   }
 
+  const getQuestionId = id => `question_${id}`
+
   const updateQuizViewStatus = questions => responses => {
     const current = countValidResponses(responses)
+    const question = questions[current]
+    question.input = question.input || { input: {type:'input'} }
 
-    $('#quiz-form')
-      .find(`.card[id^=question_]`)
-      .css('display', 'none')
-    $('#quiz-form')
-      .find(`#question_${current}`)
-      .css('display', 'block')
+    const nextQuestion = createQuestionElement(question)(getQuestionId(current))(responses[current])
+    nextQuestion && appendToQuizForm(nextQuestion)
+
+    const previousQuestion = document.getElementById(getQuestionId(current-1))
+    previousQuestion && removeFromQuizForm(previousQuestion)
 
     // Is case all questions have been responded
     if (questions.length <= current ) {
@@ -116,14 +120,6 @@
     }
 
     updateProgress(questions)(responses)
-  }
-
-  const setupQuestions = questions => responses => {
-    const defaultInput = { input: {type:'input'} }
-    questions
-      .map(question => question.input ? question : Object.assign({}, defaultInput, question))
-      .map((question, i) => createQuestionElement(question)(`question_${i}`)(responses[i]))
-      .map(appendToQuizForm)
   }
 
   const resetQuiz = () => {
@@ -147,7 +143,7 @@
     let {responses=[]} = getQuiz()
     const currentQuestion = responses.length
     const getFormInputs = getInputsByName(document.getElementById('quiz-form'))
-    const inputs = getFormInputs(`question_${currentQuestion}`)
+    const inputs = getFormInputs(getQuestionId(currentQuestion))
     const response = inputs
       .filter(({checked, type}) => type === 'text' || checked ) // has checked and it's false
       .map(({value}) => value) // map to actual values
@@ -170,7 +166,6 @@
     let {responses=[]} = getQuiz()
 
     setupQuizElement(data)(document.getElementById('quiz'))
-    setupQuestions(questions)(responses)
     updateQuizViewStatus(questions)(responses)
   })
 })($, JSON, localStorage)
