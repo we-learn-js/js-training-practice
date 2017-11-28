@@ -93,7 +93,7 @@
 
   const updateProgress = questions => responses =>
     $('#progress')
-      .css('width', (responses / questions * 100) + '%')
+      .css('width', (responses / questions.length * 100) + '%')
 
   const updateQuizViewStatus = questions => current => {
     $('#quiz-form')
@@ -104,7 +104,7 @@
       .css('display', 'block')
 
     // Is case all questions have been responded
-    if (questions <= current ) {
+    if (questions.length <= current ) {
       $('#submit-response').css('display', 'none')
       $('#quiz')
         .append('<div>Thank you for your responses.<br /><br /> </div>')
@@ -153,8 +153,8 @@
       alert('You must give a response')
     } else {
       // Count valid responses
-      updateQuizViewStatus(questions.length)(++currentQuestion)
-      updateProgress(questions.length)(countValidResponses(responses))
+      updateQuizViewStatus(questions)(++currentQuestion)
+      updateProgress(questions)(countValidResponses(responses))
       setQuiz({responses, currentQuestion})
     }
   }
@@ -165,7 +165,7 @@
 
     setupQuizElement(data)(document.getElementById('quiz'))
     setupQuestions(questions)(responses)
-    updateQuizViewStatus(questions.length)(currentQuestion)
-    updateProgress(questions.length)(countValidResponses(responses))
+    updateQuizViewStatus(questions)(currentQuestion)
+    updateProgress(questions)(countValidResponses(responses))
   })
 })($, JSON, localStorage)
