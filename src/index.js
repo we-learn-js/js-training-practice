@@ -18,19 +18,7 @@
       let {problem, input, input: {type, options}} = questions[i]
       let inputHtml = constructQuestionInputHtml(i, type, options, responses)
 
-      $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
-          <div class="content"><div class="header">${problem}</div></div>
-          <div class="content">${inputHtml}</div>
-        </div>`
-      ).css('display', 'none')
-
-      $('#quiz-form')
-        .append($question)
-
-      // Show current question
-      $('#quiz-form')
-        .find(`#question-${currentQuestion}`)
-        .css('display', 'block')
+      showQuizQuestion(i, problem, inputHtml, currentQuestion)
 
       updateProgressBar(responseCount, questions.length)
     }
@@ -225,4 +213,22 @@ function addSubmitQuizResponseButton() {
   // Add button to submit response
   $('#quiz')
     .append('<button id="submit-response" class="ui primary button">Submit response</button>')
+}
+
+function showQuizQuestion(questionIndex, problem, inputHtml, currentQuestion) {
+  let i = questionIndex
+
+  $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
+      <div class="content"><div class="header">${problem}</div></div>
+      <div class="content">${inputHtml}</div>
+    </div>`
+  ).css('display', 'none')
+
+  $('#quiz-form')
+    .append($question)
+
+  // Show current question
+  $('#quiz-form')
+    .find(`#question-${currentQuestion}`)
+    .css('display', 'block')
 }
