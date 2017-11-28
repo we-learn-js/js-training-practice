@@ -1,29 +1,29 @@
-responseCount = 0
-currentQuestion = 0
-options = {
+
+const options = {
   url: 'data/quiz.json?' + Date.now()
 }
 
 $.ajax({
   url: options.url
 }).done(function(data) {
+  let responseCount = 0
+  let currentQuestion = 0
+  
   questions = data.questions
 
   // Load data from past reponses
+  let quizData
   try {
     quizData = JSON.parse(localStorage.getItem('quiz'))
     responses = quizData.responses || []
     currentQuestion = quizData.currentQuestion || -1
     responseCount = quizData.responseCount || -1
-  } catch (e) {}
-
-  if (quizData == null) {
-    quizData = {
-      responses: []
-    }
-    responses = quizData.responses
+  } catch (e) {
+      quizData = {
+        responses: []
+      }
+      responses = quizData.responses
   }
-
 
   // Append the progress bar to DOM
   $('body')
@@ -79,12 +79,9 @@ $.ajax({
         input = '<table>'
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
-          if (responses[i]) {
-            var value = responses[i][j]
-          } else {
-            var value = ''
-          }
-          input += '<tr>' +
+          var value = responses[i] && responses[i][j] || ''
+          
+         input += '<tr>' +
             '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
             '<td width="15px"></td>' +
             '<td><div class="ui input">' +
@@ -95,14 +92,9 @@ $.ajax({
         }
         input += '</table>'
         break
-
         // Default: simple input
       default:
-        if (!!responses[i]) {
-          var value = responses[i]
-        } else {
-          var value = ''
-        }
+        var value = responses[i] || ''
         input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
