@@ -91,11 +91,15 @@
   }
   const appendToQuizForm = element => $('#quiz-form').append(element)
 
-  const updateProgress = questions => responses =>
+  const updateProgress = questions => responses => {
+    const responseCount = countValidResponses(responses)
     $('#progress')
-      .css('width', (responses / questions.length * 100) + '%')
+      .css('width', (responseCount / questions.length * 100) + '%')
+  }
 
-  const updateQuizViewStatus = questions => current => {
+  const updateQuizViewStatus = questions => responses => {
+    const current = countValidResponses(responses)
+
     $('#quiz-form')
       .find(`.card[id^=question_]`)
       .css('display', 'none')
@@ -138,7 +142,8 @@
     .reduce( ((value, response) => value + isValidResponse(response)), 0 )
 
   const submitResponse = questions => () => {
-    let {responses=[], currentQuestion=0} = getQuiz()
+    let {responses=[]} = getQuiz()
+    const currentQuestion = responses.length
     const getFormInputs = getInputsByName(document.getElementById('quiz-form'))
     const inputs = getFormInputs(`question_${currentQuestion}`)
     const response = inputs
@@ -153,19 +158,19 @@
       alert('You must give a response')
     } else {
       // Count valid responses
-      updateQuizViewStatus(questions)(++currentQuestion)
-      updateProgress(questions)(countValidResponses(responses))
-      setQuiz({responses, currentQuestion})
+      updateQuizViewStatus(questions)(responses)
+      updateProgress(questions)(responses)
+      setQuiz({responses})
     }
   }
 
   $.ajax({ url }).done(function(data) {
     let {questions} = data
-    let {responses=[], currentQuestion=0} = getQuiz()
+    let {responses=[]} = getQuiz()
 
     setupQuizElement(data)(document.getElementById('quiz'))
     setupQuestions(questions)(responses)
-    updateQuizViewStatus(questions)(currentQuestion)
-    updateProgress(questions)(countValidResponses(responses))
+    updateQuizViewStatus(questions)(responses)
+    updateProgress(questions)(responses)
   })
 })($, JSON, localStorage)
