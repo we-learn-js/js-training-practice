@@ -134,6 +134,9 @@
     && !!Array.from(response).length // not an empty array
     && !!Array.from(response).reduce((value, item) => value && !!item, true) // no value is empty
 
+  const countValidResponses = responses => responses
+    .reduce( ((value, response) => value + isValidResponse(response)), 0 )
+
   const submitResponse = questions => () => {
     let {responses=[], currentQuestion=0} = getQuiz()
     const getFormInputs = getInputsByName(document.getElementById('quiz-form'))
@@ -145,30 +148,24 @@
     // Set the current responses counter
     responses.push(response)
 
-    // Count valid responses
-    const responseCount = responses
-      .reduce( ((value, response) => value + isValidResponse(response)), 0 )
-
-    // Check if question had a valid answer
-    const isQuestionAnswered = isValidResponse(response)
-
-    if (!isQuestionAnswered) {
+    if (!isValidResponse(response)) {
       // Alert user of missing response
       alert('You must give a response')
     } else {
+      // Count valid responses
       updateQuizViewStatus(questions.length)(++currentQuestion)
-      updateProgress(questions.length)(responseCount)
-      setQuiz({responses, responseCount, currentQuestion})
+      updateProgress(questions.length)(countValidResponses(responses))
+      setQuiz({responses, currentQuestion})
     }
   }
 
   $.ajax({ url }).done(function(data) {
     let {questions} = data
-    let {responses=[], currentQuestion=0, responseCount=0} = getQuiz()
+    let {responses=[], currentQuestion=0} = getQuiz()
 
     setupQuizElement(data)(document.getElementById('quiz'))
     setupQuestions(questions)(responses)
     updateQuizViewStatus(questions.length)(currentQuestion)
-    updateProgress(questions.length)(responseCount)
+    updateProgress(questions.length)(countValidResponses(responses))
   })
 })($, JSON, localStorage)
