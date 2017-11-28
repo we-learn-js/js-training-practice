@@ -1,4 +1,5 @@
 (function($, JSON, localStorage){
+  console.clear()
   const {url} = options = {
     url: `data/quiz.json?${Date.now()}`
   }
@@ -44,11 +45,11 @@
 
   const getQuiz = () => JSON.parse(localStorage.getItem('quiz') || null) || {}
   const setQuiz = data => localStorage.setItem('quiz', JSON.stringify(data))
-  const setupQuizElement = (quizContainer, title) => {
+  const setupQuizElement = ({title, questions}) => (quizContainer) => {
     const $resetButton = $('<button class="ui button negative">Reset</button>')
     const $submitButton = $('<button id="submit-response" class="ui primary button">Submit response</button>')
     $resetButton.on('click', resetQuiz)
-    $submitButton.on('click', submitResponse)
+    $submitButton.on('click', submitResponse(questions))
 
     $(quizContainer)
       .append(`<h1 class="ui header">${title}</h1>`)
@@ -96,7 +97,7 @@
 
   const updateQuizViewStatus = questions => current => {
     $('#quiz-form')
-      .find(`[id^=question_]`)
+      .find(`.card[id^=question_]`)
       .css('display', 'none')
     $('#quiz-form')
       .find(`#question_${current}`)
@@ -124,33 +125,36 @@
     location.reload();
   }
 
-  const submitResponse = function() {
-    const $inputs = $(`[name^=question_${currentQuestion}`)
-    const question = questions[currentQuestion]
-    let response = responses[currentQuestion]
+  const getInputsByName = form => {
+    const inputs = Array.from(form)
+    return name => inputs.filter( input => input.name.includes(name) )
+  }
 
+
+
+  const submitResponse = questions => () => {
+    let {responses=[], currentQuestion=0} = getQuiz()
+    const {input:{type}={}} = questions[currentQuestion]
+    const getFormInputs = getInputsByName(document.getElementById('quiz-form'))
+    const inputs = getFormInputs(`question_${currentQuestion}`)
 
     // Behavior for each question type to add response to array of responses
-    switch (question.input.type) {
+    switch (type) {
       case 'checkbox':
       case 'radio':
-        response = []
-        $(`[name=${$inputs.attr('name')}]:checked`).each(function(i, input) {
-          response.push(input.value)
-        })
+        response = inputs
+          .filter(({checked}) => checked)
+          .map(({value}) => value)
         response = response.length ? response : null
         break
       case 'inputs':
-        response = []
-        $inputs.each(function(i, input) {
-          response.push(input.value)
-        })
+        response = inputs
+          .map(({value}) => value)
         break
       default:
-        response = $inputs.val()
+        response = inputs
+          .map(({value}) => value)[0]
     }
-
-
 
     // Set the current responses counter
     responses[currentQuestion] = response
@@ -158,7 +162,8 @@
     for (let i = 0; i < responses.length; i++) {
       let question = questions[i]
       let response = responses[i]
-      switch (question.input.type) {
+
+      switch (question.input && question.input.type) {
         case 'checkbox':
         case 'radio':
         case 'inputs':
@@ -169,7 +174,7 @@
       }
     }
 
-    updateQuizProgress(responseCount)
+    updateProgress(questions.length)(responseCount)
 
     // Check if question had a valid answer
     let isQuestionAnswered = !!response
@@ -195,11 +200,10 @@
   $.ajax({ url }).done(function(data) {
     let {questions} = data
     let {responses=[], currentQuestion=0, responseCount=0} = getQuiz()
-    const updateQuizProgress = updateProgress(questions.length)
 
-    setupQuizElement(document.getElementById('quiz'), data.title)
+    setupQuizElement(data)(document.getElementById('quiz'))
     setupQuestions(questions)(responses)
     updateQuizViewStatus(questions.length)(currentQuestion)
-    updateQuizProgress(responseCount)
+    updateProgress(questions.length)(responseCount)
   })
 })($, JSON, localStorage)
