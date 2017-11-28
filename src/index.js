@@ -114,6 +114,8 @@
         .append('<div>Thank you for your responses.<br /><br /> </div>')
         .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
     }
+
+    updateProgress(questions)(responses)
   }
 
   const setupQuestions = questions => responses => {
@@ -159,7 +161,6 @@
     } else {
       // Count valid responses
       updateQuizViewStatus(questions)(responses)
-      updateProgress(questions)(responses)
       setQuiz({responses})
     }
   }
@@ -171,6 +172,5 @@
     setupQuizElement(data)(document.getElementById('quiz'))
     setupQuestions(questions)(responses)
     updateQuizViewStatus(questions)(responses)
-    updateProgress(questions)(responses)
   })
 })($, JSON, localStorage)
