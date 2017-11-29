@@ -32,24 +32,8 @@
     $('#submit-response').on('click', function() {
       const question = questions[currentQuestion]
       let response = addQuestionTypeResponseBehavior(questions, responses, currentQuestion)
-
-      // Set the current responses counter
       responses[currentQuestion] = response
-      let responseCount = 0
-      for (let i = 0; i < responses.length; i++) {
-        let question = questions[i]
-        let response = responses[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            responseCount += !!response && !!response.join('')
-            break
-          default:
-            responseCount += !!response
-        }
-      }
-
+      let responseCount = computeCurrentReponsesCounter(questions, responses)
       updateProgressBar(responseCount, questions.length)
 
       // Check if question had a valid answer
@@ -249,4 +233,24 @@ function addQuestionTypeResponseBehavior(questions, responses, currentQuestion) 
   }
 
   return response
+}
+
+function computeCurrentReponsesCounter(questions, responses) {
+  // Set the current responses counter
+  let responseCount = 0
+  for (let i = 0; i < responses.length; i++) {
+    let question = questions[i]
+    let response = responses[i]
+    switch (question.input.type) {
+      case 'checkbox':
+      case 'radio':
+      case 'inputs':
+        responseCount += !!response && !!response.join('')
+        break
+      default:
+        responseCount += !!response
+    }
+  }
+
+  return responseCount
 }
