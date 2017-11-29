@@ -36,15 +36,7 @@
       let responseCount = computeCurrentReponsesCounter(questions, responses)
       updateProgressBar(responseCount, questions.length)
 
-      // Check if question had a valid answer
-      let isQuestionAnswered = !!response
-      if (response && response.length) {
-        for (let j = 0; j < response.length; j++) {
-          if (!response[j]) {
-            isQuestionAnswered = false
-          }
-        }
-      }
+      let isQuestionAnswered = isValidAnswer(response)
 
       if (!isQuestionAnswered) {
         // Alert user of missing response
@@ -253,4 +245,18 @@ function computeCurrentReponsesCounter(questions, responses) {
   }
 
   return responseCount
+}
+
+function isValidAnswer(response) {
+  // Check if question had a valid answer
+  let isQuestionAnswered = !!response
+  if (response && response.length) {
+    for (let j = 0; j < response.length; j++) {
+      if (!response[j]) {
+        isQuestionAnswered = false
+      }
+    }
+  }
+
+  return isQuestionAnswered
 }
