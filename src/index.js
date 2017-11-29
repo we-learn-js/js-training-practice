@@ -30,29 +30,8 @@
 
     // Actions on every response submission
     $('#submit-response').on('click', function() {
-      const $inputs = $(`[name^=question_${currentQuestion}`)
       const question = questions[currentQuestion]
-      let response = responses[currentQuestion]
-
-      // Behavior for each question type to add response to array of responses
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-          response = []
-          $(`[name=${$inputs.attr('name')}]:checked`).each(function(i, input) {
-            response.push(input.value)
-          })
-          response = response.length ? response : null
-          break
-        case 'inputs':
-          response = []
-          $inputs.each(function(i, input) {
-            response.push(input.value)
-          })
-          break
-        default:
-          response = $inputs.val()
-      }
+      let response = addQuestionTypeResponseBehavior(questions, responses, currentQuestion)
 
       // Set the current responses counter
       responses[currentQuestion] = response
@@ -241,4 +220,33 @@ function addResetButton(localStorage, location) {
     location.reload();
   })
   $('#quiz').append($resetButton)
+}
+
+function addQuestionTypeResponseBehavior(questions, responses, currentQuestion) {
+  const question = questions[currentQuestion]
+  const type = question.input.type
+  const $inputs = $(`[name^=question_${currentQuestion}`)
+  let response = responses[currentQuestion]
+
+  // Behavior for each question type to add response to array of responses
+  switch (type) {
+    case 'checkbox':
+    case 'radio':
+      response = []
+      $(`[name=${$inputs.attr('name')}]:checked`).each(function(i, input) {
+        response.push(input.value)
+      })
+      response = response.length ? response : null
+      break
+    case 'inputs':
+      response = []
+      $inputs.each(function(i, input) {
+        response.push(input.value)
+      })
+      break
+    default:
+      response = $inputs.val()
+  }
+
+  return response
 }
