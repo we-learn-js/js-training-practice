@@ -12,14 +12,7 @@
     appendProgressBarToDOM()
     appendTitleAndFormToQuiz(data.title)
 
-    // For each question of the json,
-    for (let i = 0; i < questions.length; i++) {
-      questions[i].input = questions[i].input || { type:'input' }
-      let {problem, input, input: {type, options}} = questions[i]
-      let inputHtml = constructQuestionInputHtml(i, type, options, responses)
-
-      appendQuizQuestion(i, problem, inputHtml)
-    }
+    appendQuizQuestions(questions, responses)
 
     showQuestion(currentQuestion)
     updateProgressBar(responseCount, questions.length)
@@ -233,4 +226,15 @@ function appendQuizQuestion(questionIndex, problem, inputHtml) {
 
   $('#quiz-form')
     .append($question)
+}
+
+function appendQuizQuestions(questions, responses) {
+  // For each question of the json,
+  for (let i = 0; i < questions.length; i++) {
+    questions[i].input = questions[i].input || { type:'input' }
+    let {problem, input, input: {type, options}} = questions[i]
+    let inputHtml = constructQuestionInputHtml(i, type, options, responses)
+
+    appendQuizQuestion(i, problem, inputHtml)
+  }
 }
