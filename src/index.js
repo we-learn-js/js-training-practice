@@ -30,9 +30,9 @@
 
     // Actions on every response submission
     $('#submit-response').on('click', function() {
-      const question = questions[currentQuestion]
       let response = addQuestionTypeResponseBehavior(questions, responses, currentQuestion)
       responses[currentQuestion] = response
+
       let responseCount = computeCurrentReponsesCounter(questions, responses)
       updateProgressBar(responseCount, questions.length)
 
