@@ -26,13 +26,7 @@
       $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
     }
 
-    // Add a reset button that will redirect to quiz start
-    const $resetButton = $('<button class="ui button negative">Reset</button>')
-    $resetButton.on('click', function() {
-      localStorage.removeItem('quiz')
-      location.reload();
-    })
-    $('#quiz').append($resetButton)
+    addResetButton(localStorage, location)
 
     // Actions on every response submission
     $('#submit-response').on('click', function() {
@@ -237,4 +231,14 @@ function appendQuizQuestions(questions, responses) {
 
     appendQuizQuestion(i, problem, inputHtml)
   }
+}
+
+function addResetButton(localStorage, location) {
+  // Add a reset button that will redirect to quiz start
+  const $resetButton = $('<button class="ui button negative">Reset</button>')
+  $resetButton.on('click', function() {
+    localStorage.removeItem('quiz')
+    location.reload();
+  })
+  $('#quiz').append($resetButton)
 }
