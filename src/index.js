@@ -45,12 +45,7 @@
 
         currentQuestion = displayNextQuestion(currentQuestion)
 
-        // If it was the las question, display final message
-        if (responseCount === questions.length) {
-          $('#submit-response').css('display', 'none')
-          $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-          $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-        }
+        displayFinalMessageIfLastQuestion(responseCount, questions)
       }
 
       // Save current state of the quiz
@@ -266,4 +261,13 @@ function displayNextQuestion(currentQuestionIndex) {
     .find(`#question-${++currentQuestion}`).css('display', 'block')
 
   return currentQuestion
+}
+
+function displayFinalMessageIfLastQuestion(responseCount, questions) {
+  // If it was the las question, display final message
+  if (responseCount === questions.length) {
+    $('#submit-response').css('display', 'none')
+    $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
+    $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+  }
 }
