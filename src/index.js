@@ -1,3 +1,7 @@
+var responseCount, currentQuestion, options,
+questions, responses, quizData, question, j,
+$question, $resetButton, isQuestionAnswered
+
 responseCount = 0
 currentQuestion = 0
 options = {

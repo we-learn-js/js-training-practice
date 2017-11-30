@@ -22,13 +22,17 @@
   "homepage": "https://github.com/we-learn-js/js-training-practice#readme",
   "devDependencies": {
     "@s-ui/helpers": "1",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
     "chromedriver": "2.33.1",
     "copy-webpack-plugin": "3.0.1",
     "husky": "0.14.3",
     "nightwatch": "0.9.16",
     "nodemon": "1.12.1",
     "selenium-server-standalone-jar": "3.5.3",
-    "webpack": "1.13.2",
-    "webpack-dev-server": "1.15.2"
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.5"
   }
 }
