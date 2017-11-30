@@ -1,4 +1,5 @@
 (function($, JSON, localStorage){
+  let options
   const {url} = options = {
     url: `data/quiz.json?${Date.now()}`
   }
@@ -39,7 +40,7 @@
         case 'checkbox':
         case 'radio':
           inputHtml = '<div class="inline fields">'
-          for (j = 0; j < options.length; j++) {
+          for (let j = 0; j < options.length; j++) {
             const {[j]:option} = options
             const checked = !!responses[i] && responses[i].includes(option.label) ? 'checked' : ''
 
@@ -80,7 +81,7 @@
             </div>`
       }
 
-      $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
+      const $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
           <div class="content"><div class="header">${problem}</div></div>
           <div class="content">${inputHtml}</div>
         </div>`
