@@ -43,12 +43,7 @@
         alert('You must give a response')
       } else {
 
-        // Display next question
-        $('#quiz-form')
-          .find(`#question-${currentQuestion}`).css('display', 'none')
-
-        $('#quiz-form')
-          .find(`#question-${++currentQuestion}`).css('display', 'block')
+        currentQuestion = displayNextQuestion(currentQuestion)
 
         // If it was the las question, display final message
         if (responseCount === questions.length) {
@@ -259,4 +254,16 @@ function isValidAnswer(response) {
   }
 
   return isQuestionAnswered
+}
+
+function displayNextQuestion(currentQuestionIndex) {
+  let currentQuestion = currentQuestionIndex
+  // Display next question
+  $('#quiz-form')
+    .find(`#question-${currentQuestion}`).css('display', 'none')
+
+  $('#quiz-form')
+    .find(`#question-${++currentQuestion}`).css('display', 'block')
+
+  return currentQuestion
 }
