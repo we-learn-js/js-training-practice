@@ -198,16 +198,14 @@ function addQuestionTypeResponseBehavior(questions, responses, currentQuestion) 
     case 'checkbox':
     case 'radio':
       response = []
-      $(`[name=${$inputs.attr('name')}]:checked`).each(function(i, input) {
-        response.push(input.value)
-      })
+      $(`[name=${$inputs.attr('name')}]:checked`).each(
+        (i, input) => response.push(input.value)
+      )
       response = response.length ? response : null
       break
     case 'inputs':
       response = []
-      $inputs.each(function(i, input) {
-        response.push(input.value)
-      })
+      $inputs.each((i, input) => response.push(input.value))
       break
     default:
       response = $inputs.val()
