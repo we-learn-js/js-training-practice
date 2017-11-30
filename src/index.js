@@ -48,8 +48,7 @@
         displayFinalMessageIfLastQuestion(responseCount, questions)
       }
 
-      // Save current state of the quiz
-      localStorage.setItem('quiz', JSON.stringify({responses, responseCount, currentQuestion}))
+      saveCurrentStateOfQuiz(responses, responseCount, currentQuestion)
     })
   })
 })($, JSON, localStorage)
@@ -63,6 +62,11 @@ function loadDataFromPastResponses() {
   } catch (e) {}
 
   return quizData
+}
+
+function saveCurrentStateOfQuiz(responses, responseCount, currentQuestion) {
+  // Save current state of the quiz
+  localStorage.setItem('quiz', JSON.stringify({responses, responseCount, currentQuestion}))
 }
 
 function appendProgressBarToDOM() {
