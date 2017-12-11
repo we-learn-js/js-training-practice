@@ -1,8 +1,9 @@
 (function($, JSON, localStorage){
   console.clear()
-  const {url} = options = {
+  const options = {
     url: `data/quiz.json?${Date.now()}`
   }
+  const {url} = options
 
   const getOptionsMarkup = type => options => id =>  response => {
     return '<div class="inline fields">'
@@ -102,13 +103,8 @@
 
   const updateQuizViewStatus = questions => responses => {
     const current = countValidResponses(responses)
-    const question = questions[current]
-    question.input = question.input || { input: {type:'input'} }
-
-    const nextQuestion = createQuestionElement(question)(getQuestionId(current))(responses[current])
-    nextQuestion && appendToQuizForm(nextQuestion)
-
     const previousQuestion = document.getElementById(getQuestionId(current-1))
+
     previousQuestion && removeFromQuizForm(previousQuestion)
 
     // Is case all questions have been responded
@@ -117,6 +113,12 @@
       $('#quiz')
         .append('<div>Thank you for your responses.<br /><br /> </div>')
         .append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+    } else {
+      const question = questions[current]
+      question.input = question.input || { input: {type:'input'} }
+
+      const nextQuestion = createQuestionElement(question)(getQuestionId(current))(responses[current])
+      nextQuestion && appendToQuizForm(nextQuestion)
     }
 
     updateProgress(questions)(responses)
