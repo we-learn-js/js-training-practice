@@ -40,9 +40,9 @@ describe('Quiz', () => {
       client.expect.element(questionSelector(1))
         .to.be.visible
       client.expect.element(questionSelector(2))
-        .to.not.be.visible
+        .to.not.be.present
       client.expect.element(questionSelector(3))
-        .to.not.be.visible
+        .to.not.be.present
     })
 
     it('should display description of the question', (client) => {
@@ -81,7 +81,7 @@ describe('Quiz', () => {
 
     it('should display the next question', (client) => {
       client.expect.element(questionSelector(1))
-        .to.not.be.visible
+        .to.not.be.present
       client.expect.element(questionSelector(2))
         .to.be.visible
     })
@@ -102,7 +102,7 @@ describe('Quiz', () => {
 
     it('should display the last non answered question', (client) => {
       client.expect.element(questionSelector(1))
-        .to.not.be.visible
+        .to.not.be.present
       client.expect.element(questionSelector(2))
         .to.be.visible
     })
@@ -120,7 +120,7 @@ describe('Quiz', () => {
       client.expect.element(questionSelector(1))
         .to.be.visible
       client.expect.element(questionSelector(2))
-        .to.not.be.visible
+        .to.not.be.present
     })
   })
 })

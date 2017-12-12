@@ -3,7 +3,7 @@ const BUTTON_SELECTOR = '.primary.button'
 const RESET_SELECTOR = '.negative.button'
 const PROGRESS_SELECTOR = '#progress'
 const RESPONSE_MSG = 'You must give a response'
-const questionSelector = num => `.card:nth-child(${num})`
+const questionSelector = num => `#question_${num-1}`
 
 module.exports = {
   data,
