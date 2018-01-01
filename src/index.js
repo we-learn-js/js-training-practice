@@ -85,7 +85,7 @@ function appendTitleAndFormToQuiz(title) {
     .append('<form id="quiz-form" class="ui form"></form>')
 }
 
-const getOptionsInputHtmlCurried = type => function getOptionsInputHtml(options) {
+const getOptionsInputHtmlCurried = type => options => {
   return function getOptionsInputHtml(responses, questionIndex) {
     let i = questionIndex
 
