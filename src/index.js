@@ -85,26 +85,24 @@ function appendTitleAndFormToQuiz(title) {
     .append('<form id="quiz-form" class="ui form"></form>')
 }
 
-const getOptionsInputHtmlCurried = type => options => {
-  return function getOptionsInputHtml(responses, questionIndex) {
-    let i = questionIndex
+const getOptionsInputHtmlCurried = type => options => responses => questionIndex => {
+  let i = questionIndex
 
-    inputHtml = '<div class="inline fields">'
-    for (j = 0; j < options.length; j++) {
-      const {[j]:option} = options
-      const checked = !!responses[i] && responses[i].includes(option.label) ? 'checked' : ''
+  inputHtml = '<div class="inline fields">'
+  for (j = 0; j < options.length; j++) {
+    const {[j]:option} = options
+    const checked = !!responses[i] && responses[i].includes(option.label) ? 'checked' : ''
 
-      inputHtml += `<div class="field">
-        <div class="ui checkbox ${type}">
-        <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}" value="${option.label}">
-        <label for="question_${i}_${j}">${option.label}</label>
-        </div>
-        </div>`
-    }
-    inputHtml += '</div>'
-
-    return inputHtml
+    inputHtml += `<div class="field">
+      <div class="ui checkbox ${type}">
+      <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}" value="${option.label}">
+      <label for="question_${i}_${j}">${option.label}</label>
+      </div>
+      </div>`
   }
+  inputHtml += '</div>'
+
+  return inputHtml
 }
 
 const getCheckboxInputHtmlCurried = getOptionsInputHtmlCurried('checkbox')
@@ -119,10 +117,10 @@ function constructQuestionInputHtml(questionIndex, type, options, responses) {
 
     // Multiple options
     case 'checkbox':
-      inputHtml = getCheckboxInputHtmlCurried(options)(responses, questionIndex)
+      inputHtml = getCheckboxInputHtmlCurried(options)(responses)(questionIndex)
       break
     case 'radio':
-      inputHtml = getRadioInputHtmlCurried(options)(responses, questionIndex)
+      inputHtml = getRadioInputHtmlCurried(options)(responses)(questionIndex)
       break
 
       // Set of inputs (composed response)
