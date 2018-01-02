@@ -109,12 +109,11 @@ const getRadioInputHtmlCurried = getOptionsInputHtmlCurried('radio')
 const getInputsHtml = (options, responses, questionIndex) => {
   const i = questionIndex
 
-  inputHtml = '<table>'
-  for (let j = 0; j < options.length; j++) {
-    const {[j]:option} = options
+  inputHtml = '<table>' + options.map((option, j) => {
+    const label = option.label
     const value = responses[i] && responses[i][j] || ''
 
-    inputHtml += `<tr>
+    return `<tr>
       <td><label for="question_${i}_${j}">${option.label}</label></td>
       <td width="15px"></td>
       <td><div class="ui input">
@@ -122,8 +121,9 @@ const getInputsHtml = (options, responses, questionIndex) => {
       </div></td>
       </tr>
       <tr><td colspan="3">&nbsp;</tr></tr>`
-  }
-  inputHtml += '</table>'
+  }) + '</table>'
+
+  return inputHtml
 }
 
 function constructQuestionInputHtml(questionIndex, type, options, responses) {
