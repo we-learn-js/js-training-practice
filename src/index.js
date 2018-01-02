@@ -114,7 +114,7 @@ const getInputsHtml = options => responses => questionIndex => {
     const value = responses[i] && responses[i][j] || ''
 
     return `<tr>
-      <td><label for="question_${i}_${j}">${option.label}</label></td>
+      <td><label for="question_${i}_${j}">${label}</label></td>
       <td width="15px"></td>
       <td><div class="ui input">
       <input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" />
