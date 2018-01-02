@@ -86,7 +86,7 @@ function appendTitleAndFormToQuiz(title) {
 }
 
 const getOptionsInputHtmlCurried = type => options => responses => questionIndex => {
-  let i = questionIndex
+  const i = questionIndex
 
   inputHtml = '<div class="inline fields">' + options.map((option, j) => {
       let label = option.label
