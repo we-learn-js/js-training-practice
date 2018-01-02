@@ -106,6 +106,26 @@ const getOptionsInputHtmlCurried = type => options => responses => questionIndex
 const getCheckboxInputHtmlCurried = getOptionsInputHtmlCurried('checkbox')
 const getRadioInputHtmlCurried = getOptionsInputHtmlCurried('radio')
 
+const getInputsHtml = (options, responses, questionIndex) => {
+  const i = questionIndex
+
+  inputHtml = '<table>'
+  for (let j = 0; j < options.length; j++) {
+    const {[j]:option} = options
+    const value = responses[i] && responses[i][j] || ''
+
+    inputHtml += `<tr>
+      <td><label for="question_${i}_${j}">${option.label}</label></td>
+      <td width="15px"></td>
+      <td><div class="ui input">
+      <input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" />
+      </div></td>
+      </tr>
+      <tr><td colspan="3">&nbsp;</tr></tr>`
+  }
+  inputHtml += '</table>'
+}
+
 function constructQuestionInputHtml(questionIndex, type, options, responses) {
   let inputHtml
   let i = questionIndex
@@ -123,21 +143,7 @@ function constructQuestionInputHtml(questionIndex, type, options, responses) {
 
       // Set of inputs (composed response)
     case 'inputs':
-      inputHtml = '<table>'
-      for (let j = 0; j < options.length; j++) {
-        const {[j]:option} = options
-        const value = responses[i] && responses[i][j] || ''
-
-        inputHtml += `<tr>
-          <td><label for="question_${i}_${j}">${option.label}</label></td>
-          <td width="15px"></td>
-          <td><div class="ui input">
-          <input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" />
-          </div></td>
-          </tr>
-          <tr><td colspan="3">&nbsp;</tr></tr>`
-      }
-      inputHtml += '</table>'
+      inputHtml = getInputsHtml(options, responses, questionIndex)
       break
 
       // Default: simple input
