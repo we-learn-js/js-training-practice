@@ -89,15 +89,15 @@ const getOptionsInputHtmlCurried = type => options => responses => questionIndex
   const i = questionIndex
 
   inputHtml = '<div class="inline fields">' + options.map((option, j) => {
-      let label = option.label
-      const checked = !!responses[i] && responses[i].includes(label) ? 'checked' : ''
+    const label = option.label
+    const checked = !!responses[i] && responses[i].includes(label) ? 'checked' : ''
 
-      return `<div class="field">
-        <div class="ui checkbox ${type}">
-        <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}" value="${label}">
-        <label for="question_${i}_${j}">${label}</label>
-        </div>
-        </div>`
+    return `<div class="field">
+      <div class="ui checkbox ${type}">
+      <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}" value="${label}">
+      <label for="question_${i}_${j}">${label}</label>
+      </div>
+      </div>`
   }) + '</div>'
 
   return inputHtml
