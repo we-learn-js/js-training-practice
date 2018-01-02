@@ -126,9 +126,18 @@ const getInputsHtml = options => responses => questionIndex => {
   return inputHtml
 }
 
+const getSimpleInputHtml = responses => questionIndex => {
+  const i = questionIndex
+  const value = responses[i] || ''
+  inputHtml = `<div class="ui input fluid">
+    <input type="text" placeholder="Response..." name="question_${i}" value="${value}" />
+    </div>`
+
+  return inputHtml
+}
+
 function constructQuestionInputHtml(questionIndex, type, options, responses) {
   let inputHtml
-  let i = questionIndex
 
   // Construct the input depending on question type
   switch (type) {
@@ -148,10 +157,7 @@ function constructQuestionInputHtml(questionIndex, type, options, responses) {
 
       // Default: simple input
     default:
-      const value = responses[i] || ''
-      inputHtml = `<div class="ui input fluid">
-        <input type="text" placeholder="Response..." name="question_${i}" value="${value}" />
-        </div>`
+      inputHtml = getSimpleInputHtml(responses)(questionIndex)
   }
 
   return inputHtml
