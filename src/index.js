@@ -106,7 +106,7 @@ const getOptionsInputHtmlCurried = type => options => responses => questionIndex
 const getCheckboxInputHtmlCurried = getOptionsInputHtmlCurried('checkbox')
 const getRadioInputHtmlCurried = getOptionsInputHtmlCurried('radio')
 
-const getInputsHtml = (options, responses, questionIndex) => {
+const getInputsHtml = options => responses => questionIndex => {
   const i = questionIndex
 
   inputHtml = '<table>' + options.map((option, j) => {
@@ -143,7 +143,7 @@ function constructQuestionInputHtml(questionIndex, type, options, responses) {
 
       // Set of inputs (composed response)
     case 'inputs':
-      inputHtml = getInputsHtml(options, responses, questionIndex)
+      inputHtml = getInputsHtml(options)(responses)(questionIndex)
       break
 
       // Default: simple input
