@@ -1,5 +1,5 @@
 var responseCount, currentQuestion, options,
-questions, responses, quizData, question, j,
+responses, quizData, question, j,
 $question, $resetButton, isQuestionAnswered
 
 responseCount = 0
@@ -11,7 +11,7 @@ options = {
 $.ajax({
   url: options.url
 }).done(function(data) {
-  questions = data.questions
+  let questions = data.questions
 
   // Load data from past reponses
   try {
@@ -41,8 +41,8 @@ $.ajax({
     .append('<form id="quiz-form" class="ui form"></form>')
 
   // For each question of the json,
-  for (var i = 0; i < data.questions.length; i++) {
-    question = data.questions[i]
+  for (var i = 0; i < questions.length; i++) {
+    question = questions[i]
 
     if (question.input === undefined) {
       question.input = {
