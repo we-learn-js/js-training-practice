@@ -1,9 +1,5 @@
-const options = {
-  url: 'data/quiz.json?' + Date.now()
-}
-
 $.ajax({
-  url: options.url
+  url: 'data/quiz.json?' + Date.now()
 }).done(function(data) {
   let quizData;
   let responses;
