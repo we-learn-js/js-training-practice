@@ -1,4 +1,4 @@
-var $question, $resetButton
+var $resetButton
 
 const options = {
   url: 'data/quiz.json?' + Date.now()
@@ -114,7 +114,7 @@ $.ajax({
           '</div>'
     }
 
-    $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">' +
+    const $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">' +
       '<div class="content">' +
       '<div class="header">' + question.problem + '</div>' +
       '</div>' +
