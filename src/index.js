@@ -232,9 +232,7 @@ $.ajax({
     }
 
     // Save current state of the quiz
-    quizData.responses = responses
-    quizData.responseCount = responseCount
-    quizData.currentQuestion = currentQuestion
+    quizData = {responses, responseCount, currentQuestion};
     localStorage.setItem('quiz', JSON.stringify(quizData))
   })
 })
