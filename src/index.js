@@ -1,5 +1,5 @@
 var responseCount, currentQuestion, options,
-responses, question, j,
+question, j,
 $question, $resetButton, isQuestionAnswered
 
 responseCount = 0
@@ -12,6 +12,7 @@ $.ajax({
   url: options.url
 }).done(function(data) {
   let quizData;
+  let responses;
   const questions = data.questions
 
   // Load data from past reponses
