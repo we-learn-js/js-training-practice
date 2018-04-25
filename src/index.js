@@ -1,5 +1,5 @@
 var responseCount, currentQuestion, options,
-question, j,
+j,
 $question, $resetButton, isQuestionAnswered
 
 responseCount = 0
@@ -44,7 +44,7 @@ $.ajax({
 
   // For each question of the json,
   for (var i = 0; i < questions.length; i++) {
-    question = questions[i]
+    let question = questions[i]
 
     if (question.input === undefined) {
       question.input = {
