@@ -14,9 +14,7 @@ $.ajax({
   // Load data from past reponses
   try {
     quizData = JSON.parse(localStorage.getItem('quiz'))
-    responses = quizData.responses || []
-    currentQuestion = quizData.currentQuestion || -1
-    responseCount = quizData.responseCount || -1
+    ({responses = [], currentQuestion = -1, responseCount = -1} = quizData);
   } catch (e) {}
 
   if (quizData == null) {
