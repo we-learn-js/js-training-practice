@@ -81,7 +81,7 @@ $.ajax({
         for (j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
           var type = 'checkbox'
-
+          
           if (!!responses[i]) {
             var value = responses[i][j]
           } else {
@@ -182,7 +182,7 @@ $.ajax({
     }
 
     // Set the current responses counter
-    var responseCount = 0
+    let responseCount = 0
     for (i = 0; i < responses.length; i++) {
       question = questions[i]
       switch (question.input.type) {
