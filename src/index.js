@@ -11,7 +11,7 @@ options = {
 $.ajax({
   url: options.url
 }).done(function(data) {
-  let questions = data.questions
+  const questions = data.questions
 
   // Load data from past reponses
   try {
