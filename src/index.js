@@ -1,5 +1,4 @@
 var responseCount, currentQuestion, options,
-j,
 $question, $resetButton, isQuestionAnswered
 
 responseCount = 0
@@ -59,7 +58,7 @@ $.ajax({
       case 'checkbox':
       case 'radio':
         var input = '<div class="inline fields">'
-        for (j = 0; j < question.input.options.length; j++) {
+        for (var j = 0; j < question.input.options.length; j++) {
           var option = question.input.options[j]
           var type = question.input.type
 
