@@ -1,5 +1,3 @@
-var $resetButton
-
 const options = {
   url: 'data/quiz.json?' + Date.now()
 }
