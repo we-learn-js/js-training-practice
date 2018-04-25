@@ -83,9 +83,7 @@ $.ajax({
           
           let option = question.input.options[j]
           let type = 'checkbox'
-          let value = ''; 
-
-          (!!responses[i]) ? value = responses[i][j] : '';
+          let value = (!!responses[i]) ? value = responses[i][j] : '';
 
           input += '<tr>' +
             '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
@@ -101,8 +99,7 @@ $.ajax({
 
         // Default: simple input
       default:
-        let value;
-        (!!responses[i]) ? value = responses[i]: '';
+        let value = (!!responses[i]) ? value = responses[i]: '';
 
         input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
