@@ -56,13 +56,14 @@ $.ajax({
       case 'radio':
         var input = '<div class="inline fields">'
         for (var j = 0; j < question.input.options.length; j++) {
-          var option = question.input.options[j]
-          var type = question.input.type
+          let option = question.input.options[j]
+          let type = question.input.type
+          let checked;
 
           if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-            var checked = 'checked'
+            checked = 'checked'
           } else {
-            var checked = ''
+            checked = ''
           }
 
           input += '<div class="field">' +
@@ -77,15 +78,17 @@ $.ajax({
 
         // Set of inputs (composed response)
       case 'inputs':
-        var input = '<table>'
+        input = '<table>'
         for (j = 0; j < question.input.options.length; j++) {
-          var option = question.input.options[j]
-          var type = 'checkbox'
           
+          let option = question.input.options[j]
+          let type = 'checkbox'
+          let value; 
+
           if (!!responses[i]) {
-            var value = responses[i][j]
+            value = responses[i][j]
           } else {
-            var value = ''
+            value = ''
           }
 
           input += '<tr>' +
@@ -102,12 +105,13 @@ $.ajax({
 
         // Default: simple input
       default:
+        let value;
         if (!!responses[i]) {
-          var value = responses[i]
+          value = responses[i]
         } else {
-          var value = ''
+          value = ''
         }
-        var input = '<div class="ui input fluid">' +
+        input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
     }
@@ -156,8 +160,8 @@ $.ajax({
 
   // Actions on every response submission
   $('#submit-response').on('click', function() {
-    var $inputs = $('[name^=question_' + currentQuestion + ']')
-    var question = questions[currentQuestion]
+    const $inputs = $('[name^=question_' + currentQuestion + ']')
+    const question = questions[currentQuestion]
 
     // Behavior for each question type to add response to array of responses
     switch (question.input.type) {
@@ -184,7 +188,7 @@ $.ajax({
     // Set the current responses counter
     let responseCount = 0
     for (i = 0; i < responses.length; i++) {
-      question = questions[i]
+      const question = questions[i]
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
