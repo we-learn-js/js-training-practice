@@ -1,4 +1,4 @@
-var $question, $resetButton, isQuestionAnswered
+var $question, $resetButton
 
 const options = {
   url: 'data/quiz.json?' + Date.now()
@@ -207,7 +207,7 @@ $.ajax({
       .css('width', (responseCount / questions.length * 100) + '%')
 
     // Check if question had a valid answer
-    isQuestionAnswered = true
+    let isQuestionAnswered = true
     if (!responses[currentQuestion]) {
       isQuestionAnswered = false
     }
