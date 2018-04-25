@@ -228,7 +228,7 @@ $.ajax({
     }
 
     // Save current state of the quiz
-    quizData = {responses, responseCount, currentQuestion};
+    const quizData = {responses, responseCount, currentQuestion};
     localStorage.setItem('quiz', JSON.stringify(quizData))
   })
 })
