@@ -1,8 +1,8 @@
-var responseCount, options,
+var responseCount,
 $question, $resetButton, isQuestionAnswered
 
 responseCount = 0
-options = {
+const options = {
   url: 'data/quiz.json?' + Date.now()
 }
 
