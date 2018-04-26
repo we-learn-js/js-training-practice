@@ -2,3 +2,7 @@
 /dist
 /.idea
 /*.log
+
+package-lock.json
+/test/.screenshots
+
