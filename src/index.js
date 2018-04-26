@@ -1,14 +1,14 @@
-var options = {
+const options = {
     url: 'data/quiz.json?' + Date.now()
 }
 
 $.ajax({
     url: options.url
 }).done(function (data) {
-    var responseCount = 0
-    var currentQuestion = 0
-    var questions, responses, quizData, question, j,
-        $question, $resetButton, isQuestionAnswered
+    let responseCount = 0
+    let currentQuestion = 0
+    let questions, responses, quizData, question
+    let $question, $resetButton, isQuestionAnswered
     
     questions = data.questions
 
@@ -40,7 +40,8 @@ $.ajax({
         .append('<form id="quiz-form" class="ui form"></form>')
 
     // For each question of the json,
-    for (var i = 0; i < data.questions.length; i++) {
+    let i
+    for (i = 0; i < data.questions.length; i++) {
         question = data.questions[i]
 
         if (question.input === undefined) {
@@ -49,21 +50,24 @@ $.ajax({
             }
         }
 
+        let input, option, type, value
+
         // Construct the input depending on question type
-        switch (question.input.type) {
+        switch (question.input.type) {            
 
             // Multiple options
             case 'checkbox':
             case 'radio':
-                var input = '<div class="inline fields">'
-                for (j = 0; j < question.input.options.length; j++) {
-                    var option = question.input.options[j]
-                    var type = question.input.type
+                input = '<div class="inline fields">'
+                for (let j = 0; j < question.input.options.length; j++) {
+                    option = question.input.options[j]
+                    type = question.input.type
 
+                    let checked
                     if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-                        var checked = 'checked'
+                        checked = 'checked'
                     } else {
-                        var checked = ''
+                        checked = ''
                     }
 
                     input += '<div class="field">' +
@@ -78,15 +82,15 @@ $.ajax({
 
             // Set of inputs (composed response)
             case 'inputs':
-                var input = '<table>'
-                for (j = 0; j < question.input.options.length; j++) {
-                    var option = question.input.options[j]
-                    var type = 'checkbox'
+                input = '<table>'
+                for (let j = 0; j < question.input.options.length; j++) {
+                    option = question.input.options[j]
+                    type = 'checkbox'
 
                     if (!!responses[i]) {
-                        var value = responses[i][j]
+                        value = responses[i][j]
                     } else {
-                        var value = ''
+                        value = ''
                     }
 
                     input += '<tr>' +
@@ -104,11 +108,11 @@ $.ajax({
             // Default: simple input
             default:
                 if (!!responses[i]) {
-                    var value = responses[i]
+                    value = responses[i]
                 } else {
-                    var value = ''
+                    value = ''
                 }
-                var input = '<div class="ui input fluid">' +
+                input = '<div class="ui input fluid">' +
                     '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
                     '</div>'
         }
@@ -157,8 +161,8 @@ $.ajax({
 
     // Actions on every response submission
     $('#submit-response').on('click', function () {
-        var $inputs = $('[name^=question_' + currentQuestion + ']')
-        var question = questions[currentQuestion]
+        const $inputs = $('[name^=question_' + currentQuestion + ']')
+        let question = questions[currentQuestion]
 
         // Behavior for each question type to add response to array of responses
         switch (question.input.type) {
@@ -183,8 +187,8 @@ $.ajax({
         }
 
         // Set the current responses counter
-        var responseCount = 0
-        for (i = 0; i < responses.length; i++) {
+        let responseCount = 0
+        for (let i = 0; i < responses.length; i++) {
             question = questions[i]
             switch (question.input.type) {
                 case 'checkbox':
