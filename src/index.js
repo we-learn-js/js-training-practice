@@ -15,16 +15,16 @@ $.ajax({
     // Load data from past reponses
     try {
         quizData = JSON.parse(localStorage.getItem('quiz'))
-        responses = quizData.responses || []
-        currentQuestion = quizData.currentQuestion || -1
-        responseCount = quizData.responseCount || -1
+        
+        quizData &&
+        (
+            [responses = [], currentQuestion = -1, responseCount = -1] = 
+                [quizData.responses, quizData.currentQuestion, quizData.responseCount]
+        )
     } catch (e) { }
 
     if (quizData == null) {
-        quizData = {
-            responses: []
-        }
-        responses = quizData.responses
+        [quizData, responses] = [{responses: []}, []]
     }
 
 
@@ -60,8 +60,7 @@ $.ajax({
             case 'radio':
                 input = '<div class="inline fields">'
                 for (let j = 0; j < question.input.options.length; j++) {
-                    option = question.input.options[j]
-                    type = question.input.type
+                    [option, type] = [question.input.options[j], question.input.type]
 
                     let checked
                     if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
@@ -84,8 +83,7 @@ $.ajax({
             case 'inputs':
                 input = '<table>'
                 for (let j = 0; j < question.input.options.length; j++) {
-                    option = question.input.options[j]
-                    type = 'checkbox'
+                    [option, type] = [question.input.options[j], 'checkbox']                    
 
                     if (!!responses[i]) {
                         value = responses[i][j]
@@ -244,9 +242,12 @@ $.ajax({
         }
 
         // Save current state of the quiz
-        quizData.responses = responses
-        quizData.responseCount = responseCount
-        quizData.currentQuestion = currentQuestion
+        quizData &&
+        (
+            [quizData.responses, quizData.responseCount, quizData.currentQuestion] =
+                [responses, responseCount, currentQuestion]
+        )
+
         localStorage.setItem('quiz', JSON.stringify(quizData))
     })
 })
