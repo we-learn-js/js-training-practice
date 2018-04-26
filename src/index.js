@@ -17,16 +17,12 @@ $.ajax({
         quizData = JSON.parse(localStorage.getItem('quiz'))
         
         quizData &&
-        (
-            [responses = [], currentQuestion = -1, responseCount = -1] = 
-                [quizData.responses, quizData.currentQuestion, quizData.responseCount]
-        )
+        ([responses = [], currentQuestion = -1, responseCount = -1] = 
+            [quizData.responses, quizData.currentQuestion, quizData.responseCount])
     } catch (e) { }
 
-    if (quizData == null) {
-        [quizData, responses] = [{responses: []}, []]
-    }
-
+    quizData == null && 
+    ([quizData, responses] = [{responses: []}, []])
 
     // Append the progress bar to DOM
     $('body')
@@ -44,11 +40,10 @@ $.ajax({
     for (i = 0; i < data.questions.length; i++) {
         question = data.questions[i]
 
-        if (question.input === undefined) {
-            question.input = {
-                type: 'input'
-            }
-        }
+        question.input === undefined &&
+        (question.input = {
+            type: 'input'
+        })
 
         let input, option, type, value
 
@@ -63,11 +58,9 @@ $.ajax({
                     [option, type] = [question.input.options[j], question.input.type]
 
                     let checked
-                    if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-                        checked = 'checked'
-                    } else {
-                        checked = ''
-                    }
+                    !!responses[i] && responses[i].indexOf(option.label) !== -1
+                        ? checked = 'checked'
+                        : checked = ''
 
                     input += '<div class="field">' +
                         '<div class="ui checkbox ' + type + '">' +
@@ -85,11 +78,9 @@ $.ajax({
                 for (let j = 0; j < question.input.options.length; j++) {
                     [option, type] = [question.input.options[j], 'checkbox']                    
 
-                    if (!!responses[i]) {
-                        value = responses[i][j]
-                    } else {
-                        value = ''
-                    }
+                    !!responses[i] 
+                        ? value = responses[i][j]
+                        : value = ''
 
                     input += '<tr>' +
                         '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
@@ -105,11 +96,10 @@ $.ajax({
 
             // Default: simple input
             default:
-                if (!!responses[i]) {
-                    value = responses[i]
-                } else {
-                    value = ''
-                }
+                !!responses[i]
+                    ? value = responses[i]
+                    : value = ''
+
                 input = '<div class="ui input fluid">' +
                     '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
                     '</div>'
@@ -170,9 +160,11 @@ $.ajax({
                 $('[name=' + $inputs.attr('name') + ']:checked').each(function (i, input) {
                     responses[currentQuestion].push(input.value)
                 })
-                if (responses[currentQuestion].length === 0) {
-                    responses[currentQuestion] = null
-                }
+
+                responses[currentQuestion].length === 0
+                    ? responses[currentQuestion] = null
+                    : ''
+                
                 break
             case 'inputs':
                 responses[currentQuestion] = []
@@ -192,14 +184,14 @@ $.ajax({
                 case 'checkbox':
                 case 'radio':
                 case 'inputs':
-                    if (!!responses[i] && !!responses[i].join('')) {
-                        responseCount++
-                    }
+                    !!responses[i] && !!responses[i].join('')
+                        ? responseCount++
+                        : ''
                     break
                 default:
-                    if (!!responses[i]) {
-                        responseCount++
-                    }
+                    !!responses[i]
+                        ? responseCount++
+                        : ''
             }
         }
 
@@ -208,15 +200,15 @@ $.ajax({
             .css('width', (responseCount / questions.length * 100) + '%')
 
         // Check if question had a valid answer
-        isQuestionAnswered = true
-        if (!responses[currentQuestion]) {
-            isQuestionAnswered = false
-        }
+        !responses[currentQuestion]
+            ? isQuestionAnswered = false
+            : isQuestionAnswered = true
+        
         if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
             for (let j = 0; j < responses[currentQuestion].length; j++) {
-                if (!responses[currentQuestion][j]) {
-                    isQuestionAnswered = false
-                }
+                !responses[currentQuestion][j]
+                    ? isQuestionAnswered = false
+                    : ''
             }
         }
 
