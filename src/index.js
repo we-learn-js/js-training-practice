@@ -39,27 +39,28 @@ $.ajax({
   for (let i = 0; i < questions.length; i++) {
     const question = questions[i]
 
+    const {problem, input: {options = [], type = 'input'} = {}} = questions[i];
+
     if (question.input === undefined) {
       question.input = {
         type: 'input'
       }
     }
+
     let input;
     let value;
     let option;
     // Construct the input depending on question type
-    switch (question.input.type) {
+    switch (type) {
 
       // Multiple options
       case 'checkbox':
       case 'radio':
         input = '<div class="inline fields">'
 
-        for (let j = 0; j < question.input.options.length; j++) {
-          option = question.input.options[j]
-          const type = question.input.type
+        for (let j = 0; j < options.length; j++) {
+          option = options[j]
           const checked = !!responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked': ''
-
 
           input += '<div class="field">' +
             '<div class="ui checkbox ' + type + '">' +
@@ -74,11 +75,9 @@ $.ajax({
         // Set of inputs (composed response)
       case 'inputs':
         input = '<table>'
-        for (let j = 0; j < question.input.options.length; j++) {
-          const option = question.input.options[j]
-          const type = 'checkbox'
+        for (let j = 0; j < options.length; j++) {
+          const option = options[j]
           let value = !!responses[i] ? responses[i][j] : ''
-
 
           input += '<tr>' +
             '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
@@ -103,7 +102,7 @@ $.ajax({
 
     const $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">' +
       '<div class="content">' +
-      '<div class="header">' + question.problem + '</div>' +
+      '<div class="header">' + problem + '</div>' +
       '</div>' +
       '<div class="content">' +
       input +
