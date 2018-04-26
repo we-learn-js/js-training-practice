@@ -213,7 +213,7 @@ $.ajax({
             isQuestionAnswered = false
         }
         if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-            for (j = 0; j < responses[currentQuestion].length; j++) {
+            for (let j = 0; j < responses[currentQuestion].length; j++) {
                 if (!responses[currentQuestion][j]) {
                     isQuestionAnswered = false
                 }
