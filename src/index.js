@@ -1,17 +1,12 @@
-var responseCount, currentQuestion, options,
-questions, responses, quizData, question, j,
-$question, $resetButton, isQuestionAnswered
-
-responseCount = 0
-currentQuestion = 0
-options = {
-  url: 'data/quiz.json?' + Date.now()
-}
-
 $.ajax({
-  url: options.url
+  url: 'data/quiz.json?' + Date.now()
 }).done(function(data) {
-  questions = data.questions
+  const questions = data.questions
+  let responseCount = 0
+  let responses 
+  let quizData
+  let currentQuestion = 0
+  const $question, $resetButton
 
   // Load data from past reponses
   try {
@@ -41,9 +36,13 @@ $.ajax({
     .append('<form id="quiz-form" class="ui form"></form>')
 
   // For each question of the json,
-  for (var i = 0; i < data.questions.length; i++) {
-    question = data.questions[i]
-
+  for (let i = 0; i < data.questions.length; i++) {
+    let question = data.questions[i]
+	let option
+	let type
+	let checked
+	let input
+	
     if (question.input === undefined) {
       question.input = {
         type: 'input'
@@ -56,15 +55,15 @@ $.ajax({
       // Multiple options
       case 'checkbox':
       case 'radio':
-        var input = '<div class="inline fields">'
-        for (j = 0; j < question.input.options.length; j++) {
-          var option = question.input.options[j]
-          var type = question.input.type
+        input = '<div class="inline fields">'
+        for (let j = 0; j < question.input.options.length; j++) {
+          option = question.input.options[j]
+          type = question.input.type
 
           if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-            var checked = 'checked'
+            checked = 'checked'
           } else {
-            var checked = ''
+            checked = ''
           }
 
           input += '<div class="field">' +
@@ -79,15 +78,15 @@ $.ajax({
 
         // Set of inputs (composed response)
       case 'inputs':
-        var input = '<table>'
-        for (j = 0; j < question.input.options.length; j++) {
-          var option = question.input.options[j]
-          var type = 'checkbox'
+        input = '<table>'
+        for ( let j = 0; j < question.input.options.length; j++) {
+          option = question.input.options[j]
+          type = 'checkbox'
 
           if (!!responses[i]) {
-            var value = responses[i][j]
+            value = responses[i][j]
           } else {
-            var value = ''
+            value = ''
           }
 
           input += '<tr>' +
@@ -105,11 +104,11 @@ $.ajax({
         // Default: simple input
       default:
         if (!!responses[i]) {
-          var value = responses[i]
+          value = responses[i]
         } else {
-          var value = ''
+          value = ''
         }
-        var input = '<div class="ui input fluid">' +
+        input = '<div class="ui input fluid">' +
           '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
           '</div>'
     }
@@ -158,8 +157,8 @@ $.ajax({
 
   // Actions on every response submission
   $('#submit-response').on('click', function() {
-    var $inputs = $('[name^=question_' + currentQuestion + ']')
-    var question = questions[currentQuestion]
+    let $inputs = $('[name^=question_' + currentQuestion + ']')
+    let question = questions[currentQuestion]
 
     // Behavior for each question type to add response to array of responses
     switch (question.input.type) {
@@ -184,9 +183,9 @@ $.ajax({
     }
 
     // Set the current responses counter
-    var responseCount = 0
+    let responseCount = 0
     for (i = 0; i < responses.length; i++) {
-      question = questions[i]
+      let question = questions[i]
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
@@ -207,12 +206,12 @@ $.ajax({
       .css('width', (responseCount / questions.length * 100) + '%')
 
     // Check if question had a valid answer
-    isQuestionAnswered = true
+    let isQuestionAnswered = true
     if (!responses[currentQuestion]) {
       isQuestionAnswered = false
     }
     if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-      for (j = 0; j < responses[currentQuestion].length; j++) {
+      for (let j = 0; j < responses[currentQuestion].length; j++) {
         if (!responses[currentQuestion][j]) {
           isQuestionAnswered = false
         }
