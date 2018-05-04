@@ -6,14 +6,14 @@ The quiz is a simple quiz built on client from a [json file](https://github.com/
 
 The quiz has a simple schema:
 
-| Property | Definition |
-| -- | -- |
-| `title:String` | Title of the quiz |
-| `questions:Array<Object>` | Config of questions |
-| `questions[]:Object` | |
-| `questions[].problem:String` | Question's title|
-| `questions[].input:Object` | Field to display |
-| `questions[].input.type:String` | 'radio', 'checkbox', 'inputs' or 'input' (default) |
+| Property                          | Definition                                                       |
+| --------------------------------- | ---------------------------------------------------------------- |
+| `title:String`                    | Title of the quiz                                                |
+| `questions:Array<Object>`         | Config of questions                                              |
+| `questions[]:Object`              |                                                                  |
+| `questions[].problem:String`      | Question's title                                                 |
+| `questions[].input:Object`        | Field to display                                                 |
+| `questions[].input.type:String`   | 'radio', 'checkbox', 'inputs' or 'input' (default)               |
 | `questions[].input.options:Array` | labels of the options (only for 'radio', 'checkbox' or 'inputs') |
 
 ## Why?
@@ -36,20 +36,13 @@ Runs the project on watch mode.
 
 Executes end-to-end tests on the app to check your change haven't broken anything.
 
-> :warning: **Caution!** :warning:
->
-> Tests are run with selenium and require to have Java JDK installed: http://www.oracle.com/technetwork/java/javase/downloads/index.html.
->
-> The tests were run successfully with Chrome v62
-
 ### `npm run test:dev`
 
-Executes end-to-end tests on watch mode. Tests will be reexecuted every time.
+Executes "npm run dev" with tests so you can reload them when needed.
 
 ### `npm reset`
 
 Safely reinstalls the project.
-
 
 ## Refactor phases
 
