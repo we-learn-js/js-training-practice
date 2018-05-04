@@ -1,5 +1,5 @@
 const options = {
-  url: 'data/quiz.json?' + Date.now()
+  url: `data/quiz.json?${Date.now()}`
 }
 
 $.ajax({
@@ -24,13 +24,13 @@ $.ajax({
 
   // Append the progress bar to DOM
   $('body')
-    .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">' +
-      '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>' +
-      '</div>')
+    .append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px;">
+                <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
+             </div>`)
 
   // Append title and form to quiz
   $('#quiz')
-    .append('<h1 class="ui header">' + quizTitle + '</h1>')
+    .append(`<h1 class="ui header">${quizTitle}</h1>`)
     .append('<form id="quiz-form" class="ui form"></form>')
 
   // For each question of the json
@@ -46,12 +46,12 @@ $.ajax({
         for (let j = 0; j < answers.length; j++) {
           let {label: answerLabel} = answers[j]
           !!responses[i] && responses[i].indexOf(answerLabel) !== -1 ? value = 'checked' : ''
-          input += '<div class="field">' +
-            '<div class="ui checkbox ' + inputType + '">' +
-            '<input type="' + inputType + '" ' + value + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + answerLabel + '">' +
-            '<label for="question_' + i + '_' + j + '">' + answerLabel + '</label>' +
-            '</div>' +
-            '</div>'
+          input += `<div class="field">
+                      <div class="ui checkbox ${inputType}">
+                        <input type="${inputType}" ${value} name="question_${i}" id="question_${i}_${j}" value="${answerLabel}">
+                        <label for="question_${i}_${j}">${answerLabel}</label>
+                      </div>
+                    </div>`
         }
         input += '</div>'
         break
@@ -62,14 +62,14 @@ $.ajax({
         for (let j = 0; j < answers.length; j++) {
           let {label: answerLabel} = answers[j]
           !!responses[i] ? value = responses[i][j] : value = ''
-          input += '<tr>' +
-            '<td><label for="question_' + i + '_' + j + '">' + answerLabel + '</label></td>' +
-            '<td width="15px"></td>' +
-            '<td><div class="ui input">' +
-            '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />' +
-            '</div></td>' +
-            '</tr>' +
-            '<tr><td colspan="3">&nbsp;</tr></tr>'
+          input += `<tr>
+                      <td><label for="question_${i}_${j}">${answerLabel}</label></td>
+                      <td width="15px"></td>
+                      <td><div class="ui input"><input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" /></div></td>
+                    </tr>
+                    <tr>
+                      <td colspan="3">&nbsp;</td>
+                    </tr>`
         }
         input += '</table>'
         break
@@ -77,19 +77,19 @@ $.ajax({
         // Default: simple input
       default:
         !!responses[i] ? value = responses[i] : value = ''
-        input = '<div class="ui input fluid">' +
-          '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
-          '</div>'
+        input = `<div class="ui input fluid">
+                    <input type="text" placeholder="Response..." name="question_${i}" value="${value}" />
+                </div>`
     }
 
-    let $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">' +
-      '<div class="content">' +
-      '<div class="header">' + question + '</div>' +
-      '</div>' +
-      '<div class="content">' +
-      input +
-      '</div>' +
-      '</div>'
+    let $question = $(`<div id="question-${i}" class="ui card" style="width: 100%;">
+                        <div class="content">
+                          <div class="header">${question}</div>
+                        </div>
+                        <div class="content">
+                          ${input}
+                        </div>
+                       </div>`
     ).css('display', 'none')
 
     $('#quiz-form')
@@ -97,12 +97,12 @@ $.ajax({
 
     // Show current question
     $('#quiz-form')
-      .find('#question-' + currentQuestion)
+      .find(`#question-${currentQuestion}`)
       .css('display', 'block')
 
     // Update progress bar
     $('#progress')
-      .css('width', (responseCount / questions.length * 100) + '%')
+      .css('width', `${(responseCount / questions.length * 100)}%`)
   }
 
   // Add button to submit response
@@ -126,7 +126,7 @@ $.ajax({
 
   // Actions on every response submission
   $('#submit-response').on('click', function() {
-    let $inputs = $('[name^=question_' + currentQuestion + ']')
+    let $inputs = $(`[name^=question_${currentQuestion}]`)
 
     // Behavior for each question type to add response to array of responses
     responses[currentQuestion] = []
@@ -165,7 +165,7 @@ $.ajax({
 
     // Update progress bar
     $('#progress')
-      .css('width', (responseCount / questions.length * 100) + '%')
+      .css('width', `${(responseCount / questions.length * 100)}%`)
 
     // Check if question had a valid answer
     let isQuestionAnswered = !responses[currentQuestion] ? false : true
@@ -184,12 +184,12 @@ $.ajax({
 
       // Display next question
       $('#quiz-form')
-        .find('#question-' + currentQuestion).css('display', 'none')
+        .find(`#question-${currentQuestion}`).css('display', 'none')
         
       currentQuestion++
 
       $('#quiz-form')
-        .find('#question-' + currentQuestion).css('display', 'block')
+        .find(`#question-${currentQuestion}`).css('display', 'block')
 
       // If it was the las question, display final message
       if (responseCount === questions.length) {
