@@ -6,10 +6,8 @@
   "scripts": {
     "dev": "webpack-dev-server --devtool eval --progress --colors",
     "build": "webpack --config webpack.config.js",
-    "test":
-      "concurrently --success='last' --kill-others \"webpack-dev-server\" \"sui-test e2e --baseUrl=http://localhost:8080\"",
-    "test:dev":
-      "concurrently --kill-others \"npm run dev\" \"sui-test e2e --baseUrl=http://localhost:8080 --gui\"",
+    "test": "concurrently --success='last' --kill-others \"webpack-dev-server\" \"sui-test e2e --baseUrl=http://localhost:8080\"",
+    "test:dev": "concurrently --kill-others \"npm run dev\" \"sui-test e2e --baseUrl=http://localhost:8080 --gui\"",
     "reset": "rm -Rf node_modules && npm i",
     "prepush": "npm test"
   },
