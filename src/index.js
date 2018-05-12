@@ -1,235 +1,227 @@
-const options = {
-  url: 'data/quiz.json?' + Date.now()
-}
+(function(localStorage, JSON) {
+	const options = {
+		url: 'data/quiz.json?' + Date.now()
+	};
 
-$.ajax({
-  url: options.url
-}).done(function(data) {
-  const { questions , title} = data;
+	$.ajax({
+		url: options.url
+	}).done(function(data) {
+		const { questions, title } = data;
 
-  let quizData;
+		let quizData;
 
-  try {
-    quizData = JSON.parse(localStorage.getItem('quiz'))
-  }
-  catch(e){}
+		try {
+			quizData = JSON.parse(localStorage.getItem('quiz'));
+		} catch (e) {}
 
-  if (quizData == null) {
-    quizData = {
-      responses: []
-    }
-    responses = quizData.responses
-  }
+		if (quizData == null) {
+			quizData = {
+				responses: []
+			};
+			responses = quizData.responses;
+		}
 
-  // Load data from past reponses
-  let {responses = [], currentQuestion = 0, responseCount = 0} = quizData;
+		// Load data from past reponses
+		let { responses = [], currentQuestion = 0, responseCount = 0 } = quizData;
 
-  // Append the progress bar to DOM
-  $('body')
-    .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">' +
-      '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>' +
-      '</div>')
+		// Append the progress bar to DOM
+		$('body').append(`<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">
+        <div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>
+        </div>`);
 
-  // Append title and form to quiz
-  $('#quiz')
-    .append('<h1 class="ui header">' + title + '</h1>')
-    .append('<form id="quiz-form" class="ui form"></form>')
+		// Append title and form to quiz
+		$('#quiz').append(`<h1 class="ui header">${title}</h1>`).append(`<form id="quiz-form" class="ui form"></form>`);
 
-  // For each question of the json,
-  for (let i = 0; i < questions.length; i++) {
-    const question = questions[i]
+		// For each question of the json,
+		for (let i = 0; i < questions.length; i++) {
+			const question = questions[i];
 
-    const {problem, input: {options = [], type = 'input'} = {}} = questions[i];
+			const { problem, input: { options = [], type = 'input' } = {} } = questions[i];
 
-    if (question.input === undefined) {
-      question.input = {
-        type: 'input'
-      }
-    }
+			if (question.input === undefined) {
+				question.input = {
+					type: 'input'
+				};
+			}
 
-    let input;
-    let value;
-    let option;
-    // Construct the input depending on question type
-    switch (type) {
+			let input;
+			let value;
+			let option;
+			// Construct the input depending on question type
+			switch (type) {
+				// Multiple options
+				case 'checkbox':
+				case 'radio':
+					input = '<div class="inline fields">';
 
-      // Multiple options
-      case 'checkbox':
-      case 'radio':
-        input = '<div class="inline fields">'
+					for (let j = 0; j < options.length; j++) {
+						option = options[j];
+						const checked = !!responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked' : '';
 
-        for (let j = 0; j < options.length; j++) {
-          option = options[j]
-          const checked = !!responses[i] && responses[i].indexOf(option.label) !== -1 ? 'checked': ''
+						input += `<div class="field">
+              <div class="ui checkbox ${type}">
+                <input type="${type}" ${checked} name="question_${i}" id="question_${i}_${j}"  value="${option.label}">
+                <label for="question_${i}_${j}">${option.label}</label>
+              </div> 
+              </div>`;
+					}
 
-          input += '<div class="field">' +
-            '<div class="ui checkbox ' + type + '">' +
-            '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">' +
-            '<label for="question_' + i + '_' + j + '">' + option.label + '</label>' +
-            '</div>' +
-            '</div>'
-        }
-        input += '</div>'
-        break
+					input += '</div>';
+					break;
 
-        // Set of inputs (composed response)
-      case 'inputs':
-        input = '<table>'
-        for (let j = 0; j < options.length; j++) {
-          const option = options[j]
-          let value = !!responses[i] ? responses[i][j] : ''
+				// Set of inputs (composed response)
+				case 'inputs':
+					input = '<table>';
+					for (let j = 0; j < options.length; j++) {
+						const option = options[j];
+						let value = !!responses[i] ? responses[i][j] : '';
 
-          input += '<tr>' +
-            '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
-            '<td width="15px"></td>' +
-            '<td><div class="ui input">' +
-            '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />' +
-            '</div></td>' +
-            '</tr>' +
-            '<tr><td colspan="3">&nbsp;</tr></tr>'
-        }
-        input += '</table>'
-        break
+						input += `<tr>
+                <td><label for="question_${i}_${j}">${option.label}</label></td>
+                <td width="15px"></td>
+                <td>
+                  <div class="ui input">
+                  <input type="text" placeholder="Response..." name="question_${i}" id="question_${i}_${j}" value="${value}" />
+                  </div>
+                </td>
+              </tr>
+              <tr><td colspan="3">&nbsp;</tr></tr>`;
+					}
+					input += '</table>';
+					break;
 
-        // Default: simple input
-      default:
-        const value = !!responses[i] ? responses[i] : ''
+				// Default: simple input
+				default:
+					const value = !!responses[i] ? responses[i] : '';
 
-        input = '<div class="ui input fluid">' +
-          '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
-          '</div>'
-    }
+					input = `<div class="ui input fluid">
+              <input type="text" placeholder="Response..." name="question_${i}" value="${value}" />
+            </div>`;
+			}
 
-    const $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">' +
-      '<div class="content">' +
-      '<div class="header">' + problem + '</div>' +
-      '</div>' +
-      '<div class="content">' +
-      input +
-      '</div>' +
-      '</div>'
-    ).css('display', 'none')
+			const $question = $(
+				`<div id="question-${i}" class="ui card" style="width: 100%;"> 
+          <div class="content">
+            <div class="header">${problem}</div>
+          </div>
+          <div class="content">${input}</div>
+        </div>`
+			).css('display', 'none');
 
-    $('#quiz-form')
-      .append($question)
+			$('#quiz-form').append($question);
 
-    // Show current question
-    $('#quiz-form')
-      .find('#question-' + currentQuestion)
-      .css('display', 'block')
+			// Show current question
+			$('#quiz-form').find(`#question-${currentQuestion}`).css('display', 'block');
 
-    // Update progress bar
-    $('#progress')
-      .css('width', (responseCount / questions.length * 100) + '%')
-  }
+			// Update progress bar
+			$('#progress').css('width', `${responseCount / questions.length * 100}%`);
+		}
 
-  // Add button to submit response
-  $('#quiz')
-    .append('<button id="submit-response" class="ui primary button">Submit response</button>')
+		// Add button to submit response
+		$('#quiz').append('<button id="submit-response" class="ui primary button">Submit response</button>');
 
-  // Is case all questions have been responded
-  if (responseCount === questions.length) {
-    $('#submit-response').css('display', 'none')
-    $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-    $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-  }
+		// Is case all questions have been responded
+		if (responseCount === questions.length) {
+			$('#submit-response').css('display', 'none');
+			$('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>');
+			$('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>');
+		}
 
-  // Add a reset button that will redirect to quiz start
-  const $resetButton = $('<button class="ui button negative">Reset</button>')
-  $resetButton.on('click', function() {
-    localStorage.removeItem('quiz')
-    location.reload();
-  })
-  $('#quiz').append($resetButton)
+		// Add a reset button that will redirect to quiz start
+		const $resetButton = $('<button class="ui button negative">Reset</button>');
+		$resetButton.on('click', function() {
+			localStorage.removeItem('quiz');
+			location.reload();
+		});
+		$('#quiz').append($resetButton);
 
-  // Actions on every response submission
-  $('#submit-response').on('click', function() {
-    const $inputs = $('[name^=question_' + currentQuestion + ']')
-    const question = questions[currentQuestion]
+		// Actions on every response submission
+		$('#submit-response').on('click', function() {
+			const $inputs = $('[name^=question_' + currentQuestion + ']');
+			const question = questions[currentQuestion];
 
-    // Behavior for each question type to add response to array of responses
-    switch (question.input.type) {
-      case 'checkbox':
-      case 'radio':
-        responses[currentQuestion] = []
-        $('[name=' + $inputs.attr('name') + ']:checked').each(function(i, input) {
-          responses[currentQuestion].push(input.value)
-        })
-        if (responses[currentQuestion].length === 0) {
-          responses[currentQuestion] = null
-        }
-        break
-      case 'inputs':
-        responses[currentQuestion] = []
-        $inputs.each(function(i, input) {
-          responses[currentQuestion].push(input.value)
-        })
-        break
-      default:
-        responses[currentQuestion] = $inputs.val()
-    }
+			// Behavior for each question type to add response to array of responses
+			switch (question.input.type) {
+				case 'checkbox':
+				case 'radio':
+					responses[currentQuestion] = [];
+					$('[name=' + $inputs.attr('name') + ']:checked').each(function(i, input) {
+						responses[currentQuestion].push(input.value);
+					});
+					if (responses[currentQuestion].length === 0) {
+						responses[currentQuestion] = null;
+					}
+					break;
+				case 'inputs':
+					responses[currentQuestion] = [];
+					$inputs.each(function(i, input) {
+						responses[currentQuestion].push(input.value);
+					});
+					break;
+				default:
+					responses[currentQuestion] = $inputs.val();
+			}
 
-    // Set the current responses counter
-    var responseCount = 0
-    for (let i = 0; i < responses.length; i++) {
-      let question = questions[i]
-      switch (question.input.type) {
-        case 'checkbox':
-        case 'radio':
-        case 'inputs':
-          if (!!responses[i] && !!responses[i].join('')) {
-            responseCount++
-          }
-          break
-        default:
-          if (!!responses[i]) {
-            responseCount++
-          }
-      }
-    }
+			// Set the current responses counter
+			var responseCount = 0;
+			for (let i = 0; i < responses.length; i++) {
+				let question = questions[i];
+				switch (question.input.type) {
+					case 'checkbox':
+					case 'radio':
+					case 'inputs':
+						if (!!responses[i] && !!responses[i].join('')) {
+							responseCount++;
+						}
+						break;
+					default:
+						if (!!responses[i]) {
+							responseCount++;
+						}
+				}
+			}
 
-    // Update progress bar
-    $('#progress')
-      .css('width', (responseCount / questions.length * 100) + '%')
+			// Update progress bar
+			$('#progress').css('width', responseCount / questions.length * 100 + '%');
 
-    // Check if question had a valid answer
-    let isQuestionAnswered = true
-    if (!responses[currentQuestion]) {
-      isQuestionAnswered = false
-    }
-    if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
-      for (let j = 0; j < responses[currentQuestion].length; j++) {
-        if (!responses[currentQuestion][j]) {
-          isQuestionAnswered = false
-        }
-      }
-    }
+			// Check if question had a valid answer
+			let isQuestionAnswered = true;
+			if (!responses[currentQuestion]) {
+				isQuestionAnswered = false;
+			}
+			if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
+				for (let j = 0; j < responses[currentQuestion].length; j++) {
+					if (!responses[currentQuestion][j]) {
+						isQuestionAnswered = false;
+					}
+				}
+			}
 
-    if (!isQuestionAnswered) {
-      // Alert user of missing response
-      alert('You must give a response')
-    } else {
+			if (!isQuestionAnswered) {
+				// Alert user of missing response
+				alert('You must give a response');
+			} else {
+				// Display next question
+				$('#quiz-form').find(`#question-${currentQuestion}`).css('display', 'none');
+				currentQuestion = currentQuestion + 1;
 
-      // Display next question
-      $('#quiz-form')
-        .find('#question-' + currentQuestion).css('display', 'none')
-      currentQuestion = currentQuestion + 1
+				$('#quiz-form').find(`#question-${currentQuestion}`).css('display', 'block');
 
-      $('#quiz-form')
-        .find('#question-' + currentQuestion).css('display', 'block')
+				// If it was the las question, display final message
+				if (responseCount === questions.length) {
+					$('#submit-response').css('display', 'none');
+					$('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>');
+					$('#quiz').append(
+						'<button class="ui primary button" onclick="window.print()" >Print responses</button>'
+					);
+				}
+			}
 
-      // If it was the las question, display final message
-      if (responseCount === questions.length) {
-        $('#submit-response').css('display', 'none')
-        $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-        $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-      }
-    }
-
-    // Save current state of the quiz
-    quizData.responses = responses
-    quizData.responseCount = responseCount
-    quizData.currentQuestion = currentQuestion
-    localStorage.setItem('quiz', JSON.stringify(quizData))
-  })
-})
+			// Save current state of the quiz
+			quizData.responses = responses;
+			quizData.responseCount = responseCount;
+			quizData.currentQuestion = currentQuestion;
+			localStorage.setItem('quiz', JSON.stringify(quizData));
+		});
+	});
+})(localStorage, JSON);
