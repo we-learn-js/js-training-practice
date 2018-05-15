@@ -133,7 +133,7 @@ $.ajax({
     switch (questions[currentQuestion].input.type) {
       case 'checkbox':
       case 'radio':
-        $('[name=' + $inputs.attr('name') + ']:checked').each(function(i, input) {
+        $(`[name='${$inputs.attr('name')}']:checked`).each(function(i, input) {
           responses[currentQuestion].push(input.value)
         })
         if (responses[currentQuestion].length === 0) {
