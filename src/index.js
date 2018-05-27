@@ -1,3 +1,169 @@
+class ViewHandler {
+        
+    appendProgressBarToDom = () => {
+        $('body')
+        .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">' +
+          '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>' +
+          '</div>')    
+    }
+    
+    appendTitleAndFormToQuiz = (title) => {
+        $('#quiz')
+        .append('<h1 class="ui header">' + title + '</h1>')
+        .append('<form id="quiz-form" class="ui form"></form>')    
+    }
+    
+    appendQuestionToQuizForm = (question, response, questionIndex) => {
+        const input = this._constructDivQuestionInput(question.input, response, questionIndex)
+        $question = this._constructDivQuestion(question.problem, input, questionIndex)
+
+        $('#quiz-form')
+          .append($question)
+    }
+
+    showQuestion(questionIndex) {
+        $('#quiz-form')
+        .find('#question-' + questionIndex)
+        .css('display', 'block')
+    }
+
+    hideQuestion(questionIndex) {
+        $('#quiz-form')
+        .find('#question-' + questionIndex)
+        .css('display', 'none')
+    }    
+
+    showModalMessage(message) {
+        alert(message)
+    }
+    
+    updateProgressBar(responseCount, questionsLength) {
+        $('#progress')
+            .css('width', (responseCount / questionsLength * 100) + '%')  
+    }
+    
+    addButtonToSubmitResponse() {
+        $('#quiz')
+            .append('<button id="submit-response" class="ui primary button">Submit response</button>')
+    }    
+
+    showPrintResponsesButton() {
+        $('#submit-response').css('display', 'none')
+        $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
+        $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')        
+    }
+
+    addResetButton() {
+        const $resetButton = $('<button class="ui button negative">Reset</button>')
+        $resetButton.on('click', function() {
+          localStorage.removeItem('quiz')
+          location.reload();
+        })
+        
+        $('#quiz').append($resetButton)        
+    }
+
+    _getMultipleOptionsInput(questionInput, response, questionIndex) {
+        let input = '<div class="inline fields">'
+        for (let j = 0; j < questionInput.options.length; j++) {
+        let option = questionInput.options[j]
+        let type = questionInput.type
+        let checked = ''
+
+        if (!!response && response.indexOf(option.label) !== -1) {
+            checked = 'checked'
+        }
+
+        input += '<div class="field">' +
+            '<div class="ui checkbox ' + type + '">' +
+            '<input type="' + type + '" ' + checked + ' name="question_' + questionIndex + '" id="question_' + 
+            questionIndex + '_' + j + '" value="' + option.label + '">' +
+            '<label for="question_' + questionIndex + '_' + j + '">' + option.label + '</label>' +
+            '</div>' +
+            '</div>' + 
+            '</div>'
+        }
+    
+        return input        
+    }
+
+    _getMultipleInputs(questionInput, response, questionIndex) {
+        let input = '<table>'
+        for (let j = 0; j < questionInput.options.length; j++) {
+        var option = questionInput.options[j]
+        var type = 'checkbox'
+
+        if (!!response) {
+            var value = response[j]
+        } else {
+            var value = ''
+        }
+
+        input += '<tr>' +
+            '<td><label for="question_' + questionIndex + '_' + j + '">' + option.label + 
+            '</label></td>' +
+            '<td width="15px"></td>' +
+            '<td><div class="ui input">' +
+            '<input type="text" placeholder="Response..." name="question_' + questionIndex + 
+            '" id="question_' + questionIndex + '_' + j + '" value="' + value + '" />' +
+            '</div></td>' +
+            '</tr>' +
+            '<tr><td colspan="3">&nbsp;</tr></tr>' +
+            '</table>'
+        }
+
+        return input
+    }
+
+    _getSimpleInput(questionInput, response, questionIndex) {
+        if (!!response) {
+            var value = response
+        } else {
+            var value = ''
+        }
+        
+        const input = '<div class="ui input fluid">' +
+            '<input type="text" placeholder="Response..." name="question_' + questionIndex + 
+            '" value="' + value + '" />' +
+            '</div>'
+        
+        return input
+    }
+
+    _constructDivQuestionInput = (questionInput, response, questionIndex) => {
+        let input 
+    
+        switch (questionInput.type) {
+            case 'checkbox':
+            case 'radio':
+                input = this._getMultipleOptionsInput(questionInput, response, questionIndex)
+                break
+            case 'inputs':
+                input = this._getMultipleInputs(questionInput, response, questionIndex)
+                break
+            default:
+                input = this._getSimpleInput()
+                break
+        }
+        
+        return input
+    }
+    
+    _constructDivQuestion = (questionProblem, input, questionIndex) => {
+        return $(
+            '<div id="question-' + questionIndex + '" class="ui card" style="width: 100%;">' +
+                '<div class="content">' +
+                    '<div class="header">' + questionProblem + '</div>' +
+                '</div>' +
+                '<div class="content">' +
+                    input +
+                '</div>' +
+            '</div>'
+        ).css('display', 'none')    
+    }    
+}
+
+
 var responseCount, currentQuestion, options,
 questions, responses, quizData, question, j,
 $question, $resetButton, isQuestionAnswered
@@ -8,7 +174,10 @@ options = {
   url: 'data/quiz.json?' + Date.now()
 }
 
+const viewHandler = new ViewHandler()
+
 $.ajax({
+  dataType: "json",
   url: options.url
 }).done(function(data) {
   questions = data.questions
@@ -28,133 +197,27 @@ $.ajax({
     responses = quizData.responses
   }
 
-
-  // Append the progress bar to DOM
-  $('body')
-    .append('<div style="position: fixed; bottom: 0; background: #eee; width: 100%; height: 6px; ">' +
-      '<div id="progress" style="background: #1678c2; width: 1%;">&nbsp;</div>' +
-      '</div>')
-
-  // Append title and form to quiz
-  $('#quiz')
-    .append('<h1 class="ui header">' + data.title + '</h1>')
-    .append('<form id="quiz-form" class="ui form"></form>')
+  viewHandler.appendProgressBarToDom()
+  viewHandler.appendTitleAndFormToQuiz(data.title)
 
   // For each question of the json,
   for (var i = 0; i < data.questions.length; i++) {
     question = data.questions[i]
-
-    if (question.input === undefined) {
-      question.input = {
-        type: 'input'
-      }
-    }
-
-    // Construct the input depending on question type
-    switch (question.input.type) {
-
-      // Multiple options
-      case 'checkbox':
-      case 'radio':
-        var input = '<div class="inline fields">'
-        for (j = 0; j < question.input.options.length; j++) {
-          var option = question.input.options[j]
-          var type = question.input.type
-
-          if (!!responses[i] && responses[i].indexOf(option.label) !== -1) {
-            var checked = 'checked'
-          } else {
-            var checked = ''
-          }
-
-          input += '<div class="field">' +
-            '<div class="ui checkbox ' + type + '">' +
-            '<input type="' + type + '" ' + checked + ' name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + option.label + '">' +
-            '<label for="question_' + i + '_' + j + '">' + option.label + '</label>' +
-            '</div>' +
-            '</div>'
-        }
-        input += '</div>'
-        break
-
-        // Set of inputs (composed response)
-      case 'inputs':
-        var input = '<table>'
-        for (j = 0; j < question.input.options.length; j++) {
-          var option = question.input.options[j]
-          var type = 'checkbox'
-
-          if (!!responses[i]) {
-            var value = responses[i][j]
-          } else {
-            var value = ''
-          }
-
-          input += '<tr>' +
-            '<td><label for="question_' + i + '_' + j + '">' + option.label + '</label></td>' +
-            '<td width="15px"></td>' +
-            '<td><div class="ui input">' +
-            '<input type="text" placeholder="Response..." name="question_' + i + '" id="question_' + i + '_' + j + '" value="' + value + '" />' +
-            '</div></td>' +
-            '</tr>' +
-            '<tr><td colspan="3">&nbsp;</tr></tr>'
-        }
-        input += '</table>'
-        break
-
-        // Default: simple input
-      default:
-        if (!!responses[i]) {
-          var value = responses[i]
-        } else {
-          var value = ''
-        }
-        var input = '<div class="ui input fluid">' +
-          '<input type="text" placeholder="Response..." name="question_' + i + '" value="' + value + '" />' +
-          '</div>'
-    }
-
-    $question = $('<div id="question-' + i + '" class="ui card" style="width: 100%;">' +
-      '<div class="content">' +
-      '<div class="header">' + question.problem + '</div>' +
-      '</div>' +
-      '<div class="content">' +
-      input +
-      '</div>' +
-      '</div>'
-    ).css('display', 'none')
-
-    $('#quiz-form')
-      .append($question)
-
-    // Show current question
-    $('#quiz-form')
-      .find('#question-' + currentQuestion)
-      .css('display', 'block')
-
-    // Update progress bar
-    $('#progress')
-      .css('width', (responseCount / questions.length * 100) + '%')
+    question.input = initQuestionInput(question.input)
+    viewHandler.appendQuestionToQuizForm(question, responses[i], i)
   }
 
-  // Add button to submit response
-  $('#quiz')
-    .append('<button id="submit-response" class="ui primary button">Submit response</button>')
+  viewHandler.showQuestion(currentQuestion)
+  viewHandler.updateProgressBar(responseCount, questions.length)
+  viewHandler.addButtonToSubmitResponse()
 
   // Is case all questions have been responded
   if (responseCount === questions.length) {
-    $('#submit-response').css('display', 'none')
-    $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-    $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+      viewHandler.showPrintResponsesButton()
   }
 
   // Add a reset button that will redirect to quiz start
-  $resetButton = $('<button class="ui button negative">Reset</button>')
-  $resetButton.on('click', function() {
-    localStorage.removeItem('quiz')
-    location.reload();
-  })
-  $('#quiz').append($resetButton)
+  viewHandler.addResetButton()
 
   // Actions on every response submission
   $('#submit-response').on('click', function() {
@@ -203,8 +266,7 @@ $.ajax({
     }
 
     // Update progress bar
-    $('#progress')
-      .css('width', (responseCount / questions.length * 100) + '%')
+    viewHandler.updateProgressBar(responseCount, questions.length)
 
     // Check if question had a valid answer
     isQuestionAnswered = true
@@ -221,22 +283,17 @@ $.ajax({
 
     if (!isQuestionAnswered) {
       // Alert user of missing response
-      alert('You must give a response')
+      viewHandler.showModalMessage('You must give a response')
     } else {
 
       // Display next question
-      $('#quiz-form')
-        .find('#question-' + currentQuestion).css('display', 'none')
+      viewHandler.hideQuestion(currentQuestion)
       currentQuestion = currentQuestion + 1
-
-      $('#quiz-form')
-        .find('#question-' + currentQuestion).css('display', 'block')
+      viewHandler.showQuestion(currentQuestion)
 
       // If it was the las question, display final message
       if (responseCount === questions.length) {
-        $('#submit-response').css('display', 'none')
-        $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-        $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
+        viewHandler.showPrintResponsesButton()
       }
     }
 
@@ -247,3 +304,14 @@ $.ajax({
     localStorage.setItem('quiz', JSON.stringify(quizData))
   })
 })
+
+const initQuestionInput = (questionInput) => {
+    if (questionInput === undefined) {
+        questionInput = {
+          type: 'input'
+        }
+    }
+    
+    return questionInput
+}
+
