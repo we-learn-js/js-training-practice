@@ -246,90 +246,62 @@ $.ajax({
         responses[currentQuestion] = $inputs.val()
     }
 
-    // Add button to submit response
-    $('#quiz')
-      .append('<button id="submit-response" class="ui primary button">Submit response</button>')
-
-    // Is case all questions have been responded
-    if (responseCount === questions.length) {
-      $('#submit-response').css('display', 'none')
-      $('#quiz').append('<div>Thank you for your responses.<br /><br /> </div>')
-      $('#quiz').append('<button class="ui primary button" onclick="window.print()" >Print responses</button>')
-    }
-
-    // Add a reset button that will redirect to quiz start
-    const $resetButton = $('<button class="ui button negative">Reset</button>')
-    $resetButton.on('click', function() {
-      localStorage.removeItem('quiz')
-      location.reload();
-    })
-    $('#quiz').append($resetButton)
-
-    // Actions on every response submission
-    $('#submit-response').on('click', function() {
-      const $inputs = $(`[name^=question_${currentQuestion}`)
-      const question = questions[currentQuestion]
-      let response = responses[currentQuestion]
-
-      // Behavior for each question type to add response to array of responses
+    // Set the current responses counter
+    var responseCount = 0
+    for (i = 0; i < responses.length; i++) {
+      question = questions[i]
       switch (question.input.type) {
         case 'checkbox':
         case 'radio':
-          response = []
-          $(`[name=${$inputs.attr('name')}]:checked`).each(function(i, input) {
-            response.push(input.value)
-          })
-          response = response.length ? response : null
-          break
         case 'inputs':
-          response = []
-          $inputs.each(function(i, input) {
-            response.push(input.value)
-          })
+          if (!!responses[i] && !!responses[i].join('')) {
+            responseCount++
+          }
           break
         default:
-          response = $inputs.val()
+          if (!!responses[i]) {
+            responseCount++
+          }
       }
+    }
 
-      // Update progress bar
-      viewHandler.updateProgressBar(responseCount, questions.length)
+    // Update progress bar
+    viewHandler.updateProgressBar(responseCount, questions.length)
 
-      // Set the current responses counter
-      responses[currentQuestion] = response
-      let responseCount = 0
-      for (let i = 0; i < responses.length; i++) {
-        let question = questions[i]
-        let response = responses[i]
-        switch (question.input.type) {
-          case 'checkbox':
-          case 'radio':
-          case 'inputs':
-            responseCount += !!response && !!response.join('')
-            break
-          default:
-            responseCount += !!response
+    // Check if question had a valid answer
+    isQuestionAnswered = true
+    if (!responses[currentQuestion]) {
+      isQuestionAnswered = false
+    }
+    if (!!responses[currentQuestion] && !!responses[currentQuestion].length) {
+      for (j = 0; j < responses[currentQuestion].length; j++) {
+        if (!responses[currentQuestion][j]) {
+          isQuestionAnswered = false
         }
       }
+    }
 
-      if (!isQuestionAnswered) {
-        // Alert user of missing response
-        viewHandler.showModalMessage('You must give a response')
-      } else {
+    if (!isQuestionAnswered) {
+      // Alert user of missing response
+      viewHandler.showModalMessage('You must give a response')
+    } else {
 
-        // Display next question
-        viewHandler.hideQuestion(currentQuestion)
-        currentQuestion = currentQuestion + 1
-        viewHandler.showQuestion(currentQuestion)
-      }
+      // Display next question
+      viewHandler.hideQuestion(currentQuestion)
+      currentQuestion = currentQuestion + 1
+      viewHandler.showQuestion(currentQuestion)
 
       // If it was the las question, display final message
       if (responseCount === questions.length) {
         viewHandler.showPrintResponsesButton()
       }
+    }
 
-      // Save current state of the quiz
-      localStorage.setItem('quiz', JSON.stringify({responses, responseCount, currentQuestion}))
-    })
+    // Save current state of the quiz
+    quizData.responses = responses
+    quizData.responseCount = responseCount
+    quizData.currentQuestion = currentQuestion
+    localStorage.setItem('quiz', JSON.stringify(quizData))
   })
 })
 
